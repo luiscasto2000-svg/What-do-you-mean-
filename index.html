@@ -787,12 +787,18 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
 .patch-list li{list-style:none;padding-left:0}
 .patch-list b{color:var(--pk);font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:.95rem}
 
-/* ── STORIA MODE (V4) ── */
+/* ── STORIA MODE (V10 — Mappa stile Candy Crush con percorso zigzag) ── */
 .btn-story-home{background:linear-gradient(135deg,#00ff88,#00c8ff);color:#000;
   box-shadow:0 4px 24px rgba(0,255,136,.4)}
-.story-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+.story-overlay{position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%,rgba(155,48,255,.3) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 30% 100%,rgba(0,200,255,.2) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 70% 50%,rgba(255,45,120,.18) 0%,transparent 60%),
+    linear-gradient(180deg,#07001a 0%,#1a0050 100%);
+  backdrop-filter:blur(10px);
   z-index:615;display:none;flex-direction:column;align-items:center;
-  overflow-y:auto;padding:24px 18px 100px;animation:fin .25s ease}
+  overflow-y:auto;padding:24px 18px 120px;animation:fin .25s ease}
 .story-overlay.on{display:flex}
 .story-header{text-align:center;width:100%;max-width:520px;margin-bottom:18px}
 .story-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;
@@ -839,6 +845,71 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
 .story-end{background:rgba(15,0,48,.85);border:2px solid rgba(0,255,136,.4);
   border-radius:18px;padding:24px;text-align:center;width:100%;max-width:460px;margin-bottom:14px}
 .story-end-stars{font-size:3rem;letter-spacing:8px;margin:10px 0;animation:medalSpin 1s ease-out}
+
+/* ── MAPPA STORIA V10 stile Candy Crush ── */
+.story-map{position:relative;width:100%;max-width:440px;
+  /* altezza calcolata dinamicamente in JS */
+  background:transparent}
+.story-node{position:absolute;width:74px;height:74px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:transform .2s;
+  font-family:'Bebas Neue',sans-serif;
+  border:4px solid transparent;background-clip:padding-box;z-index:2}
+.story-node:active{transform:scale(.88)}
+.story-node-inner{width:100%;height:100%;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  position:relative;overflow:hidden}
+.story-node-inner::after{content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.35),transparent 60%);
+  pointer-events:none}
+.story-node .sn-num{font-size:1.6rem;color:#fff;font-weight:bold;line-height:1;
+  text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.story-node .sn-stars{display:flex;gap:1px;margin-top:1px;height:.7rem}
+.story-node .sn-stars span{font-size:.7rem;line-height:1}
+/* Stato: locked */
+.story-node.locked{cursor:not-allowed}
+.story-node.locked .story-node-inner{
+  background:linear-gradient(180deg,#3a2a55,#2a1a45);
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.4),inset 0 4px 0 rgba(255,255,255,.05)}
+.story-node.locked .sn-num{color:rgba(255,255,255,.3)}
+.story-node.locked::after{content:'🔒';position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:1.6rem;z-index:3;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.story-node.locked .sn-num,.story-node.locked .sn-stars{visibility:hidden}
+/* Stato: completed */
+.story-node.completed .story-node-inner{
+  background:linear-gradient(180deg,#34d399,#10b981);
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.3),inset 0 4px 0 rgba(255,255,255,.25),0 4px 16px rgba(0,255,136,.3)}
+/* Stato: next (current playable) */
+.story-node.next .story-node-inner{
+  background:linear-gradient(180deg,#ff2d78,#9b30ff);
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.3),inset 0 4px 0 rgba(255,255,255,.3),0 4px 24px rgba(255,45,120,.5);
+  animation:nodePulse 1.6s ease-in-out infinite}
+/* Stato: boss (livello finale di un capitolo, ogni 5) */
+.story-node.boss .story-node-inner{
+  background:linear-gradient(180deg,#ffcc00,#ff8800);
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,.3),inset 0 4px 0 rgba(255,255,255,.35),0 4px 24px rgba(255,204,0,.5)}
+.story-node.boss .sn-num{color:#000}
+.story-node.boss.locked .story-node-inner{
+  background:linear-gradient(180deg,#5a3a1a,#3a2a10)}
+.story-node.boss::before{content:'👑';position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+  font-size:1.4rem;z-index:4;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+.story-node.boss.locked::before{filter:grayscale(1) brightness(.5)}
+@keyframes nodePulse{
+  0%,100%{transform:scale(1);box-shadow:inset 0 -4px 0 rgba(0,0,0,.3),inset 0 4px 0 rgba(255,255,255,.3),0 4px 24px rgba(255,45,120,.5)}
+  50%{transform:scale(1.08);box-shadow:inset 0 -4px 0 rgba(0,0,0,.3),inset 0 4px 0 rgba(255,255,255,.3),0 4px 32px rgba(255,45,120,.9)}
+}
+/* Path SVG between nodes */
+.story-path{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.story-path path{fill:none;stroke:rgba(255,255,255,.18);stroke-width:6;stroke-dasharray:8 6;stroke-linecap:round}
+.story-path path.done{stroke:rgba(0,255,136,.5);stroke-dasharray:none}
+/* Chapter divider */
+.chap-divider{position:absolute;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:center;
+  z-index:1;pointer-events:none}
+.chap-divider .chap-pill{background:rgba(15,0,48,.85);border:1.5px solid rgba(155,48,255,.5);
+  border-radius:100px;padding:8px 18px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;
+  color:#fff;font-size:.85rem;backdrop-filter:blur(6px);box-shadow:0 4px 16px rgba(0,0,0,.5);
+  display:flex;align-items:center;gap:8px}
+.chap-divider .chap-pill .ce{font-size:1.2rem}
 
 /* ── LANGUAGE PICKER (V5) — overlay scelta lingua ── */
 .lang-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
@@ -1224,15 +1295,18 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   </div>
 </div>
 
-<!-- STORY OVERLAY -->
+<!-- STORY OVERLAY V10 - mappa stile Candy Crush -->
 <div id="STORY_OV" class="story-overlay">
   <div class="story-header">
-    <div class="story-title">📚 STORIA</div>
-    <div class="story-sub">impara con il maestro boccalone</div>
-    <div class="story-prog">⭐ <span id="STORY_PROG_TXT">0</span> / 60 stelle totali</div>
+    <div class="story-title">📚 LA TUA AVVENTURA</div>
+    <div class="story-sub">impara passo passo le lingue del mondo</div>
+    <div class="story-prog">⭐ <span id="STORY_PROG_TXT">0</span></div>
   </div>
-  <div id="STORY_CHAPTERS_LIST" style="width:100%;max-width:520px"></div>
-  <button class="story-close" onclick="closeStory()">CHIUDI</button>
+  <div id="STORY_MAP_CONTAINER" style="position:relative;width:100%;max-width:440px;margin-bottom:20px">
+    <svg id="STORY_PATH_SVG" class="story-path"></svg>
+    <div id="STORY_MAP" class="story-map"></div>
+  </div>
+  <button class="story-close" onclick="closeStory()" style="position:fixed;bottom:104px;left:50%;transform:translateX(-50%);width:auto;max-width:200px;padding:10px 20px;background:rgba(15,0,48,.85);border:1.5px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);z-index:5">← CHIUDI MAPPA</button>
 </div>
 
 <!-- LOADING -->
@@ -4417,44 +4491,127 @@ window.STORY_CHAPTERS=STORY_CHAPTERS_V5;
 // Helper sicuro per accedere a STORY_CHAPTERS in tutte le funzioni
 function _CHAP(){return window.STORY_CHAPTERS||STORY_CHAPTERS_V5;}
 
-// Sovrascrivo renderStoryMap per usare V5 chapters (mix lingue automatico)
+// Sovrascrivo renderStoryMap V10 - mappa Candy Crush con percorso zigzag
 renderStoryMap=function(){
   const CHAPS=_CHAP();
-  document.getElementById('STORY_PROG_TXT').textContent=getTotalStars()+' / '+(CHAPS.length*5*3);
-  const list=document.getElementById('STORY_CHAPTERS_LIST');
-  list.innerHTML=CHAPS.map((c,ci)=>{
-    const chapUnlocked=isLevelUnlocked(ci,0);
-    const cls='story-chapter'+(chapUnlocked?'':' locked');
-    const levelsHtml=Array.from({length:c.len},(_,li)=>{
-      const stars=getStarsFor(ci,li);
-      const unlocked=isLevelUnlocked(ci,li);
-      const next=unlocked&&stars===0;
-      const completed=stars>0;
-      let cl='story-level';
-      if(!unlocked)cl+=' locked';
-      if(completed)cl+=' completed';
-      if(next&&!completed)cl+=' next';
-      const starsHtml=stars>0?'⭐'.repeat(stars)+'☆'.repeat(3-stars):'☆☆☆';
-      return `<div class="${cl}" onclick="${unlocked?`startStoryLevel(${ci},${li})`:'sfxFail()'}">
-        <div class="story-level-num">${li+1}</div>
-        <div class="story-level-stars" style="color:${stars>0?'#ffcc00':'#7060a0'};font-size:.65rem">${starsHtml}</div>
-      </div>`;
-    }).join('');
-    // Mostro le bandiere del langPool come "ingredienti" del capitolo
-    const flags=(c.langPool||[]).map(t=>LANGS.find(l=>l.t===t)?.f||'').join('');
-    const diffStars='🔥'.repeat(Math.min(c.difficulty,5));
-    return `<div class="${cls}">
-      <div class="story-chap-head">
-        <div class="story-chap-emoji">${c.emoji}</div>
-        <div class="story-chap-info">
-          <div class="story-chap-title">CAP. ${ci+1} · ${c.title}</div>
-          <div class="story-chap-sub">${c.sub} · ${diffStars}</div>
-        </div>
-        <div class="story-chap-flag" style="font-size:1rem;letter-spacing:1px">${flags}</div>
+  const totalLevels=CHAPS.reduce((sum,c)=>sum+c.len,0); // 8*5 = 40
+  const totalStars=totalLevels*3; // 120
+  const got=getTotalStars();
+  document.getElementById('STORY_PROG_TXT').textContent=got+' / '+totalStars;
+
+  const map=document.getElementById('STORY_MAP');
+  const svg=document.getElementById('STORY_PATH_SVG');
+  if(!map||!svg)return;
+
+  // Layout config
+  const NODE_SIZE=74;
+  const NODE_GAP_Y=110; // distanza verticale tra i nodi
+  const MARGIN_X=20;
+  const CHAP_GAP=70; // spazio extra alla fine di ogni capitolo (per il divider)
+  const containerW=Math.min(440,window.innerWidth-36);
+
+  // Posizioni X alternate (zigzag) — 4 colonne possibili
+  const cols=[0.20, 0.40, 0.60, 0.80]; // percentuali della larghezza
+  // Sequence che zigzaga: usa pattern come Candy Crush
+  const colSeq=[0.25, 0.5, 0.75, 0.5, 0.25, 0.5, 0.75, 0.5, 0.25, 0.5];
+
+  // Calcola posizioni di tutti i 40 livelli
+  const nodes=[];
+  let globalIdx=0;
+  let yCursor=20;
+  CHAPS.forEach((c,ci)=>{
+    for(let li=0;li<c.len;li++){
+      // Posizione X: zigzag
+      const colIdx=globalIdx%colSeq.length;
+      const xPct=colSeq[colIdx];
+      const x=xPct*containerW-NODE_SIZE/2;
+      const y=yCursor;
+      nodes.push({ci,li,x,y,globalIdx,boss:li===c.len-1,c});
+      yCursor+=NODE_GAP_Y;
+      globalIdx++;
+    }
+    // Spazio extra dopo ogni capitolo
+    yCursor+=CHAP_GAP;
+  });
+
+  const totalH=yCursor+40;
+  map.style.height=totalH+'px';
+  svg.style.height=totalH+'px';
+  svg.setAttribute('viewBox',`0 0 ${containerW} ${totalH}`);
+
+  // Disegna path SVG che collega i nodi
+  let pathD='';
+  let pathDoneD='';
+  for(let i=0;i<nodes.length-1;i++){
+    const n=nodes[i],n2=nodes[i+1];
+    const x1=n.x+NODE_SIZE/2,y1=n.y+NODE_SIZE/2;
+    const x2=n2.x+NODE_SIZE/2,y2=n2.y+NODE_SIZE/2;
+    // Curva bezier morbida
+    const segment=`M${x1} ${y1} C ${x1} ${y1+40}, ${x2} ${y2-40}, ${x2} ${y2}`;
+    pathD+=segment+' ';
+    // Done se i due nodi hanno entrambi stelle (completed)
+    const s1=getStarsFor(n.ci,n.li),s2=getStarsFor(n2.ci,n2.li);
+    if(s1>0&&s2>0)pathDoneD+=segment+' ';
+  }
+  svg.innerHTML=`
+    <path d="${pathD}" />
+    <path d="${pathDoneD}" class="done"/>
+  `;
+
+  // Render dei nodi
+  map.innerHTML=nodes.map(n=>{
+    const stars=getStarsFor(n.ci,n.li);
+    const unlocked=isLevelUnlocked(n.ci,n.li);
+    const completed=stars>0;
+    const next=unlocked&&!completed;
+    let cls='story-node';
+    if(!unlocked)cls+=' locked';
+    else if(completed)cls+=' completed';
+    if(next)cls+=' next';
+    if(n.boss)cls+=' boss';
+    const starsHtml=Array.from({length:3},(_,si)=>
+      `<span style="color:${si<stars?'#ffcc00':'rgba(255,255,255,.25)'}">${si<stars?'★':'☆'}</span>`
+    ).join('');
+    const onClick=unlocked?`startStoryLevel(${n.ci},${n.li})`:'sfxFail()';
+    return `<div class="${cls}" style="left:${n.x}px;top:${n.y}px" onclick="${onClick}">
+      <div class="story-node-inner">
+        <span class="sn-num">${n.globalIdx+1}</span>
+        <div class="sn-stars">${starsHtml}</div>
       </div>
-      <div class="story-levels">${levelsHtml}</div>
     </div>`;
   }).join('');
+
+  // Aggiungi i chapter divider tra capitoli (etichette flottanti)
+  let dividerHtml='';
+  let yDiv=20-NODE_GAP_Y+NODE_SIZE; // sopra il primo
+  CHAPS.forEach((c,ci)=>{
+    // Posiziona il divider INIZIO capitolo (sopra il primo nodo del capitolo)
+    const firstNode=nodes.find(n=>n.ci===ci&&n.li===0);
+    if(firstNode){
+      const flags=(c.langPool||[]).map(t=>LANGS.find(l=>l.t===t)?.f||'').slice(0,4).join('');
+      const diffStars='🔥'.repeat(Math.min(c.difficulty,5));
+      const top=firstNode.y-50;
+      dividerHtml+=`<div class="chap-divider" style="top:${top}px">
+        <div class="chap-pill">
+          <span class="ce">${c.emoji}</span>
+          <span>CAP.${ci+1} · ${c.title}</span>
+          <span style="opacity:.7;font-size:.7rem">${flags} ${diffStars}</span>
+        </div>
+      </div>`;
+    }
+  });
+  map.insertAdjacentHTML('beforeend',dividerHtml);
+
+  // Auto-scroll al primo livello giocabile (next)
+  setTimeout(()=>{
+    const nextNode=document.querySelector('.story-node.next');
+    if(nextNode){
+      const ov=document.getElementById('STORY_OV');
+      const rect=nextNode.getBoundingClientRect();
+      const containerRect=ov.getBoundingClientRect();
+      ov.scrollTop=ov.scrollTop+rect.top-containerRect.top-window.innerHeight/3;
+    }
+  },150);
 };
 
 // openStory ora apre DIRETTAMENTE — no scelta lingua, mix automatico
@@ -4714,15 +4871,22 @@ function pvpStartCurrentRound(){
 const _origNextForPvpV6=nextOrSummary;
 nextOrSummary=function(){
   if(G.pvp&&_pvp&&_pvp.mode==='create'){
+    // Salva score corrente del round
     _pvp.cur++;
     if(_pvp.cur>=PVP_ROUNDS){
+      // Vai a Home prima di mostrare il finished
+      go('S0');
       pvpCreateFinished();
       return;
     }
-    // Torna a pick screen per il prossimo round
+    // Torna a Home pulita prima di mostrare il pick screen
     G.round++;
-    document.getElementById('PVP_OV').classList.add('on');
-    pvpShowPickScreen(_pvp.cur);
+    go('S0');
+    // Piccolo delay per evitare race condition con lo S5 che si chiude
+    setTimeout(()=>{
+      document.getElementById('PVP_OV').classList.add('on');
+      pvpShowPickScreen(_pvp.cur);
+    },80);
     return;
   }
   return _origNextForPvpV6();
