@@ -1,0 +1,12 @@
+node_modules
+android
+ios
+.git
+.gitignore
+.capignore
+package-lock.json
+patch-db.ps1
+repair-encoding.ps1
+*.bak
+icons/generate-icons.html
+icons/icon-source.svg

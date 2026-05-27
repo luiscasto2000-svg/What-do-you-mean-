@@ -1,0 +1,29 @@
+{
+  "name": "whatdoyoumean-app",
+  "version": "1.0.0",
+  "description": "What Do You Mean? — Party game di pronuncia linguistica. PWA + app Android via Capacitor.",
+  "main": "sw.js",
+  "scripts": {
+    "build": "node build.js",
+    "sync": "npm run build && npx cap sync android",
+    "open:android": "npx cap open android",
+    "android": "npm run sync && npm run open:android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luiscasto2000-svg/What-do-you-mean-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/luiscasto2000-svg/What-do-you-mean-/issues"
+  },
+  "homepage": "https://github.com/luiscasto2000-svg/What-do-you-mean-#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/cli": "^8.3.4",
+    "@capacitor/core": "^8.3.4"
+  }
+}

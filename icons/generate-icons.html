@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Generatore icone — What Do You Mean?</title>
+<style>
+  body{font-family:system-ui,sans-serif;background:#07001a;color:#eeddff;
+       padding:32px;display:flex;flex-direction:column;align-items:center;gap:20px;min-height:100vh;margin:0}
+  h1{color:#ff2d78;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;margin:0;font-size:1.8rem;text-align:center}
+  p{color:#7060a0;max-width:520px;text-align:center;line-height:1.6;font-size:.95rem}
+  button{background:linear-gradient(135deg,#ff2d78,#9b30ff);color:#fff;border:none;
+         padding:14px 28px;border-radius:12px;font-size:1rem;cursor:pointer;font-weight:700;
+         box-shadow:0 4px 24px rgba(255,45,120,.4)}
+  button:hover{transform:translateY(-1px)}
+  .row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+  .preview{background:rgba(255,255,255,.04);border:1px solid rgba(155,48,255,.25);
+           border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  canvas{border-radius:12px}
+  .lbl{font-size:.75rem;color:#7060a0;letter-spacing:1px;text-transform:uppercase}
+  code{background:rgba(155,48,255,.15);padding:2px 8px;border-radius:6px;color:#ffcc00}
+</style>
+</head>
+<body>
+<h1>🎨 Generatore icone PWA</h1>
+<p>Clicca il bottone per generare e scaricare le 3 icone PNG dell'app, partendo da <code>icon-source.svg</code>.<br>
+Poi sposta i file scaricati in questa stessa cartella <code>icons/</code>.</p>
+
+<button id="GEN">⬇️ GENERA E SCARICA LE 3 ICONE</button>
+
+<div class="row" id="OUT"></div>
+
+<script>
+const SIZES = [
+  {name:'icon-192.png', size:192, padding:0},
+  {name:'icon-512.png', size:512, padding:0},
+  {name:'icon-512-maskable.png', size:512, padding:96} // safe zone per Android maskable
+];
+
+document.getElementById('GEN').addEventListener('click', async () => {
+  const svgRes = await fetch('icon-source.svg');
+  const svgText = await svgRes.text();
+  const blob = new Blob([svgText], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  await new Promise((res, rej) => {
+    img.onload = res;
+    img.onerror = rej;
+    img.src = url;
+  });
+  const out = document.getElementById('OUT');
+  out.innerHTML = '';
+  for (const s of SIZES) {
+    const c = document.createElement('canvas');
+    c.width = s.size; c.height = s.size;
+    const ctx = c.getContext('2d');
+    // background nero per evitare alpha problems su Android
+    ctx.fillStyle = '#07001a';
+    ctx.fillRect(0, 0, s.size, s.size);
+    const drawSize = s.size - s.padding*2;
+    ctx.drawImage(img, s.padding, s.padding, drawSize, drawSize);
+    const dataUrl = c.toDataURL('image/png');
+    // download
+    const a = document.createElement('a');
+    a.href = dataUrl; a.download = s.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    // preview
+    const wrap = document.createElement('div'); wrap.className = 'preview';
+    const small = document.createElement('canvas');
+    small.width = 128; small.height = 128;
+    small.getContext('2d').drawImage(c, 0, 0, 128, 128);
+    wrap.appendChild(small);
+    const lbl = document.createElement('div'); lbl.className = 'lbl';
+    lbl.textContent = s.name + ' (' + s.size + 'px)';
+    wrap.appendChild(lbl);
+    out.appendChild(wrap);
+  }
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>

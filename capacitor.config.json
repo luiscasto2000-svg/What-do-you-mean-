@@ -1,0 +1,21 @@
+{
+  "appId": "com.luigicasto.wdym",
+  "appName": "What Do You Mean?",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#07001a",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    }
+  }
+}

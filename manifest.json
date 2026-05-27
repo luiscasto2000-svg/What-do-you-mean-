@@ -1,0 +1,42 @@
+{
+  "name": "What Do You Mean? — Il Gioco della Pronuncia",
+  "short_name": "What Do You Mean?",
+  "description": "Il party game più folle di pronuncia linguistica. 12 lingue, Maestro Boccalone come giudice. Da 1 a 8 giocatori.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07001a",
+  "theme_color": "#07001a",
+  "lang": "it",
+  "categories": ["games", "education", "entertainment"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Schermata iniziale"
+    }
+  ]
+}

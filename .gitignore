@@ -1,0 +1,6 @@
+node_modules/
+android/
+ios/
+www/
+*.bak
+.DS_Store

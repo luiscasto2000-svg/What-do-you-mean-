@@ -6,6 +6,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#07001a">
+<meta name="description" content="Il party game più folle di pronuncia linguistica. 12 lingue, Maestro Boccalone giudice. Da 1 a 8 giocatori. Si gioca offline.">
+<meta property="og:title" content="🌍 What Do You Mean? — Il gioco della pronuncia">
+<meta property="og:description" content="Riesci a pronunciare 'Otorinolaringoiatra' in cinese? Sfida il Maestro Boccalone. 12 lingue. Da 1 a 8 giocatori.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://luiscasto2000-svg.github.io/What-do-you-mean-/">
+<meta property="og:image" content="https://luiscasto2000-svg.github.io/What-do-you-mean-/icons/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+<!-- PWA -->
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7DZ3L2FB8L"></script>
 <script>
@@ -14,8 +25,10 @@
   gtag('js', new Date());
   gtag('config', 'G-7DZ3L2FB8L');
 </script>
-<title>🌍 What Do You Mean?</title>
+<title>🌍 What Do You Mean? — Il gioco della pronuncia</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- html2canvas per generare immagine podio condivisibile -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --bg:#07001a; --s1:#0f0030; --s2:#1a0050;
@@ -236,9 +249,672 @@ input::placeholder{color:var(--mt);opacity:.7}
 @keyframes bnc{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes fin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .fin{animation:fin .45s ease forwards}
+
+/* ═══════════════════════════════════════════════
+   V2 ADDITIONS — Single-Player, Share, Confetti, PWA
+   ═══════════════════════════════════════════════ */
+.btn-solo{background:linear-gradient(135deg,#ffcc00,#ff8800);color:#000;
+  box-shadow:0 4px 24px rgba(255,204,0,.4);position:relative;overflow:hidden}
+.btn-solo::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+  animation:shine 3s infinite}
+@keyframes shine{0%,40%{left:-100%}60%,100%{left:100%}}
+.btn-share{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;
+  box-shadow:0 4px 24px rgba(37,211,102,.45);position:relative}
+.btn-share::before{content:'';position:absolute;inset:-2px;border-radius:16px;
+  background:linear-gradient(135deg,#25D366,#9b30ff,#ff2d78,#25D366);
+  background-size:300% 300%;animation:gradBorder 4s linear infinite;z-index:-1;opacity:.5}
+@keyframes gradBorder{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.medal-box{background:linear-gradient(135deg,rgba(255,204,0,.18),rgba(155,48,255,.12));
+  border:2px solid rgba(255,204,0,.5);border-radius:var(--r);padding:24px 20px;
+  text-align:center;width:100%;max-width:460px;margin-bottom:14px;
+  box-shadow:0 0 60px rgba(255,204,0,.2)}
+.medal-emoji{font-size:5rem;line-height:1;margin-bottom:8px;display:block;
+  animation:medalSpin 1.2s ease-out}
+@keyframes medalSpin{0%{transform:scale(0) rotate(-180deg);opacity:0}
+  60%{transform:scale(1.15) rotate(10deg);opacity:1}
+  100%{transform:scale(1) rotate(0)}}
+.medal-tier{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;margin-bottom:8px}
+.medal-score{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:#fff;letter-spacing:2px;margin-bottom:4px}
+.medal-msg{font-size:.85rem;color:var(--tx);line-height:1.6;font-style:italic;margin-top:14px}
+.medal-best{margin-top:14px;padding-top:14px;border-top:1px solid rgba(155,48,255,.2);
+  font-size:.75rem;color:var(--mt);letter-spacing:1px}
+.medal-best b{color:var(--gd);font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px}
+.new-record{display:inline-block;background:linear-gradient(135deg,var(--pk),var(--gd));
+  color:#000;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:2px;
+  padding:4px 12px;border-radius:100px;margin-top:6px;animation:bnc 1s infinite}
+.share-overlay{position:fixed;inset:0;background:rgba(7,0,26,.95);backdrop-filter:blur(8px);
+  z-index:600;display:none;flex-direction:column;align-items:center;justify-content:flex-start;
+  overflow-y:auto;padding:24px 18px;animation:fin .25s ease}
+.share-overlay.on{display:flex}
+.share-card{background:rgba(15,0,48,.85);border:1.5px solid rgba(155,48,255,.4);
+  border-radius:18px;padding:18px;width:100%;max-width:460px;margin-bottom:14px}
+.share-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--pk);
+  letter-spacing:2px;text-align:center;margin-bottom:6px}
+.share-sub{font-size:.7rem;color:var(--mt);letter-spacing:2px;text-transform:uppercase;
+  text-align:center;margin-bottom:14px}
+.share-preview{width:100%;border-radius:14px;border:1px solid rgba(155,48,255,.3);
+  overflow:hidden;background:#07001a;margin-bottom:12px;min-height:200px;
+  display:flex;align-items:center;justify-content:center}
+.share-preview img{width:100%;display:block}
+.share-preview .ldot{color:var(--mt);font-size:.8rem;padding:30px}
+.share-btns{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%}
+.sbtn{display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 10px;border:none;border-radius:12px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;color:#fff;
+  transition:transform .12s}
+.sbtn:active{transform:scale(.94)}
+.sb-wa{background:linear-gradient(135deg,#25D366,#128C7E)}
+.sb-ig{background:linear-gradient(135deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)}
+.sb-tg{background:linear-gradient(135deg,#229ED9,#0088cc)}
+.sb-x{background:linear-gradient(135deg,#000,#222)}
+.sb-dl{background:rgba(255,255,255,.08);border:1px solid rgba(155,48,255,.3);grid-column:span 2}
+.sb-cp{background:rgba(155,48,255,.15);border:1px solid rgba(155,48,255,.4);grid-column:span 2}
+.share-close{width:100%;padding:14px;border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.05);color:var(--mt);border-radius:12px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;margin-top:8px}
+#PODIUM_SNAP{position:fixed;left:-9999px;top:0;width:1080px;height:1920px;
+  background:linear-gradient(180deg,#07001a 0%,#1a0050 50%,#0f0030 100%);
+  padding:80px 60px;color:#eeddff;font-family:'DM Sans',sans-serif;box-sizing:border-box;
+  display:flex;flex-direction:column;align-items:center}
+#PODIUM_SNAP .snap-logo{font-family:'Bebas Neue',sans-serif;font-size:64px;letter-spacing:6px;
+  background:linear-gradient(135deg,#ff2d78,#9b30ff,#00c8ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;text-align:center}
+#PODIUM_SNAP .snap-sub{font-size:24px;color:#9b30ff;letter-spacing:6px;text-transform:uppercase;
+  margin-bottom:60px;text-align:center}
+#PODIUM_SNAP .snap-globe{font-size:160px;margin:20px 0}
+#PODIUM_SNAP .snap-title{font-family:'Bebas Neue',sans-serif;font-size:140px;letter-spacing:8px;
+  background:linear-gradient(135deg,#ffcc00,#ff2d78);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:20px;text-align:center;line-height:1}
+#PODIUM_SNAP .snap-winner{font-family:'Bebas Neue',sans-serif;font-size:90px;color:#fff;
+  letter-spacing:6px;margin-bottom:20px;text-align:center}
+#PODIUM_SNAP .snap-score{font-family:'Bebas Neue',sans-serif;font-size:200px;color:#ffcc00;
+  letter-spacing:4px;line-height:1;margin:20px 0;text-shadow:0 0 60px rgba(255,204,0,.5)}
+#PODIUM_SNAP .snap-list{width:100%;display:flex;flex-direction:column;gap:24px;margin-top:40px}
+#PODIUM_SNAP .snap-item{display:flex;align-items:center;gap:30px;background:rgba(15,0,48,.7);
+  border-radius:24px;padding:30px 38px;border:2px solid rgba(155,48,255,.3)}
+#PODIUM_SNAP .snap-pos{font-family:'Bebas Neue',sans-serif;font-size:60px;color:#7060a0;width:80px}
+#PODIUM_SNAP .snap-name{flex:1;font-family:'Bebas Neue',sans-serif;font-size:54px;color:#fff;letter-spacing:3px}
+#PODIUM_SNAP .snap-pts{font-family:'Bebas Neue',sans-serif;font-size:80px;color:#ffcc00}
+#PODIUM_SNAP .snap-footer{margin-top:auto;padding-top:60px;text-align:center;width:100%}
+#PODIUM_SNAP .snap-cta{font-family:'Bebas Neue',sans-serif;font-size:48px;color:#ff2d78;letter-spacing:4px;margin-bottom:12px}
+#PODIUM_SNAP .snap-url{font-size:30px;color:#7060a0;letter-spacing:3px}
+#CONFETTI{position:fixed;inset:0;pointer-events:none;z-index:550;display:none}
+#CONFETTI.on{display:block}
+
+/* ── COIN BADGE (top-right indicator) ── */
+.coin-badge{position:fixed;top:14px;right:14px;z-index:200;
+  background:linear-gradient(135deg,#ffcc00,#ff8800);
+  border:1.5px solid rgba(255,255,255,.25);border-radius:100px;
+  padding:7px 14px 7px 11px;display:flex;align-items:center;gap:7px;
+  box-shadow:0 4px 16px rgba(255,204,0,.4);cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;color:#000;
+  transition:transform .15s}
+.coin-badge:active{transform:scale(.93)}
+.coin-badge .ci{font-size:1.1rem;line-height:1}
+.coin-badge .cv{font-size:.95rem;font-weight:700}
+.coin-pop{position:fixed;z-index:560;pointer-events:none;
+  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#ffcc00;
+  text-shadow:0 0 12px rgba(255,204,0,.8),0 0 24px rgba(255,204,0,.4);
+  letter-spacing:1px;animation:coinFly 1.4s ease-out forwards}
+@keyframes coinFly{
+  0%{transform:translate(-50%,0) scale(.5);opacity:0}
+  20%{transform:translate(-50%,-20px) scale(1.2);opacity:1}
+  100%{transform:translate(-50%,-90px) scale(.8);opacity:0}
+}
+
+/* ── SHOP ── */
+.shop-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+  z-index:610;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;padding:24px 18px;animation:fin .25s ease}
+.shop-overlay.on{display:flex}
+.shop-header{width:100%;max-width:520px;text-align:center;margin-bottom:18px}
+.shop-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#ffcc00,#ff8800,#ff2d78);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:6px}
+.shop-balance{display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,rgba(255,204,0,.2),rgba(255,136,0,.15));
+  border:1.5px solid rgba(255,204,0,.4);border-radius:100px;
+  padding:8px 18px;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;
+  color:#ffcc00;letter-spacing:2px;margin-bottom:18px}
+.shop-tabs{display:flex;gap:6px;margin-bottom:14px;width:100%;max-width:520px}
+.shop-tab{flex:1;padding:10px;background:rgba(15,0,48,.6);border:1px solid rgba(155,48,255,.25);
+  border-radius:12px;cursor:pointer;font-family:'Bebas Neue',sans-serif;
+  font-size:.85rem;letter-spacing:1.5px;color:var(--mt);text-align:center;
+  transition:all .2s}
+.shop-tab.on{color:#fff;background:rgba(255,45,120,.18);border-color:rgba(255,45,120,.5)}
+.shop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:520px;margin-bottom:14px}
+.shop-item{background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.25);
+  border-radius:14px;padding:12px 8px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative}
+.shop-item:active{transform:scale(.95)}
+.shop-item.owned{border-color:rgba(0,255,136,.5);background:rgba(0,255,136,.08)}
+.shop-item.equipped{border-color:rgba(255,45,120,.6);background:rgba(255,45,120,.12);
+  box-shadow:0 0 24px rgba(255,45,120,.25)}
+.shop-item.locked{opacity:.92}
+.shop-item.cantbuy{opacity:.5}
+.shop-emoji{font-size:2.5rem;line-height:1;margin-bottom:6px;display:block}
+.shop-name{font-size:.7rem;color:var(--tx);margin-bottom:4px;line-height:1.2;min-height:1.8em}
+.shop-price{display:inline-flex;align-items:center;gap:3px;
+  background:rgba(255,204,0,.15);border-radius:100px;padding:3px 9px;
+  font-family:'Bebas Neue',sans-serif;font-size:.8rem;color:#ffcc00;letter-spacing:1px}
+.shop-price.free{background:rgba(0,255,136,.15);color:#00ff88}
+.shop-tag{position:absolute;top:6px;right:6px;font-size:.55rem;letter-spacing:1.5px;
+  text-transform:uppercase;padding:2px 6px;border-radius:6px;
+  font-family:'Bebas Neue',sans-serif;font-weight:bold}
+.shop-tag.owned-tag{background:rgba(0,255,136,.25);color:#00ff88;border:1px solid rgba(0,255,136,.5)}
+.shop-tag.equipped-tag{background:rgba(255,45,120,.25);color:#ff2d78;border:1px solid rgba(255,45,120,.5)}
+.shop-close{width:100%;max-width:520px;padding:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+  color:var(--mt);border-radius:12px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;margin-top:8px}
+
+/* ── PVP CHALLENGE ── */
+.btn-pvp{background:linear-gradient(135deg,#9b30ff,#ff2d78);color:#fff;
+  box-shadow:0 4px 24px rgba(155,48,255,.45)}
+.pvp-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+  z-index:620;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;padding:24px 18px;animation:fin .25s ease}
+.pvp-overlay.on{display:flex}
+.pvp-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#9b30ff,#ff2d78,#00c8ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin:18px 0 4px;text-align:center}
+.pvp-sub{font-size:.7rem;color:var(--mt);letter-spacing:3px;text-transform:uppercase;
+  text-align:center;margin-bottom:18px}
+.pvp-card{background:rgba(15,0,48,.85);border:1.5px solid rgba(155,48,255,.4);
+  border-radius:18px;padding:20px;width:100%;max-width:460px;margin-bottom:14px}
+.pvp-link-box{background:rgba(0,0,0,.4);border:1.5px solid rgba(155,48,255,.3);
+  border-radius:10px;padding:10px 12px;font-family:monospace;font-size:.72rem;
+  color:var(--bl);word-break:break-all;margin-bottom:10px;line-height:1.5;max-height:80px;overflow:hidden}
+.pvp-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;
+  background:rgba(15,0,48,.7);border-radius:16px;padding:18px 14px;
+  border:2px solid rgba(155,48,255,.3);width:100%;max-width:460px;margin-bottom:14px}
+.pvp-vs-side{text-align:center}
+.pvp-vs-name{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;
+  color:var(--tx);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pvp-vs-score{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;letter-spacing:1px;
+  line-height:1}
+.pvp-vs-side.win .pvp-vs-score{color:var(--gd);text-shadow:0 0 24px rgba(255,204,0,.5)}
+.pvp-vs-side.lose .pvp-vs-score{color:var(--mt)}
+.pvp-vs-side.tie .pvp-vs-score{color:var(--bl)}
+.pvp-vs-mid{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--pu);letter-spacing:2px}
+.pvp-result-banner{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;
+  text-align:center;margin-bottom:10px;line-height:1.1}
+.pvp-result-banner.win{background:linear-gradient(135deg,var(--gd),var(--pk));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pvp-result-banner.lose{color:var(--mt)}
+.pvp-result-banner.tie{color:var(--bl)}
+
+/* ── PROFILE / LEADERBOARD / ONLINE — FASE C UI ── */
+.fc-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+  z-index:615;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;padding:24px 18px;animation:fin .25s ease}
+.fc-overlay.on{display:flex}
+.fc-header{width:100%;max-width:520px;text-align:center;margin-bottom:14px}
+.fc-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;
+  margin-bottom:4px}
+.fc-sub{font-size:.7rem;color:var(--mt);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.fc-close{width:100%;max-width:520px;padding:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+  color:var(--mt);border-radius:12px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;margin-top:8px}
+
+/* Profile */
+.btn-profile{background:linear-gradient(135deg,#00c8ff,#9b30ff);color:#fff;
+  box-shadow:0 4px 24px rgba(0,200,255,.45)}
+.prof-card{background:rgba(15,0,48,.85);border:1.5px solid rgba(155,48,255,.4);
+  border-radius:18px;padding:20px;width:100%;max-width:520px;margin-bottom:14px;text-align:center}
+.prof-avatar{font-size:5rem;line-height:1;margin-bottom:6px}
+.prof-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;color:#fff;margin-bottom:6px}
+.prof-edit{font-size:.7rem;color:var(--bl);cursor:pointer;text-decoration:underline}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;max-width:520px;margin-bottom:14px}
+.prof-stat{background:rgba(15,0,48,.7);border:1px solid rgba(155,48,255,.2);border-radius:12px;
+  padding:14px 12px;text-align:center}
+.prof-stat-v{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gd);letter-spacing:1px;line-height:1.1}
+.prof-stat-l{font-size:.65rem;color:var(--mt);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+.prof-rank{background:linear-gradient(135deg,rgba(255,45,120,.12),rgba(155,48,255,.1));
+  border:1.5px solid rgba(255,45,120,.4);border-radius:14px;padding:14px;text-align:center;
+  width:100%;max-width:520px;margin-bottom:14px}
+.prof-rank-v{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:#fff;letter-spacing:2px;line-height:1}
+.prof-rank-l{font-size:.7rem;color:var(--mt);letter-spacing:2px;text-transform:uppercase}
+
+/* Leaderboard */
+.btn-lb{background:linear-gradient(135deg,#ffcc00,#ff2d78);color:#000;
+  box-shadow:0 4px 24px rgba(255,204,0,.4)}
+.lb-tabs{display:flex;gap:6px;margin-bottom:12px;width:100%;max-width:520px}
+.lb-tab{flex:1;padding:9px;background:rgba(15,0,48,.6);border:1px solid rgba(155,48,255,.25);
+  border-radius:10px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:.78rem;
+  letter-spacing:1.5px;color:var(--mt);text-align:center}
+.lb-tab.on{color:#000;background:linear-gradient(135deg,#ffcc00,#ff8800);border-color:transparent}
+.lb-list{width:100%;max-width:520px;margin-bottom:10px}
+.lb-row{display:flex;align-items:center;gap:11px;background:rgba(15,0,48,.7);
+  border-radius:12px;padding:10px 13px;margin-bottom:7px;border:1px solid rgba(155,48,255,.18)}
+.lb-row.me{border-color:rgba(255,45,120,.5);background:rgba(255,45,120,.1);
+  box-shadow:0 0 20px rgba(255,45,120,.2)}
+.lb-row.top1{border-color:rgba(255,204,0,.5);background:rgba(255,204,0,.06)}
+.lb-row.top2{border-color:rgba(200,200,200,.4);background:rgba(200,200,200,.04)}
+.lb-row.top3{border-color:rgba(205,127,50,.4);background:rgba(205,127,50,.05)}
+.lb-rank{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--mt);width:42px;text-align:center}
+.lb-rank.top1{color:#ffd700;font-size:1.6rem}
+.lb-rank.top2{color:#c0c0c0;font-size:1.5rem}
+.lb-rank.top3{color:#cd7f32;font-size:1.5rem}
+.lb-av{font-size:1.5rem;line-height:1}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;color:#fff;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-meta{font-size:.6rem;color:var(--mt);margin-top:1px}
+.lb-score{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gd);letter-spacing:1px}
+.lb-fake-tag{position:absolute;top:14px;right:14px;font-size:.55rem;letter-spacing:1.5px;
+  background:rgba(255,45,120,.2);color:var(--pk);border:1px solid rgba(255,45,120,.5);
+  border-radius:6px;padding:3px 8px;font-family:'Bebas Neue',sans-serif}
+
+/* Match Online */
+.btn-online{background:linear-gradient(135deg,#00ff88,#00c8ff);color:#000;
+  box-shadow:0 4px 24px rgba(0,255,136,.4)}
+.online-card{background:rgba(15,0,48,.85);border:2px solid rgba(0,200,255,.4);
+  border-radius:18px;padding:24px 20px;width:100%;max-width:520px;text-align:center;margin-bottom:14px;
+  background-image:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.1) 0%,transparent 50%),
+                   radial-gradient(ellipse at 70% 80%,rgba(0,200,255,.1) 0%,transparent 50%)}
+.online-icon{font-size:4rem;margin-bottom:10px;animation:bnc 2s infinite}
+.online-msg{font-size:.85rem;color:var(--tx);line-height:1.8;margin:14px 0}
+.online-msg b{color:var(--bl);font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+.coming-soon{display:inline-block;background:linear-gradient(135deg,var(--pk),var(--pu));
+  color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:.85rem;
+  padding:6px 14px;border-radius:100px;margin-top:8px}
+
+/* ── BOTTOM NAVIGATION V7 — stile gaming app (5 tab, centrale rialzato FAB) ── */
+.bnav{position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:linear-gradient(180deg,rgba(26,0,80,.55) 0%,rgba(7,0,26,.95) 35%,rgba(15,0,48,1) 100%);
+  backdrop-filter:blur(24px);
+  border-top:2px solid rgba(155,48,255,.5);
+  display:flex;align-items:flex-end;justify-content:space-around;
+  padding:8px 6px 6px;padding-bottom:max(8px,env(safe-area-inset-bottom));
+  box-shadow:0 -16px 40px rgba(0,0,0,.7),0 -2px 0 rgba(255,255,255,.06) inset;
+  min-height:78px}
+.bnav-btn{flex:1;background:linear-gradient(180deg,rgba(155,48,255,.08),rgba(15,0,48,.6));
+  border:1.5px solid rgba(255,255,255,.08);
+  color:rgba(255,255,255,.85);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  padding:10px 4px 9px;border-radius:14px;transition:all .2s;
+  font-family:'Bebas Neue',sans-serif;letter-spacing:.8px;margin:0 3px;position:relative;
+  min-height:62px;max-width:80px}
+.bnav-btn:active{transform:scale(.92)}
+.bnav-btn .bi{font-size:1.7rem;line-height:1;transition:transform .25s;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+.bnav-btn .bl{font-size:.62rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:bold;
+  text-shadow:0 1px 2px rgba(0,0,0,.7);opacity:.95}
+.bnav-btn:hover .bi{transform:scale(1.15) translateY(-2px)}
+.bnav-btn::after{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  width:30px;height:3px;border-radius:2px;background:transparent;transition:background .2s}
+.bnav-btn.shop{color:#ffcc00}
+.bnav-btn.shop::after{background:linear-gradient(90deg,transparent,#ffcc00,transparent);opacity:.6}
+.bnav-btn.pvp{color:#ff2d78}
+.bnav-btn.pvp::after{background:linear-gradient(90deg,transparent,#ff2d78,transparent);opacity:.6}
+.bnav-btn.lb{color:#00c8ff}
+.bnav-btn.lb::after{background:linear-gradient(90deg,transparent,#00c8ff,transparent);opacity:.6}
+.bnav-btn.prof{color:#9b30ff}
+.bnav-btn.prof::after{background:linear-gradient(90deg,transparent,#9b30ff,transparent);opacity:.6}
+
+/* CENTRALE STORIA — FAB rialzato */
+.bnav-btn.story-fab{position:relative;
+  background:linear-gradient(180deg,#00ff88 0%,#00c8ff 100%);
+  border:4px solid #07001a;
+  color:#000;
+  width:74px;height:74px;flex:0 0 74px;max-width:74px;
+  border-radius:50%;
+  margin-top:-28px;margin-bottom:4px;
+  padding:0;
+  box-shadow:0 4px 24px rgba(0,255,136,.6),inset 0 -3px 0 rgba(0,0,0,.15),inset 0 3px 0 rgba(255,255,255,.3);
+  animation:fabBounce 3s ease-in-out infinite}
+@keyframes fabBounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+.bnav-btn.story-fab .bi{font-size:2.2rem;filter:drop-shadow(0 1px 0 rgba(0,0,0,.2))}
+.bnav-btn.story-fab .bl{position:absolute;bottom:-22px;font-size:.62rem;color:#00ff88;
+  text-shadow:0 0 8px rgba(0,255,136,.5),0 1px 2px rgba(0,0,0,.8);letter-spacing:1.5px;font-weight:bold;
+  background:rgba(7,0,26,.7);padding:2px 8px;border-radius:8px;border:1px solid rgba(0,255,136,.3)}
+.bnav-btn.story-fab::after{display:none}
+.bnav-btn.story-fab:active{transform:scale(.88);box-shadow:0 2px 12px rgba(0,255,136,.5)}
+
+/* Notification dot (per indicare novità) */
+.bnav-dot{position:absolute;top:6px;right:8px;width:9px;height:9px;border-radius:50%;
+  background:#ff2d78;border:1.5px solid rgba(7,0,26,.95);
+  box-shadow:0 0 8px rgba(255,45,120,.7);animation:dotPulse 1.5s ease-in-out infinite}
+.bnav-btn.story-fab .bnav-dot{top:0px;right:4px;width:14px;height:14px;
+  background:#ffcc00;border-color:#07001a;color:#000;font-size:.6rem;font-weight:bold;
+  display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif}
+@keyframes dotPulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 8px rgba(255,45,120,.7)}
+  50%{transform:scale(1.2);box-shadow:0 0 14px rgba(255,45,120,1)}
+}
+
+body{padding-bottom:104px} /* spazio per bottom nav più grande */
+
+/* ── PVP PICK SCREEN (V6) — scegli lingua + parola per ogni round ── */
+.pvp-pick-section{margin-bottom:14px}
+.pvp-pick-label{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:2px;
+  color:var(--gd);margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.pvp-pick-label .num{display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;background:linear-gradient(135deg,var(--pk),var(--pu));
+  color:#fff;border-radius:50%;font-size:.85rem;font-weight:bold}
+.pvp-langs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;max-width:520px;margin-bottom:8px}
+.pvp-lang-tile{background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.25);
+  border-radius:10px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:3px;transition:all .15s;aspect-ratio:1.4}
+.pvp-lang-tile:active{transform:scale(.94)}
+.pvp-lang-tile.on{border-color:var(--bl);background:rgba(0,200,255,.12);
+  box-shadow:0 0 16px rgba(0,200,255,.25)}
+.pvp-lang-tile.used{opacity:.3;pointer-events:none;text-decoration:line-through}
+.pvp-lang-tile .f{font-size:1.5rem;line-height:1}
+.pvp-lang-tile .n{font-family:'Bebas Neue',sans-serif;font-size:.62rem;color:#fff;letter-spacing:.5px;text-align:center}
+.pvp-words{display:flex;flex-direction:column;gap:7px;max-width:520px;margin-bottom:14px}
+.pvp-word-tile{background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.25);
+  border-radius:12px;padding:11px 14px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:10px}
+.pvp-word-tile:active{transform:scale(.97)}
+.pvp-word-tile.on{border-color:var(--pk);background:rgba(255,45,120,.12);
+  box-shadow:0 0 16px rgba(255,45,120,.25)}
+.pvp-word-tile .w-it{flex:1;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:#fff}
+.pvp-word-tile .w-hint{font-size:.7rem;color:var(--mt)}
+.pvp-pick-progress{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:14px}
+.pvp-pick-dot{width:10px;height:10px;border-radius:50%;background:rgba(155,48,255,.3)}
+.pvp-pick-dot.done{background:var(--gn)}
+.pvp-pick-dot.current{background:var(--pk);box-shadow:0 0 12px var(--pk);
+  animation:pulseNext 1.5s ease-in-out infinite}
+
+/* ── FAB REGOLE (tastino tondo che parla) ── */
+.rules-fab{position:fixed;top:14px;left:14px;z-index:200;
+  width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);
+  background:linear-gradient(135deg,#9b30ff,#ff2d78);color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  box-shadow:0 4px 16px rgba(155,48,255,.5);
+  animation:fabPulse 3s ease-in-out infinite;transition:transform .15s}
+.rules-fab:active{transform:scale(.88)}
+.rules-fab.speaking{animation:fabSpeak 0.8s ease-in-out infinite}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 4px 16px rgba(155,48,255,.5)}
+  50%{box-shadow:0 4px 28px rgba(155,48,255,.85),0 0 0 4px rgba(155,48,255,.15)}
+}
+@keyframes fabSpeak{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.12)}
+}
+.rules-fab .tip{position:absolute;left:54px;top:50%;transform:translateY(-50%);
+  background:rgba(15,0,48,.95);color:#fff;font-family:'Bebas Neue',sans-serif;
+  font-size:.72rem;letter-spacing:1.5px;padding:6px 11px;border-radius:8px;
+  border:1px solid rgba(155,48,255,.4);white-space:nowrap;pointer-events:none;
+  opacity:0;animation:tipShow 6s ease-in-out 1s forwards}
+@keyframes tipShow{
+  0%{opacity:0;transform:translate(-10px,-50%)}
+  15%,75%{opacity:1;transform:translate(0,-50%)}
+  100%{opacity:0;transform:translate(0,-50%)}
+}
+
+/* ── PATCH BANNER V2 ── */
+.patch-banner{position:fixed;inset:0;background:rgba(7,0,26,.95);backdrop-filter:blur(12px);
+  z-index:700;display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;animation:fin .4s ease}
+.patch-banner.on{display:flex}
+.patch-card{background:linear-gradient(180deg,rgba(15,0,48,.95),rgba(26,0,80,.95));
+  border:2px solid rgba(255,45,120,.5);border-radius:22px;padding:28px 22px;
+  max-width:460px;width:100%;text-align:center;
+  box-shadow:0 0 80px rgba(255,45,120,.4),inset 0 0 40px rgba(155,48,255,.1)}
+.patch-icon{font-size:5rem;margin-bottom:8px;animation:bnc 1.5s infinite}
+.patch-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:4px;
+  background:linear-gradient(135deg,#ff2d78,#9b30ff,#00c8ff,#ffcc00);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:4px;line-height:1}
+.patch-version{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gd);
+  letter-spacing:3px;margin-bottom:18px}
+.patch-list{text-align:left;font-size:.88rem;color:var(--tx);line-height:2;margin-bottom:18px}
+.patch-list li{list-style:none;padding-left:0}
+.patch-list b{color:var(--pk);font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:.95rem}
+
+/* ── STORIA MODE (V4) ── */
+.btn-story-home{background:linear-gradient(135deg,#00ff88,#00c8ff);color:#000;
+  box-shadow:0 4px 24px rgba(0,255,136,.4)}
+.story-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+  z-index:615;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;padding:24px 18px 100px;animation:fin .25s ease}
+.story-overlay.on{display:flex}
+.story-header{text-align:center;width:100%;max-width:520px;margin-bottom:18px}
+.story-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#00ff88,#00c8ff,#9b30ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:4px}
+.story-sub{font-size:.72rem;color:var(--mt);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.story-prog{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.4);
+  border-radius:100px;padding:6px 14px;
+  font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:#00ff88;letter-spacing:2px}
+.story-chapter{background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.25);
+  border-radius:18px;padding:16px;width:100%;max-width:520px;margin-bottom:12px}
+.story-chapter.locked{opacity:.55}
+.story-chap-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.story-chap-emoji{font-size:2rem;line-height:1}
+.story-chap-info{flex:1}
+.story-chap-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:#fff}
+.story-chap-sub{font-size:.65rem;color:var(--mt);letter-spacing:1.5px;margin-top:2px}
+.story-chap-flag{font-size:1.8rem;line-height:1}
+.story-levels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.story-level{aspect-ratio:1;background:rgba(26,0,80,.6);border:1.5px solid rgba(155,48,255,.3);
+  border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;transition:all .15s;position:relative;padding:4px}
+.story-level:active{transform:scale(.92)}
+.story-level.locked{opacity:.4;cursor:not-allowed}
+.story-level.locked::after{content:'🔒';position:absolute;font-size:1.4rem;line-height:1}
+.story-level.locked > *{visibility:hidden}
+.story-level.completed{border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.08)}
+.story-level.next{border-color:rgba(255,45,120,.5);background:rgba(255,45,120,.1);
+  box-shadow:0 0 16px rgba(255,45,120,.3);animation:pulseNext 2s ease-in-out infinite}
+@keyframes pulseNext{
+  0%,100%{box-shadow:0 0 16px rgba(255,45,120,.3)}
+  50%{box-shadow:0 0 24px rgba(255,45,120,.6)}
+}
+.story-level-num{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:#fff;line-height:1}
+.story-level-stars{display:flex;gap:1px;font-size:.7rem;line-height:1;height:.8rem}
+.story-close{width:100%;max-width:520px;padding:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+  color:var(--mt);border-radius:12px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px}
+
+/* Story end card (dopo round storia) */
+.story-end{background:rgba(15,0,48,.85);border:2px solid rgba(0,255,136,.4);
+  border-radius:18px;padding:24px;text-align:center;width:100%;max-width:460px;margin-bottom:14px}
+.story-end-stars{font-size:3rem;letter-spacing:8px;margin:10px 0;animation:medalSpin 1s ease-out}
+
+/* ── LANGUAGE PICKER (V5) — overlay scelta lingua ── */
+.lang-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+  z-index:625;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;padding:24px 18px;animation:fin .25s ease}
+.lang-overlay.on{display:flex}
+.lang-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%;max-width:520px;margin-bottom:14px}
+.lang-tile{aspect-ratio:1.2;background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.3);
+  border-radius:14px;padding:8px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;transition:all .15s}
+.lang-tile:active{transform:scale(.94)}
+.lang-tile.on{border-color:rgba(255,45,120,.6);background:rgba(255,45,120,.12);
+  box-shadow:0 0 20px rgba(255,45,120,.3)}
+.lang-tile.random{background:linear-gradient(135deg,rgba(255,204,0,.18),rgba(255,45,120,.15));
+  border-color:rgba(255,204,0,.5);grid-column:span 3}
+.lang-tile.random:not(.on){background:linear-gradient(135deg,rgba(255,204,0,.08),rgba(255,45,120,.06))}
+.lang-flag{font-size:2rem;line-height:1}
+.lang-name{font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:1px;color:#fff;text-align:center}
+.lang-tile.random .lang-name{font-size:1rem}
+
+/* ── PACK MONETE (V5) ── */
+.pack-card{display:flex;align-items:center;gap:14px;background:rgba(15,0,48,.7);
+  border:1.5px solid rgba(155,48,255,.25);border-radius:14px;padding:14px 16px;
+  margin-bottom:9px;position:relative;transition:all .15s;cursor:not-allowed}
+.pack-card.locked{opacity:.92}
+.pack-card.locked::before{content:'';position:absolute;inset:0;border-radius:14px;
+  background:rgba(7,0,26,.35);pointer-events:none}
+.pack-icon{font-size:2.4rem;line-height:1;filter:drop-shadow(0 0 8px rgba(255,204,0,.5))}
+.pack-info{flex:1;min-width:0}
+.pack-amount{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#ffcc00;letter-spacing:1.5px}
+.pack-bonus{font-size:.7rem;color:var(--gn);font-weight:bold}
+.pack-price{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#fff;letter-spacing:1px;text-align:right}
+.pack-locked-tag{position:absolute;top:8px;right:8px;background:rgba(7,0,26,.85);
+  border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:3px 8px;font-size:.55rem;
+  color:#fff;letter-spacing:1.5px;font-family:'Bebas Neue',sans-serif;z-index:2}
+.coming-info{background:rgba(155,48,255,.1);border:1px solid rgba(155,48,255,.3);
+  border-radius:12px;padding:12px;text-align:center;font-size:.78rem;color:var(--tx);line-height:1.7;
+  width:100%;max-width:520px;margin-bottom:14px}
+.coming-info b{color:var(--pk);font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+
+/* ── SKIN PREMIUM (V5) ── */
+.skin-row{background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.25);border-radius:14px;
+  padding:12px 14px;margin-bottom:9px;display:flex;align-items:center;gap:14px;position:relative}
+.skin-row.locked{opacity:.85}
+.skin-row.locked::after{content:'🔒';position:absolute;top:50%;right:14px;transform:translateY(-50%);
+  font-size:1.4rem}
+.skin-emoji{font-size:2.2rem;line-height:1}
+.skin-info{flex:1;min-width:0}
+.skin-name{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;letter-spacing:1.5px}
+.skin-req{font-size:.65rem;color:var(--mt);margin-top:2px;letter-spacing:1px}
+.skin-grade{font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:2px;padding:3px 9px;
+  border-radius:6px;background:rgba(255,204,0,.15);color:#ffcc00;margin-right:30px}
+.skin-grade.legendary{background:linear-gradient(135deg,rgba(255,45,120,.2),rgba(255,204,0,.2));color:#ffcc00}
+.skin-grade.epic{background:rgba(155,48,255,.15);color:var(--pu)}
+.skin-grade.rare{background:rgba(0,200,255,.15);color:var(--bl)}
+
+/* ── ONBOARDING / ACCOUNT (V5) ── */
+.onb-overlay{position:fixed;inset:0;background:linear-gradient(180deg,#07001a 0%,#1a0050 100%);
+  z-index:710;display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 18px;animation:fin .4s ease}
+.onb-overlay.on{display:flex}
+.onb-card{background:rgba(15,0,48,.85);border:1.5px solid rgba(155,48,255,.4);
+  border-radius:22px;padding:28px 24px;max-width:460px;width:100%;text-align:center}
+.onb-globe{font-size:5rem;margin-bottom:8px;animation:bnc 2s infinite}
+.onb-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#ff2d78,#9b30ff,#00c8ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:4px;line-height:1}
+.onb-sub{font-size:.75rem;color:var(--mt);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.onb-input{width:100%;background:rgba(26,0,80,.8);border:1.5px solid rgba(155,48,255,.3);
+  border-radius:12px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:.95rem;
+  padding:13px 14px;outline:none;-webkit-appearance:none;margin-bottom:10px;text-align:center}
+.onb-input:focus{border-color:var(--pk)}
+.onb-label{font-size:.7rem;color:var(--mt);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:6px;text-align:left}
+.onb-avs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.onb-av{aspect-ratio:1;background:rgba(26,0,80,.6);border:1.5px solid rgba(155,48,255,.25);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;cursor:pointer}
+.onb-av.on{border-color:var(--pk);background:rgba(255,45,120,.15)}
+.onb-note{font-size:.65rem;color:var(--mt);line-height:1.6;margin-top:6px;text-align:center}
+
+.install-bar{position:fixed;bottom:14px;left:14px;right:14px;max-width:460px;margin:0 auto;
+  background:linear-gradient(135deg,rgba(255,45,120,.95),rgba(155,48,255,.95));
+  backdrop-filter:blur(10px);border-radius:14px;padding:12px 14px;
+  display:none;align-items:center;gap:12px;z-index:400;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);animation:fin .4s ease}
+.install-bar.on{display:flex}
+.install-bar .ib-ico{font-size:1.8rem}
+.install-bar .ib-txt{flex:1;font-size:.78rem;color:#fff;line-height:1.4}
+.install-bar .ib-txt b{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:.95rem;display:block}
+.install-bar button{background:#fff;color:#9b30ff;border:none;border-radius:10px;
+  padding:8px 14px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;font-size:.85rem}
+.install-bar .ib-x{background:transparent;color:#fff;padding:6px 8px;font-size:1rem;opacity:.7}
 </style>
 </head>
 <body>
+
+<!-- COIN BADGE (top-right) -->
+<div id="COIN_BADGE" class="coin-badge" onclick="openShop()">
+  <span class="ci">🪙</span><span class="cv" id="COIN_VAL">0</span>
+</div>
+
+<!-- RULES FAB (top-left, parla con TTS) -->
+<button id="RULES_FAB" class="rules-fab" onclick="speakRules()" aria-label="Leggi le regole">
+  📖
+  <span class="tip" id="RULES_TIP">🔊 LEGGIMI!</span>
+</button>
+
+<!-- BOTTOM NAVIGATION V7 — 5 tab, centrale rialzato come FAB -->
+<nav class="bnav" id="BNAV">
+  <button class="bnav-btn shop" onclick="openShop()" aria-label="Negozio">
+    <span class="bi">🛍️</span><span class="bl">NEGOZIO</span>
+    <span class="bnav-dot" id="DOT_SHOP" style="display:none"></span>
+  </button>
+  <button class="bnav-btn pvp" onclick="pvpCreateStart()" aria-label="PvP">
+    <span class="bi">⚔️</span><span class="bl">PVP</span>
+  </button>
+  <button class="bnav-btn story-fab" onclick="openStory()" aria-label="Storia">
+    <span class="bi">📚</span><span class="bl">STORIA</span>
+    <span class="bnav-dot" id="DOT_STORY">!</span>
+  </button>
+  <button class="bnav-btn lb" onclick="openLeaderboard()" aria-label="Classifica">
+    <span class="bi">🏆</span><span class="bl">CLASSIFICA</span>
+  </button>
+  <button class="bnav-btn prof" onclick="openProfile()" aria-label="Profilo">
+    <span class="bi">👤</span><span class="bl">PROFILO</span>
+  </button>
+</nav>
+
+<!-- ONBOARDING (al primissimo avvio: nickname + avatar) -->
+<div id="ONB_OV" class="onb-overlay">
+  <div class="onb-card">
+    <div class="onb-globe">🌍</div>
+    <div class="onb-title">BENVENUTO!</div>
+    <div class="onb-sub">crea il tuo profilo</div>
+    <div class="onb-label">👤 Il tuo nickname</div>
+    <input type="text" id="ONB_NAME" class="onb-input" placeholder="Es: Mario" maxlength="16">
+    <div class="onb-label">🎭 Scegli il tuo avatar</div>
+    <div class="onb-avs" id="ONB_AVS"></div>
+    <button class="btn bp" onclick="onbFinish()">🚀 INIZIA A GIOCARE</button>
+    <div class="onb-note">
+      🔒 Per ora il profilo è salvato solo sul tuo telefono.<br>
+      Quando aprirai l'app vera potrai creare un <b style="color:var(--pk)">account reale</b> che ti segue ovunque.
+    </div>
+  </div>
+</div>
+
+<!-- LANGUAGE PICKER (per Solo + PVP) -->
+<div id="LANG_OV" class="lang-overlay">
+  <div class="story-header">
+    <div class="story-title" style="background:linear-gradient(135deg,#ffcc00,#ff2d78,#9b30ff);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🌐 SCEGLI LA LINGUA</div>
+    <div class="story-sub" id="LANG_SUB">in che lingua ti sfidi?</div>
+  </div>
+  <div class="lang-grid" id="LANG_GRID"></div>
+  <button class="story-close" onclick="closeLangPicker()">← Annulla</button>
+</div>
+
+<!-- PATCH BANNER V2.0 (al primo avvio dopo update) -->
+<div id="PATCH_BANNER" class="patch-banner">
+  <div class="patch-card">
+    <div class="patch-icon">🎉</div>
+    <div class="patch-title">PATCH V2.0</div>
+    <div class="patch-version">la grande aggiornata</div>
+    <ul class="patch-list">
+      <li>📚 <b>MODALITÀ STORIA</b> — 4 capitoli, 20 livelli con bot</li>
+      <li>⚔️ <b>PVP VIA LINK WHATSAPP</b> — sfida chiunque</li>
+      <li>🛍️ <b>NEGOZIO</b> — 20 avatar sbloccabili con monete</li>
+      <li>🏆 <b>CLASSIFICA</b> mondiale (in arrivo)</li>
+      <li>🪙 <b>MONETE</b> — guadagni ad ogni partita</li>
+      <li>👤 <b>PROFILO</b> personale con statistiche</li>
+      <li>🌟 <b>BOCCALONE</b> più permissivo (voti +15%)</li>
+      <li>🎯 <b>4 LIVELLI</b> di difficoltà progressiva</li>
+    </ul>
+    <button class="btn bp" onclick="closePatchBanner()">🚀 INIZIAMO!</button>
+  </div>
+</div>
+
+<!-- STORY OVERLAY -->
+<div id="STORY_OV" class="story-overlay">
+  <div class="story-header">
+    <div class="story-title">📚 STORIA</div>
+    <div class="story-sub">impara con il maestro boccalone</div>
+    <div class="story-prog">⭐ <span id="STORY_PROG_TXT">0</span> / 60 stelle totali</div>
+  </div>
+  <div id="STORY_CHAPTERS_LIST" style="width:100%;max-width:520px"></div>
+  <button class="story-close" onclick="closeStory()">CHIUDI</button>
+</div>
 
 <!-- LOADING -->
 <div id="LOV" class="lovo">
@@ -269,27 +945,31 @@ input::placeholder{color:var(--mt);opacity:.7}
   </div>
   <div class="card" style="background:rgba(255,204,0,.06);border-color:rgba(255,204,0,.2)">
     <div class="clbl" style="color:var(--gd)">📈 Livelli di difficoltà</div>
-    <div style="display:flex;flex-direction:column;gap:6px">
-      <div style="display:flex;align-items:center;gap:10px;font-size:.78rem">
-        <span class="diff-badge diff-1" style="padding:4px 10px;font-size:.75rem;margin:0">LV 1</span>
-        <span style="color:var(--mt)">1 parola sola — facile!</span>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:flex-start;gap:10px;font-size:.78rem">
+        <span class="diff-badge diff-1" style="padding:4px 10px;font-size:.72rem;margin:0;flex-shrink:0">⭐ LV 1</span>
+        <span style="color:var(--mt);line-height:1.45"><b style="color:#00ff88">FACILE</b> — 1 parola breve<br><span style="opacity:.7">es: Lumaca, Balena, Pinguino</span></span>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:.78rem">
-        <span class="diff-badge diff-2" style="padding:4px 10px;font-size:.75rem;margin:0">LV 2</span>
-        <span style="color:var(--mt)">2 parole — si fa più difficile</span>
+      <div style="display:flex;align-items:flex-start;gap:10px;font-size:.78rem">
+        <span class="diff-badge diff-2" style="padding:4px 10px;font-size:.72rem;margin:0;flex-shrink:0">⭐⭐ LV 2</span>
+        <span style="color:var(--mt);line-height:1.45"><b style="color:#00c8ff">MEDIO</b> — 1 parola tosta italiana<br><span style="opacity:.7">es: Otorinolaringoiatra, Gnocchi, Bruschetta</span></span>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:.78rem">
-        <span class="diff-badge diff-3" style="padding:4px 10px;font-size:.75rem;margin:0">LV 3</span>
-        <span style="color:var(--mt)">Frase breve — attento!</span>
+      <div style="display:flex;align-items:flex-start;gap:10px;font-size:.78rem">
+        <span class="diff-badge diff-3" style="padding:4px 10px;font-size:.72rem;margin:0;flex-shrink:0">🔥 LV 3</span>
+        <span style="color:var(--mt);line-height:1.45"><b style="color:#ffcc00">DIFFICILE</b> — 2 parole combinate<br><span style="opacity:.7">es: Gatto pazzo, Pizza volante, Robot romantico</span></span>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:.78rem">
-        <span class="diff-badge diff-4" style="padding:4px 10px;font-size:.75rem;margin:0">LV 4+</span>
-        <span style="color:var(--mt)">Frase lunga — buona fortuna 😅</span>
+      <div style="display:flex;align-items:flex-start;gap:10px;font-size:.78rem">
+        <span class="diff-badge diff-4" style="padding:4px 10px;font-size:.72rem;margin:0;flex-shrink:0">💀 LV 4</span>
+        <span style="color:var(--mt);line-height:1.45"><b style="color:#ff2d78">IMPOSSIBILE</b> — 2 parole in LINGUE TOSTE<br><span style="opacity:.7">solo cinese, giapponese, arabo, hindi, russo, coreano</span></span>
       </div>
     </div>
   </div>
-  <button class="btn bp" onclick="go('S1')">🎮 GIOCA ORA!</button>
-  <button class="btn bs" onclick="showRules()">📖 REGOLE (leggile... se hai coraggio)</button>
+  <button class="btn btn-story-home" onclick="openStory()">📚 STORIA — IMPARA CON BOCCALONE</button>
+  <button class="btn btn-solo" onclick="startSolo()">🎯 SFIDA BOCCALONE (DA SOLO)</button>
+  <button class="btn btn-online" onclick="openOnline()">🌐 MATCH ONLINE (giocatori random)</button>
+  <button class="btn bp" onclick="go('S1')">🎮 GIOCA IN GRUPPO (2-8)</button>
+  <button class="btn btn-profile" onclick="openProfile()">👤 PROFILO PERSONALE</button>
+  <button class="btn bs" onclick="showRules()">📖 REGOLE COMPLETE</button>
 </div>
 
 <!-- ═══════ SETUP ═══════ -->
@@ -328,10 +1008,10 @@ input::placeholder{color:var(--mt);opacity:.7}
   </div>
   <div style="width:100%;max-width:460px">
     <!-- FRASE PERSONALIZZATA — sopra tutto -->
-    <button class="btn bs" onclick="showCustomPhrase()" 
+    <button class="btn bs" onclick="showCustomPhrase()"
       style="border-color:rgba(155,48,255,.5);color:var(--pu);background:rgba(155,48,255,.08);
       display:flex;align-items:center;justify-content:center;gap:8px;font-size:.95rem">
-      ✍️ SCRIVI UNA FRASE TUA
+      ✍️ SCRIVI UNA FRASE TUA <span style="background:linear-gradient(135deg,#ffcc00,#ff8800);color:#000;padding:2px 8px;border-radius:100px;font-size:.75rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1px">250 🪙</span>
     </button>
     <div style="display:flex;align-items:center;gap:10px;margin:2px 0 10px">
       <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
@@ -442,9 +1122,272 @@ input::placeholder{color:var(--mt);opacity:.7}
   <div id="POD" class="pod"></div>
   <div id="FL" style="width:100%;max-width:460px;margin-bottom:14px"></div>
   <div id="WV2" class="vbox"></div>
-  <button class="btn bp" onclick="rivincita()" style="margin-top:8px;background:linear-gradient(135deg,#ff8800,var(--pk))">⚔️ RIVINCITA! (stessi giocatori)</button>
+  <div id="SOLO_BOX" style="display:none;width:100%;max-width:460px"></div>
+  <button class="btn btn-share" onclick="openShare()">📸 CONDIVIDI IL TRIONFO</button>
+  <button class="btn bp" onclick="rivincita()" style="margin-top:4px;background:linear-gradient(135deg,#ff8800,var(--pk))">⚔️ RIVINCITA! (stessi giocatori)</button>
   <button class="btn bp" onclick="newGame()">🎮 NUOVA PARTITA</button>
   <button class="btn bs" onclick="go('S0')">🏠 Menu</button>
+</div>
+
+<!-- ═══════ SHARE OVERLAY ═══════ -->
+<div id="SHARE_OV" class="share-overlay">
+  <div class="share-card">
+    <div class="share-title">📸 CONDIVIDI IL TRIONFO</div>
+    <div class="share-sub">il maestro boccalone certifica</div>
+    <div class="share-preview" id="SHARE_PREV"><div class="ldot">⏳ Generando l'immagine...</div></div>
+    <div class="share-btns">
+      <button class="sbtn sb-wa" onclick="shareTo('whatsapp')">💚 WhatsApp</button>
+      <button class="sbtn sb-ig" onclick="shareTo('instagram')">📷 IG Story</button>
+      <button class="sbtn sb-tg" onclick="shareTo('telegram')">✈️ Telegram</button>
+      <button class="sbtn sb-x" onclick="shareTo('x')">𝕏 Twitter/X</button>
+      <button class="sbtn sb-cp" onclick="shareTo('native')">📤 ALTRO / SISTEMA</button>
+      <button class="sbtn sb-dl" onclick="shareTo('download')">⬇️ SCARICA IMMAGINE</button>
+    </div>
+    <button class="share-close" onclick="closeShare()">CHIUDI</button>
+  </div>
+</div>
+
+<!-- ═══════ PODIUM SNAPSHOT (off-screen, per html2canvas) ═══════ -->
+<div id="PODIUM_SNAP"></div>
+
+<!-- ═══════ CONFETTI ═══════ -->
+<canvas id="CONFETTI"></canvas>
+
+<!-- ═══════ PROFILE OVERLAY (FASE C mockup) ═══════ -->
+<div id="PROFILE_OV" class="fc-overlay">
+  <div class="fc-header">
+    <div class="fc-title" style="background:linear-gradient(135deg,#00c8ff,#9b30ff);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">👤 PROFILO</div>
+    <div class="fc-sub">il tuo cv linguistico</div>
+  </div>
+  <div class="prof-card">
+    <div class="prof-avatar" id="PROF_AV">🦊</div>
+    <div class="prof-name" id="PROF_NAME">GIOCATORE</div>
+    <div class="prof-edit" onclick="editProfile()">✏️ Cambia nickname / avatar</div>
+  </div>
+  <div class="prof-stats">
+    <div class="prof-stat"><div class="prof-stat-v" id="PROF_COINS">0</div><div class="prof-stat-l">🪙 monete</div></div>
+    <div class="prof-stat"><div class="prof-stat-v" id="PROF_GAMES">0</div><div class="prof-stat-l">partite</div></div>
+    <div class="prof-stat"><div class="prof-stat-v" id="PROF_WINS">0</div><div class="prof-stat-l">vittorie</div></div>
+    <div class="prof-stat"><div class="prof-stat-v" id="PROF_BEST">0</div><div class="prof-stat-l">record solo</div></div>
+    <div class="prof-stat"><div class="prof-stat-v" id="PROF_PVP">0</div><div class="prof-stat-l">⚔️ sfide PvP</div></div>
+    <div class="prof-stat"><div class="prof-stat-v" id="PROF_UNLOCKED">0</div><div class="prof-stat-l">avatar sbloccati</div></div>
+  </div>
+  <div class="prof-rank">
+    <div class="prof-rank-v">🔒</div>
+    <div class="prof-rank-l">posizione mondiale<br><span style="color:var(--pk)">in arrivo con Firebase (Sessione 2)</span></div>
+  </div>
+  <button class="fc-close" onclick="closeProfile()">CHIUDI</button>
+</div>
+
+<!-- ═══════ LEADERBOARD OVERLAY (FASE C mockup) ═══════ -->
+<div id="LB_OV" class="fc-overlay">
+  <div class="fc-header" style="position:relative">
+    <div class="fc-title" style="background:linear-gradient(135deg,#ffcc00,#ff2d78);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🏆 CLASSIFICA MONDIALE</div>
+    <div class="fc-sub">i poliglotti più temibili del pianeta</div>
+    <span class="lb-fake-tag">DEMO · DATI FAKE</span>
+  </div>
+  <div class="lb-tabs">
+    <div class="lb-tab on" data-lb="world" onclick="lbTab('world')">🌍 MONDO</div>
+    <div class="lb-tab" data-lb="italy" onclick="lbTab('italy')">🇮🇹 ITALIA</div>
+    <div class="lb-tab" data-lb="friends" onclick="lbTab('friends')">👥 AMICI</div>
+  </div>
+  <div id="LB_LIST" class="lb-list"></div>
+  <div style="font-size:.7rem;color:var(--mt);text-align:center;max-width:460px;line-height:1.6;margin-bottom:10px">
+    🔒 La classifica live arriva con Firebase nella <b style="color:var(--pk)">Sessione 3</b>.<br>
+    Per ora vedi un esempio di come sarà.
+  </div>
+  <button class="fc-close" onclick="closeLeaderboard()">CHIUDI</button>
+</div>
+
+<!-- ═══════ ONLINE MATCH OVERLAY (FASE C mockup) ═══════ -->
+<div id="ONLINE_OV" class="fc-overlay">
+  <div class="fc-header">
+    <div class="fc-title" style="background:linear-gradient(135deg,#00ff88,#00c8ff);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🌐 MATCH ONLINE</div>
+    <div class="fc-sub">sfida giocatori random nel mondo</div>
+  </div>
+  <div class="online-card">
+    <div class="online-icon">🌎</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#fff;letter-spacing:2px;margin-bottom:6px">
+      MATCHMAKING REAL-TIME
+    </div>
+    <div class="online-msg">
+      Cerca un avversario <b>random nel mondo</b> con la tua stessa abilità.<br>
+      3 round in <b>diretta</b> via internet.<br>
+      Chi vince guadagna <b>+50 monete</b> 🪙 e <b>+100 XP</b>.<br><br>
+      Sfide private con amici via <b>numero di telefono</b> dalla rubrica.
+    </div>
+    <div class="coming-soon">🔧 IN ARRIVO · SESSIONE 4</div>
+  </div>
+  <div style="background:rgba(15,0,48,.7);border:1px solid rgba(155,48,255,.25);border-radius:14px;
+    padding:16px;width:100%;max-width:520px;margin-bottom:14px;font-size:.82rem;color:var(--tx);line-height:1.8">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gd);letter-spacing:2px;margin-bottom:8px">
+      ⚙️ COSA SARÀ POSSIBILE
+    </div>
+    🌍 Sfida <b>giocatori random</b> dal mondo intero<br>
+    📱 Sfida <b>contatti dalla rubrica</b> (chi ha l'app)<br>
+    📞 <b>Invita chi non ha l'app</b> via WhatsApp/SMS<br>
+    🏆 <b>Classifica</b> mondiale e nazionale<br>
+    💎 <b>Trofei</b> e achievement sbloccabili<br>
+    ⚡ <b>Notifiche</b> "Mario ti sfida"
+  </div>
+  <div style="font-size:.7rem;color:var(--mt);text-align:center;max-width:460px;line-height:1.7;margin-bottom:8px">
+    Intanto puoi sfidare amici col <b style="color:var(--pk)">PvP via link WhatsApp</b> — funziona già!
+  </div>
+  <button class="btn btn-pvp" style="max-width:520px" onclick="closeOnline();pvpCreateStart()">⚔️ SFIDA UN AMICO VIA LINK</button>
+  <button class="fc-close" onclick="closeOnline()">CHIUDI</button>
+</div>
+
+<!-- ═══════ PVP CHALLENGE OVERLAY ═══════ -->
+<div id="PVP_OV" class="pvp-overlay">
+  <!-- Stato CREATE: input nome challenger -->
+  <div id="PVP_CREATE" style="width:100%;max-width:460px;display:none">
+    <div style="text-align:center;font-size:3.5rem;margin-top:20px">⚔️</div>
+    <div class="pvp-title">SFIDA UN AMICO</div>
+    <div class="pvp-sub">via WhatsApp · 3 round · no server</div>
+    <div class="pvp-card">
+      <div class="clbl">Come funziona</div>
+      <div style="font-size:.82rem;color:var(--mt);line-height:1.9;margin-bottom:12px">
+        1. Scrivi il tuo nome<br>
+        2. Fai 3 pronunce (random)<br>
+        3. <b style="color:var(--tx)">Mandi il link su WhatsApp</b><br>
+        4. Il tuo amico apre il link, fa LE STESSE pronunce<br>
+        5. Vince chi prende più punti totali<br>
+        6. <b style="color:var(--gd)">Vinci → +30 monete 🪙</b>
+      </div>
+      <div class="clbl">Il tuo nome</div>
+      <input id="PVP_NAME" placeholder="Es: Mario" maxlength="16"
+        onkeydown="if(event.key==='Enter')pvpCreateConfirm()">
+    </div>
+    <button class="btn btn-pvp" onclick="pvpCreateConfirm()">🚀 INIZIA LA TUA SFIDA</button>
+    <button class="btn bs" onclick="closePvp()">← Annulla</button>
+  </div>
+
+  <!-- Stato PICK: scegli lingua + parola per il round corrente -->
+  <div id="PVP_PICK" style="width:100%;max-width:520px;display:none">
+    <div style="text-align:center;font-size:3.2rem;margin-top:14px">⚔️</div>
+    <div class="pvp-title">SCEGLI LA SFIDA</div>
+    <div class="pvp-sub" id="PVP_PICK_SUB">round 1 di 3</div>
+    <div class="pvp-pick-progress" id="PVP_PICK_PROG"></div>
+    <div class="pvp-card">
+      <div class="pvp-pick-section">
+        <div class="pvp-pick-label"><span class="num">1</span> SCEGLI LA LINGUA</div>
+        <div class="pvp-langs" id="PVP_PICK_LANGS"></div>
+      </div>
+      <div class="pvp-pick-section">
+        <div class="pvp-pick-label"><span class="num">2</span> SCEGLI LA PAROLA</div>
+        <div class="pvp-words" id="PVP_PICK_WORDS"></div>
+      </div>
+    </div>
+    <button class="btn btn-pvp" id="PVP_PICK_GO" onclick="pvpStartCurrentRound()" disabled style="opacity:.4">▶️ INIZIA QUESTO ROUND</button>
+    <button class="btn bs" onclick="closePvp()">← Annulla sfida</button>
+  </div>
+
+  <!-- Stato SENT: link generato, mostra a Mario -->
+  <div id="PVP_SENT" style="width:100%;max-width:460px;display:none">
+    <div style="text-align:center;font-size:3.5rem;margin-top:20px">📤</div>
+    <div class="pvp-title">SFIDA PRONTA!</div>
+    <div class="pvp-sub">manda il link al tuo amico</div>
+    <div class="pvp-card" style="text-align:center">
+      <div style="font-size:.7rem;color:var(--mt);letter-spacing:2px;margin-bottom:6px">HAI FATTO</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--gd);line-height:1" id="PVP_SENT_SCORE">0</div>
+      <div style="font-size:.75rem;color:var(--mt);margin-bottom:14px">su <span id="PVP_SENT_MAX">30</span> totali</div>
+      <div class="clbl">🔗 Link da condividere</div>
+      <div class="pvp-link-box" id="PVP_LINK"></div>
+      <div style="font-size:.7rem;color:var(--mt);text-align:center;margin-top:6px">⚠️ Non chiudere prima di aver mandato il link!</div>
+    </div>
+    <button class="btn btn-share" onclick="pvpShareLink('whatsapp')">💚 MANDA SU WHATSAPP</button>
+    <button class="btn bs" onclick="pvpShareLink('copy')">📋 COPIA LINK</button>
+    <button class="btn bs" onclick="closePvp()">✓ HO MANDATO</button>
+  </div>
+
+  <!-- Stato RECEIVED: Anna apre il link -->
+  <div id="PVP_RECEIVED" style="width:100%;max-width:460px;display:none">
+    <div style="text-align:center;font-size:3.5rem;margin-top:20px">📥</div>
+    <div class="pvp-title">SFIDA RICEVUTA!</div>
+    <div class="pvp-sub">qualcuno ti ha mandato un guanto</div>
+    <div class="pvp-card" style="text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--pk);letter-spacing:2px;margin-bottom:4px" id="PVP_RECV_NAME">MARIO</div>
+      <div style="font-size:.75rem;color:var(--mt);margin-bottom:12px">ti sfida con questo punteggio:</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--gd);line-height:1" id="PVP_RECV_SCORE">22</div>
+      <div style="font-size:.75rem;color:var(--mt);margin-bottom:14px">su <span id="PVP_RECV_MAX">30</span> totali</div>
+      <div style="background:rgba(155,48,255,.1);border:1px solid rgba(155,48,255,.3);
+        border-radius:12px;padding:12px;font-size:.8rem;color:var(--tx);line-height:1.7">
+        Devi pronunciare le <b>stesse 3 parole</b> con le <b>stesse lingue</b>.<br>
+        Se prendi più punti di lui, <b style="color:var(--gd)">VINCI</b>.
+      </div>
+    </div>
+    <button class="btn btn-pvp" onclick="pvpAcceptStart()">🎤 ACCETTA LA SFIDA</button>
+    <button class="btn bs" onclick="closePvp()">← Non oggi</button>
+  </div>
+
+  <!-- Stato RESULT: confronto finale -->
+  <div id="PVP_RESULT" style="width:100%;max-width:460px;display:none">
+    <div style="text-align:center;font-size:3rem;margin-top:14px" id="PVP_RES_EMOJI">🏆</div>
+    <div class="pvp-result-banner" id="PVP_RES_BANNER">HAI VINTO!</div>
+    <div class="pvp-vs">
+      <div class="pvp-vs-side" id="PVP_RES_LEFT">
+        <div class="pvp-vs-name" id="PVP_RES_NAME_L">TU</div>
+        <div class="pvp-vs-score" id="PVP_RES_SC_L">0</div>
+      </div>
+      <div class="pvp-vs-mid">VS</div>
+      <div class="pvp-vs-side" id="PVP_RES_RIGHT">
+        <div class="pvp-vs-name" id="PVP_RES_NAME_R">MARIO</div>
+        <div class="pvp-vs-score" id="PVP_RES_SC_R">0</div>
+      </div>
+    </div>
+    <div id="PVP_RES_COINS" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gd);letter-spacing:2px;text-align:center;margin-bottom:14px"></div>
+    <button class="btn btn-share" onclick="pvpShareResult()">📸 MANDA RISULTATO AL TUO AMICO</button>
+    <button class="btn btn-pvp" onclick="pvpRevenge()">⚔️ RIVINCITA!</button>
+    <button class="btn bs" onclick="closePvp()">🏠 Menu</button>
+  </div>
+</div>
+
+<!-- ═══════ SHOP ═══════ -->
+<div id="SHOP_OV" class="shop-overlay">
+  <div class="shop-header">
+    <div class="shop-title">🛍️ SHOP</div>
+    <div class="shop-balance">🪙 <span id="SHOP_BAL">0</span></div>
+  </div>
+  <div class="shop-tabs">
+    <div class="shop-tab on" data-tab="avatars" onclick="shopTab('avatars')">👤 AVATAR</div>
+    <div class="shop-tab" data-tab="packs" onclick="shopTab('packs')">💰 PACK</div>
+    <div class="shop-tab" data-tab="premium" onclick="shopTab('premium')">💎 SKIN</div>
+    <div class="shop-tab" data-tab="info" onclick="shopTab('info')">ℹ️ INFO</div>
+  </div>
+  <div id="SHOP_GRID" class="shop-grid"></div>
+  <div id="SHOP_PACKS" style="display:none;width:100%;max-width:520px"></div>
+  <div id="SHOP_PREMIUM" style="display:none;width:100%;max-width:520px"></div>
+  <div id="SHOP_INFO" style="display:none;width:100%;max-width:520px;
+    background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.25);
+    border-radius:14px;padding:18px;color:var(--tx);font-size:.85rem;line-height:1.9;margin-bottom:14px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gd);letter-spacing:2px;margin-bottom:10px">
+      💰 COME SI GUADAGNANO LE MONETE
+    </div>
+    🌟 <b>+20</b> per ogni 10/10 in pronuncia<br>
+    👍 <b>+10</b> per voti 8 o 9<br>
+    ✓ <b>+3</b> per voti 5-7<br>
+    🎯 <b>+10</b> a fine partita SOLO<br>
+    🏆 <b>+50</b> nuovo record personale<br>
+    👑 <b>+30</b> bonus Poliglotta Supremo (≥90%)<br>
+    📸 <b>+5</b> prima condivisione del giorno<br><br>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--pk);letter-spacing:1.5px;margin-bottom:6px">
+      🔒 IN ARRIVO
+    </div>
+    ⚔️ <b>+30</b> vincere sfida WhatsApp (FASE B.3)<br>
+    🔥 <b>+100</b> streak 7 giorni consecutivi
+  </div>
+  <button class="shop-close" onclick="closeShop()">CHIUDI</button>
+</div>
+
+<!-- ═══════ INSTALL PROMPT ═══════ -->
+<div id="INSTALL_BAR" class="install-bar">
+  <div class="ib-ico">📲</div>
+  <div class="ib-txt"><b>INSTALLA L'APP</b>Gioca offline, senza browser</div>
+  <button onclick="doInstall()">INSTALLA</button>
+  <button class="ib-x" onclick="dismissInstall()">✕</button>
 </div>
 
 <script>
@@ -454,7 +1397,12 @@ input::placeholder{color:var(--mt);opacity:.7}
 // TUTTE le traduzioni sono pre-caricate — ZERO API, ZERO COSTI
 // ═══════════════════════════════════════════════════════
 const DB = {
-  1: [ // UNA PAROLA — 30 parole
+  1: [ // UNA PAROLA — 35 (5 iconiche italiane TOSTE in cima + 30 originali)
+    {it:"Otorinolaringoiatra",hint:"Lo specialista 🏥",tr:{"zh-CN":{t:"耳鼻喉医生",p:"ěr bí hóu yī shēng"},"ja-JP":{t:"耳鼻咽喉科医",p:"jibi inkouka i"},"fr-FR":{t:"Oto-rhino-laryngologiste",p:"oto-rino-laringologist"},"de-DE":{t:"HNO-Arzt",p:"ha-en-o artst"},"ru-RU":{t:"Оториноларинголог",p:"otorinolaringolog"},"ar-SA":{t:"طبيب أنف وأذن",p:"tabib anf wa udhun"},"ko-KR":{t:"이비인후과 의사",p:"i-bi-in-hu-gwa ui-sa"},"pt-BR":{t:"Otorrinolaringologista",p:"otorrinolaringologista"},"en-GB":{t:"Otolaryngologist",p:"oto-larin-gologist"},"es-ES":{t:"Otorrinolaringólogo",p:"otorrinolaringologo"},"hi-IN":{t:"ईएनटी विशेषज्ञ",p:"e-en-ti visheshagya"},"tr-TR":{t:"KBB doktoru",p:"ka-be-be doktoru"}}},
+    {it:"Gnocchi",hint:"Pasta italiana 🥟",tr:{"zh-CN":{t:"意大利团子",p:"yì dà lì tuán zi"},"ja-JP":{t:"ニョッキ",p:"nyokki"},"fr-FR":{t:"Gnocchi",p:"nyoki"},"de-DE":{t:"Gnocchi",p:"njoki"},"ru-RU":{t:"Ньокки",p:"nyokki"},"ar-SA":{t:"نيوكي",p:"niyuki"},"ko-KR":{t:"뇨키",p:"nyo-ki"},"pt-BR":{t:"Nhoque",p:"nyoki"},"en-GB":{t:"Gnocchi",p:"nyoki"},"es-ES":{t:"Ñoquis",p:"nyokis"},"hi-IN":{t:"ग्नोची",p:"nyoki"},"tr-TR":{t:"Niyoki",p:"niyoki"}}},
+    {it:"Bruschetta",hint:"Antipasto 🍞",tr:{"zh-CN":{t:"烤面包片",p:"kǎo miàn bāo piàn"},"ja-JP":{t:"ブルスケッタ",p:"burusuketta"},"fr-FR":{t:"Bruschetta",p:"brusketa"},"de-DE":{t:"Bruschetta",p:"brusketa"},"ru-RU":{t:"Брускетта",p:"brusketta"},"ar-SA":{t:"بروسكيتا",p:"brusketa"},"ko-KR":{t:"브루스케타",p:"beu-ru-seu-ke-ta"},"pt-BR":{t:"Brusqueta",p:"brusketa"},"en-GB":{t:"Bruschetta",p:"brusketa"},"es-ES":{t:"Brusqueta",p:"brusketa"},"hi-IN":{t:"ब्रुस्केटा",p:"brusketta"},"tr-TR":{t:"Brusketta",p:"brusketta"}}},
+    {it:"Lavastoviglie",hint:"Cucina 🍽️",tr:{"zh-CN":{t:"洗碗机",p:"xǐ wǎn jī"},"ja-JP":{t:"食器洗い機",p:"shokki arai ki"},"fr-FR":{t:"Lave-vaisselle",p:"lav-vesel"},"de-DE":{t:"Geschirrspüler",p:"gheshir-shpuler"},"ru-RU":{t:"Посудомоечная машина",p:"posudomoyechnaya mashina"},"ar-SA":{t:"غسالة الصحون",p:"ghassalat as-suhun"},"ko-KR":{t:"식기세척기",p:"sik-gi-se-cheok-gi"},"pt-BR":{t:"Lava-louças",p:"lava-loisas"},"en-GB":{t:"Dishwasher",p:"dish-washer"},"es-ES":{t:"Lavavajillas",p:"lababahiyas"},"hi-IN":{t:"बर्तन धोने की मशीन",p:"bartan dhone ki machine"},"tr-TR":{t:"Bulaşık makinesi",p:"bulashik makinesi"}}},
+    {it:"Sciopero",hint:"Protesta 📢",tr:{"zh-CN":{t:"罢工",p:"bà gōng"},"ja-JP":{t:"ストライキ",p:"sutoraiki"},"fr-FR":{t:"Grève",p:"grev"},"de-DE":{t:"Streik",p:"shtraik"},"ru-RU":{t:"Забастовка",p:"zabastovka"},"ar-SA":{t:"إضراب",p:"idrab"},"ko-KR":{t:"파업",p:"pa-eop"},"pt-BR":{t:"Greve",p:"grevi"},"en-GB":{t:"Strike",p:"straik"},"es-ES":{t:"Huelga",p:"welga"},"hi-IN":{t:"हड़ताल",p:"hadtaal"},"tr-TR":{t:"Grev",p:"grev"}}},
     {it:"Farfalla",hint:"Insetto 🦋",tr:{"zh-CN":{t:"蝴蝶",p:"hú dié"},"ja-JP":{t:"蝶々",p:"cho-cho"},"fr-FR":{t:"Papillon",p:"papiyohn"},"de-DE":{t:"Schmetterling",p:"shmetterling"},"ru-RU":{t:"Бабочка",p:"babochka"},"ar-SA":{t:"فراشة",p:"farasha"},"ko-KR":{t:"나비",p:"na-bi"},"pt-BR":{t:"Borboleta",p:"borboleta"},"en-GB":{t:"Butterfly",p:"batter-flai"},"es-ES":{t:"Mariposa",p:"mariposa"},"hi-IN":{t:"तितली",p:"titli"},"tr-TR":{t:"Kelebek",p:"kelebek"}}},
     {it:"Coccodrillo",hint:"Rettile 🐊",tr:{"zh-CN":{t:"鳄鱼",p:"è yú"},"ja-JP":{t:"ワニ",p:"wani"},"fr-FR":{t:"Crocodile",p:"krokodil"},"de-DE":{t:"Krokodil",p:"krokodil"},"ru-RU":{t:"Крокодил",p:"krokodil"},"ar-SA":{t:"تمساح",p:"timsah"},"ko-KR":{t:"악어",p:"a-geo"},"pt-BR":{t:"Crocodilo",p:"krokodilu"},"en-GB":{t:"Crocodile",p:"kroko-dail"},"es-ES":{t:"Cocodrilo",p:"kokodrilo"},"hi-IN":{t:"मगरमच्छ",p:"magar-macch"},"tr-TR":{t:"Timsah",p:"timsah"}}},
     {it:"Tramonto",hint:"Cielo 🌅",tr:{"zh-CN":{t:"日落",p:"rì luò"},"ja-JP":{t:"夕焼け",p:"yuu-yake"},"fr-FR":{t:"Coucher de soleil",p:"kushé de soleil"},"de-DE":{t:"Sonnenuntergang",p:"zonen-unter-gang"},"ru-RU":{t:"Закат",p:"zakat"},"ar-SA":{t:"غروب الشمس",p:"ghurub ash-shams"},"ko-KR":{t:"일몰",p:"il-mol"},"pt-BR":{t:"Pôr do sol",p:"por du sol"},"en-GB":{t:"Sunset",p:"san-set"},"es-ES":{t:"Atardecer",p:"atardeser"},"hi-IN":{t:"सूर्यास्त",p:"surya-ast"},"tr-TR":{t:"Gün batımı",p:"gun batimi"}}},
@@ -590,12 +1538,12 @@ const LANGS=[
   {c:'tr',n:'Turco',    f:'🇹🇷',t:'tr-TR'},
 ];
 
-// Info livelli
+// Info livelli — 4 difficoltà crescenti (V4)
 const LEVELS={
-  1:{label:'⭐ LIVELLO 1 — 1 PAROLA',    cls:'diff-1',stars:'⭐'},
-  2:{label:'⭐⭐ LIVELLO 2 — 2 PAROLE',   cls:'diff-2',stars:'⭐⭐'},
-  3:{label:'⭐⭐⭐ LIVELLO 3 — FRASE BREVE',cls:'diff-3',stars:'⭐⭐⭐'},
-  4:{label:'🔥 LIVELLO 4 — FRASE LUNGA', cls:'diff-4',stars:'🔥'},
+  1:{label:'⭐ LIVELLO 1 — FACILE',         cls:'diff-1',stars:'⭐'},
+  2:{label:'⭐⭐ LIVELLO 2 — MEDIO',         cls:'diff-2',stars:'⭐⭐'},
+  3:{label:'🔥 LIVELLO 3 — DIFFICILE',      cls:'diff-3',stars:'🔥'},
+  4:{label:'💀 LIVELLO 4 — IMPOSSIBILE',    cls:'diff-4',stars:'💀'},
 };
 
 const AVS=['🦊','🐼','🦁','🐸','🦋','🌟','🦄','🐉'];
@@ -710,16 +1658,8 @@ function showRules(){
             <span style="color:#c0b0e0"><b style="color:#fff">1 parola</b> — quasi troppo facile. Quasi.</span>
           </div>
           <div style="display:flex;align-items:center;gap:12px">
-            <span style="background:rgba(0,200,255,.15);border:1px solid rgba(0,200,255,.4);border-radius:100px;padding:4px 12px;font-family:'Bebas Neue',sans-serif;color:#00c8ff;letter-spacing:1px;white-space:nowrap">⭐⭐ LV 2</span>
-            <span style="color:#c0b0e0"><b style="color:#fff">2 parole</b> — ora inizia il panico</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <span style="background:rgba(255,204,0,.15);border:1px solid rgba(255,204,0,.4);border-radius:100px;padding:4px 12px;font-family:'Bebas Neue',sans-serif;color:#ffcc00;letter-spacing:1px;white-space:nowrap">⭐⭐⭐ LV 3</span>
-            <span style="color:#c0b0e0"><b style="color:#fff">Frase breve</b> — il Maestro Boccalone inizia a preoccuparsi</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <span style="background:rgba(255,45,120,.15);border:1px solid rgba(255,45,120,.4);border-radius:100px;padding:4px 12px;font-family:'Bebas Neue',sans-serif;color:#ff2d78;letter-spacing:1px;white-space:nowrap">🔥 LV 4</span>
-            <span style="color:#c0b0e0"><b style="color:#fff">Frase lunga</b> — dio mio. Buona fortuna.</span>
+            <span style="background:rgba(255,45,120,.15);border:1px solid rgba(255,45,120,.4);border-radius:100px;padding:4px 12px;font-family:'Bebas Neue',sans-serif;color:#ff2d78;letter-spacing:1px;white-space:nowrap">🔥 LV 2</span>
+            <span style="color:#c0b0e0"><b style="color:#fff">2 parole</b> — il Maestro Boccalone inizia a preoccuparsi</span>
           </div>
         </div>
       </div>
@@ -817,10 +1757,37 @@ function showRules(){
 // CALCOLA LIVELLO in base al round
 // ═══════════════════════════════════════════════
 function getLevel(){
+  // V4 — 4 livelli crescenti:
+  // LV1 = 1 parola FACILE (DB[1] indici 5+, salto le 5 iconiche italiane toste)
+  // LV2 = 1 parola TOSTA (DB[1] indici 0-4: Otorinolaringoiatra, Gnocchi, Bruschetta, ecc.)
+  // LV3 = 2 parole (DB[2])
+  // LV4 = 2 parole DB[2] con LINGUE TOSTE forzate (cinese, arabo, giapponese, hindi, russo, coreano)
   if(G.round===1)return 1;
   if(G.round===2)return 2;
   if(G.round===3)return 3;
-  return 4; // round 4 e oltre = livello massimo
+  return 4;
+}
+
+// Lingue toste per LV4 (suoni più impossibili per italiani)
+const HARD_LANGS=['zh-CN','ja-JP','ar-SA','hi-IN','ru-RU','ko-KR'];
+
+// Restituisce {pool, langs, dbKey, offset} per il livello richiesto
+function pickWordForLevel(lv){
+  if(lv===1){
+    // FACILE: indici 5..34 di DB[1] (salto le 5 toste in cima)
+    return {pool:DB[1].slice(5), langs:LANGS, dbKey:1, offset:5};
+  }
+  if(lv===2){
+    // MEDIO/TOSTO: prime 5 (iconiche italiane) + 10 medio (Pipistrello, Polpaccio, Ascella ecc.)
+    return {pool:DB[1].slice(0,15), langs:LANGS, dbKey:1, offset:0};
+  }
+  if(lv===3){
+    // DIFFICILE: DB[2] (2 parole, qualsiasi lingua)
+    return {pool:DB[2], langs:LANGS, dbKey:2, offset:0};
+  }
+  // LV4 IMPOSSIBILE: DB[2] forzato lingue toste
+  const harshLangs=LANGS.filter(l=>HARD_LANGS.includes(l.t));
+  return {pool:DB[2], langs:harshLangs, dbKey:2, offset:0};
 }
 
 // ═══════════════════════════════════════════════
@@ -929,19 +1896,23 @@ function stopRec(){
 // GIUDICE LOCALE — confronta pronuncia con fonetica
 // ═══════════════════════════════════════════════
 function judgeLocally(spokenText,correctPhon){
+  // V2 SCORING — Maestro Boccalone più permissivo (+15% medio)
   const spoken=(spokenText||'').toLowerCase().replace(/[^a-z\s]/g,'').trim();
   const correct=(correctPhon||'').toLowerCase().replace(/[^a-z\s]/g,'').trim();
-  let score=3;
+  let score=5; // base più alta (era 3)
   if(!spoken||spoken.length<1){
-    score=Math.floor(Math.random()*2); // 0-1
+    score=Math.floor(Math.random()*3)+2; // 2-4 (era 0-1: troppo cattivo)
   } else {
     const sw=spoken.split(/\s+/);
     const cw=correct.split(/\s+/);
     let matches=0;
-    sw.forEach(w=>{if(cw.some(c=>c.includes(w)||w.includes(c)||levenshtein(w,c)<2))matches++;});
+    sw.forEach(w=>{
+      if(cw.some(c=>c.includes(w)||w.includes(c)||levenshtein(w,c)<3))matches++; // tollero distanza 2 (era 1)
+    });
     const ratio=matches/Math.max(cw.length,1);
-    score=Math.min(10,Math.round(ratio*10));
-    score=Math.max(0,Math.min(10,score+Math.floor(Math.random()*3)-1));
+    score=Math.min(10,Math.round(ratio*10)+1); // +1 bonus permissivo
+    // Random component: tendente al positivo (0..+2 invece di -1..+1)
+    score=Math.max(2,Math.min(10,score+Math.floor(Math.random()*3)));
   }
   return score;
 }
@@ -1524,6 +2495,1916 @@ let _lt=0;
 document.addEventListener('touchend',e=>{
   const n=Date.now();if(n-_lt<300)e.preventDefault();_lt=n;
 },{passive:false});
+
+// ═══════════════════════════════════════════════════════
+// V2 ADDITIONS — Single-Player + Share + Confetti + Sound + PWA
+// ═══════════════════════════════════════════════════════
+
+// ─── Service Worker ───
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});
+}
+
+// ─── Install Prompt (Android Chrome) ───
+let _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();_deferredPrompt=e;
+  if(!localStorage.getItem('wdym_install_dismissed')){
+    setTimeout(()=>document.getElementById('INSTALL_BAR').classList.add('on'),4000);
+  }
+});
+function doInstall(){
+  if(_deferredPrompt){
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then(c=>{
+      if(typeof gtag==='function')gtag('event','pwa_install',{outcome:c.outcome});
+      _deferredPrompt=null;dismissInstall();
+    });
+  }
+}
+function dismissInstall(){
+  document.getElementById('INSTALL_BAR').classList.remove('on');
+  localStorage.setItem('wdym_install_dismissed','1');
+}
+
+// ─── Sound Effects (Web Audio API, zero libs) ───
+let _ac=null;
+function ac(){return _ac||(_ac=new(window.AudioContext||window.webkitAudioContext)());}
+function beep(f,d,t='sine',v=0.12){
+  try{
+    const c=ac(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type=t;o.frequency.value=f;
+    g.gain.setValueAtTime(v,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);
+    o.start();o.stop(c.currentTime+d);
+  }catch(e){}
+}
+function sfxClick(){beep(800,0.04,'square',0.06);}
+function sfxSuccess(){beep(523.25,0.1);setTimeout(()=>beep(659.25,0.1),90);setTimeout(()=>beep(783.99,0.15),180);}
+function sfxFail(){beep(180,0.25,'sawtooth',0.08);}
+function sfxFanfare(){[523.25,659.25,783.99,1046.5].forEach((f,i)=>setTimeout(()=>beep(f,0.18,'triangle',0.14),i*110));}
+
+// ─── Confetti (canvas, no lib) ───
+function confetti(){
+  const cv=document.getElementById('CONFETTI');
+  cv.classList.add('on');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const cols=['#ff2d78','#00c8ff','#9b30ff','#ffcc00','#00ff88','#ff8800'];
+  const ps=[];
+  for(let i=0;i<160;i++){
+    ps.push({x:Math.random()*cv.width,y:-20-Math.random()*200,vx:(Math.random()-.5)*5,vy:Math.random()*3+2,
+      r:Math.random()*7+3,c:cols[Math.floor(Math.random()*cols.length)],rot:Math.random()*Math.PI,vrot:(Math.random()-.5)*0.25});
+  }
+  const t0=performance.now();
+  (function frame(){
+    const t=performance.now()-t0;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.rot+=p.vrot;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);
+      ctx.fillStyle=p.c;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+      ctx.restore();
+    });
+    if(t<4500)requestAnimationFrame(frame);
+    else{ctx.clearRect(0,0,cv.width,cv.height);cv.classList.remove('on');}
+  })();
+}
+
+// ─── SINGLE-PLAYER MODE ───
+function startSolo(){
+  sfxClick();
+  G.solo=true;G.players=['TU'];G.scores={'TU':0};G.rounds=5;G.round=1;G.subRound=0;
+  G.chooser=0;G.firstChooser=0;G.usedPhrases={1:[],2:[],3:[],4:[]};
+  G.queue=['TU'];G.pIdx=0;
+  if(typeof gtag==='function')gtag('event','solo_start');
+  soloAutoPickAndListen();
+}
+function soloAutoPickAndListen(){
+  const lv=getLevel();
+  const cfg=pickWordForLevel(lv);
+  const dbArr=DB[cfg.dbKey];
+  // Pool di indici REALI in dbArr (considerando offset)
+  const used=G.usedPhrases[cfg.dbKey]||[];
+  let pool=[];
+  for(let i=0;i<cfg.pool.length;i++){
+    const idx=cfg.offset+i;
+    if(!used.includes(idx))pool.push(idx);
+  }
+  if(pool.length===0){
+    G.usedPhrases[cfg.dbKey]=[];
+    for(let i=0;i<cfg.pool.length;i++)pool.push(cfg.offset+i);
+  }
+  const wi=pool[Math.floor(Math.random()*pool.length)];
+  G.usedPhrases[cfg.dbKey]=(G.usedPhrases[cfg.dbKey]||[]).concat([wi]);
+  G.phrase=dbArr[wi];
+  const li=Math.floor(Math.random()*cfg.langs.length);
+  G.lang=cfg.langs[li];
+  // Safety: se la traduzione manca in quella lingua, ripiego su prima disponibile
+  if(!G.phrase.tr[G.lang.t]){
+    const keys=Object.keys(G.phrase.tr);
+    G.lang=LANGS.find(l=>l.t===keys[0])||LANGS[0];
+  }
+  G.tran=G.phrase.tr[G.lang.t].t;
+  G.phon=G.phrase.tr[G.lang.t].p;
+  showListen();
+}
+
+// ─── PATCH: showVerdict — confetti & SFX on score ───
+const _origShowVerdict=showVerdict;
+showVerdict=function(name,sc){
+  const r=_origShowVerdict(name,sc);
+  if(sc>=10){confetti();sfxFanfare();}
+  else if(sc>=7){sfxSuccess();}
+  else if(sc<=2){sfxFail();}
+  return r;
+};
+
+// ─── PATCH: nextOrSummary — in solo skip multiplayer flow ───
+const _origNextOrSummary=nextOrSummary;
+nextOrSummary=function(){
+  if(!G.solo)return _origNextOrSummary();
+  if(G.round>=G.rounds){soloFinal();return;}
+  G.round++;G.subRound=0;G.pIdx=0;G.queue=['TU'];
+  soloAutoPickAndListen();
+};
+
+// ─── PATCH: startPronouncers — in solo TU pronunci (no chooser exclusion) ───
+const _origStartPronouncers=startPronouncers;
+startPronouncers=function(){
+  if(G.solo){G.queue=['TU'];G.pIdx=0;G.rscores={};showPronounce();return;}
+  _origStartPronouncers();
+};
+
+// ─── PATCH: showPassPhone — in solo skip "passa il telefono" ───
+const _origShowPassPhone=showPassPhone;
+showPassPhone=function(){
+  if(G.solo){showPronounce();return;}
+  _origShowPassPhone();
+};
+
+// ─── SOLO FINAL — medaglia personale reusing S7 ───
+function soloFinal(){
+  go('S7');
+  const total=G.scores['TU'];
+  const max=G.rounds*10;
+  const pct=total/max;
+  let tier,emoji,msg,color;
+  if(pct>=0.9){tier='POLIGLOTTA SUPREMO';emoji='👑';color='#ffcc00';
+    msg='"Mai sentito una pronuncia così. Il Maestro Boccalone si commuove." 🥲';}
+  else if(pct>=0.75){tier="LINGUA D'ORO";emoji='🥇';color='#ffcc00';
+    msg='"Niente male. Hai sopravvissuto al Maestro Boccalone."';}
+  else if(pct>=0.6){tier="LINGUA D'ARGENTO";emoji='🥈';color='#c0c0c0';
+    msg='"Quasi quasi. Continua e ci arrivi."';}
+  else if(pct>=0.4){tier='APPRENDISTA';emoji='🥉';color='#cd7f32';
+    msg='"C\'è da lavorare. Il Maestro Boccalone ti osserva con sospetto."';}
+  else if(pct>=0.2){tier='LINGUA DI LEGNO';emoji='🪵';color='#8b4513';
+    msg='"Mmh. La pratica fa il maestro. Tu non sei il maestro."';}
+  else{tier='DISASTRO COSMICO';emoji='💀';color='#ff3344';
+    msg='"Il Maestro Boccalone ha bisogno di terapia adesso. Ritenta."';}
+  const bk='wdym_solo_best_'+G.rounds;
+  const prev=parseInt(localStorage.getItem(bk)||'0');
+  const isNew=total>prev;
+  if(isNew)localStorage.setItem(bk,total);
+  document.getElementById('POD').innerHTML='';
+  document.getElementById('FL').innerHTML='';
+  document.getElementById('WV2').style.display='none';
+  document.getElementById('FSB').textContent=`${G.rounds} round in solo`;
+  const hero=document.querySelector('#S7 .hero');
+  hero.innerHTML='TU SEI<br>UN...';hero.style.fontSize='2rem';
+  const box=document.getElementById('SOLO_BOX');
+  box.style.display='block';
+  box.innerHTML=`
+    <div class="medal-box">
+      <span class="medal-emoji">${emoji}</span>
+      <div class="medal-tier" style="background:linear-gradient(135deg,${color},#ff2d78);
+        -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${tier}</div>
+      <div class="medal-score">${total}<span style="font-size:1.4rem;color:var(--mt)"> / ${max}</span></div>
+      <div class="medal-msg">${msg}</div>
+      <div class="medal-best">
+        🏆 Record personale (${G.rounds} round): <b>${Math.max(prev,total)} / ${max}</b>
+        ${isNew?'<br><span class="new-record">⭐ NUOVO RECORD! ⭐</span>':''}
+      </div>
+    </div>`;
+  if(pct>=0.75){confetti();sfxFanfare();}
+  if(typeof gtag==='function')gtag('event','solo_complete',{score:total,rounds:G.rounds});
+}
+
+// ─── PATCH: newGame & rivincita — restore UI ───
+const _origNewGame=newGame;
+newGame=function(){
+  G.solo=false;
+  document.getElementById('SOLO_BOX').style.display='none';
+  document.getElementById('WV2').style.display='block';
+  const hero=document.querySelector('#S7 .hero');
+  hero.innerHTML='POLIGLOTTA<br>SUPREMO';hero.style.fontSize='2.5rem';
+  _origNewGame();
+};
+const _origRivincita=rivincita;
+rivincita=function(){
+  if(G.solo){
+    G.scores['TU']=0;G.round=1;G.subRound=0;G.usedPhrases={1:[],2:[],3:[],4:[]};
+    G.pIdx=0;G.queue=['TU'];
+    document.getElementById('SOLO_BOX').style.display='none';
+    document.getElementById('WV2').style.display='block';
+    soloAutoPickAndListen();return;
+  }
+  _origRivincita();
+};
+
+// ─── SHARE SYSTEM ───
+function openShare(){
+  sfxClick();
+  buildPodiumSnapshot();
+  const ov=document.getElementById('SHARE_OV');
+  ov.classList.add('on');
+  const prev=document.getElementById('SHARE_PREV');
+  prev.innerHTML='<div class="ldot">⏳ Generando l\'immagine...</div>';
+  setTimeout(()=>{
+    generateShareImage().then(d=>{
+      prev.innerHTML='';
+      const img=document.createElement('img');img.src=d;
+      prev.appendChild(img);
+      window._shareDataUrl=d;
+    }).catch(e=>{
+      prev.innerHTML='<div class="ldot">⚠️ Errore. Usa "Altro" per condividere il link.</div>';
+      console.error(e);
+    });
+  },120);
+  if(typeof gtag==='function')gtag('event','share_open',{mode:G.solo?'solo':'multi'});
+}
+function closeShare(){document.getElementById('SHARE_OV').classList.remove('on');}
+function buildPodiumSnapshot(){
+  const snap=document.getElementById('PODIUM_SNAP');
+  if(G.solo){
+    const total=G.scores['TU'];const max=G.rounds*10;const pct=total/max;
+    let tier,emoji;
+    if(pct>=0.9){tier='POLIGLOTTA SUPREMO';emoji='👑';}
+    else if(pct>=0.75){tier="LINGUA D'ORO";emoji='🥇';}
+    else if(pct>=0.6){tier="LINGUA D'ARGENTO";emoji='🥈';}
+    else if(pct>=0.4){tier='APPRENDISTA';emoji='🥉';}
+    else if(pct>=0.2){tier='LINGUA DI LEGNO';emoji='🪵';}
+    else{tier='DISASTRO COSMICO';emoji='💀';}
+    snap.innerHTML=`
+      <div class="snap-logo">🌍 WHAT DO YOU MEAN?</div>
+      <div class="snap-sub">il giudizio del maestro boccalone</div>
+      <div class="snap-globe">${emoji}</div>
+      <div class="snap-title">${tier}</div>
+      <div class="snap-winner">PUNTEGGIO</div>
+      <div class="snap-score">${total} / ${max}</div>
+      <div class="snap-footer">
+        <div class="snap-cta">PROVACI ANCHE TU!</div>
+        <div class="snap-url">luiscasto2000-svg.github.io/What-do-you-mean-</div>
+      </div>`;
+  }else{
+    const sorted=[...G.players].sort((a,b)=>G.scores[b]-G.scores[a]);
+    const w=sorted[0];
+    snap.innerHTML=`
+      <div class="snap-logo">🌍 WHAT DO YOU MEAN?</div>
+      <div class="snap-sub">la classifica ufficiale del maestro boccalone</div>
+      <div class="snap-globe">👑</div>
+      <div class="snap-title">POLIGLOTTA SUPREMO</div>
+      <div class="snap-winner">${w.toUpperCase()}</div>
+      <div class="snap-score">${G.scores[w]}</div>
+      <div class="snap-list">${sorted.slice(0,5).map((p,i)=>`
+        <div class="snap-item">
+          <div class="snap-pos">#${i+1}</div>
+          <div class="snap-name">${p.toUpperCase()}</div>
+          <div class="snap-pts">${G.scores[p]}</div>
+        </div>`).join('')}
+      </div>
+      <div class="snap-footer">
+        <div class="snap-cta">SFIDA I TUOI AMICI!</div>
+        <div class="snap-url">luiscasto2000-svg.github.io/What-do-you-mean-</div>
+      </div>`;
+  }
+}
+async function generateShareImage(){
+  if(typeof html2canvas==='undefined')throw new Error('html2canvas not loaded');
+  const snap=document.getElementById('PODIUM_SNAP');
+  const canvas=await html2canvas(snap,{backgroundColor:'#07001a',width:1080,height:1920,scale:0.5,useCORS:true,logging:false});
+  return canvas.toDataURL('image/png');
+}
+function shareTo(channel){
+  sfxClick();
+  const url='https://luiscasto2000-svg.github.io/What-do-you-mean-/';
+  const text=G.solo
+    ?`Ho fatto ${G.scores['TU']}/${G.rounds*10} a What Do You Mean?! 🌍 Sfida il Maestro Boccalone anche tu!`
+    :`Vinto a What Do You Mean?! 🌍 Il Maestro Boccalone mi ha incoronato. Provaci anche tu!`;
+  if(typeof gtag==='function')gtag('event','share_action',{channel:channel,mode:G.solo?'solo':'multi'});
+  switch(channel){
+    case 'whatsapp':window.open(`https://wa.me/?text=${encodeURIComponent(text+' '+url)}`,'_blank');break;
+    case 'telegram':window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,'_blank');break;
+    case 'x':window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,'_blank');break;
+    case 'instagram':
+      downloadImage();
+      alert('📷 Immagine scaricata!\n\nApri Instagram → tocca "+" → Storia → seleziona l\'immagine dall\'album.\n\nIncolla il link in bio: '+url);
+      try{setTimeout(()=>window.location.href='instagram://story-camera',500);}catch(e){}
+      break;
+    case 'download':downloadImage();break;
+    case 'native':
+      if(navigator.share){nativeShareWithImage(text,url);}
+      else if(navigator.clipboard){navigator.clipboard.writeText(text+' '+url).then(()=>alert('📋 Link copiato!'));}
+      break;
+  }
+}
+function downloadImage(){
+  if(!window._shareDataUrl)return;
+  const a=document.createElement('a');
+  a.href=window._shareDataUrl;a.download=`what-do-you-mean-${Date.now()}.png`;
+  document.body.appendChild(a);a.click();a.remove();
+}
+async function nativeShareWithImage(text,url){
+  try{
+    if(window._shareDataUrl){
+      const blob=await(await fetch(window._shareDataUrl)).blob();
+      const file=new File([blob],'wdym-result.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({title:'What Do You Mean?',text:text+'\n'+url,files:[file]});return;
+      }
+    }
+    await navigator.share({title:'What Do You Mean?',text,url});
+  }catch(e){if(e.name!=='AbortError')console.error(e);}
+}
+
+// ═══════════════════════════════════════════════════════
+// FASE B.1 — SISTEMA MONETE 🪙
+// ═══════════════════════════════════════════════════════
+// I dati stanno in localStorage (memoria del telefono).
+// Non c'è server, non c'è account: le monete vivono solo qui.
+const COIN_KEY='wdym_coins';
+const COIN_LOG_KEY='wdym_coin_log';
+const SHARE_LAST_KEY='wdym_share_last_day';
+
+function getCoins(){return parseInt(localStorage.getItem(COIN_KEY)||'0');}
+function setCoins(n){
+  localStorage.setItem(COIN_KEY,String(Math.max(0,n)));
+  updateCoinDisplay();
+}
+function addCoins(amount,reason){
+  if(amount<=0)return;
+  const cur=getCoins();
+  const next=cur+amount;
+  setCoins(next);
+  // Log per audit / future feature
+  try{
+    const log=JSON.parse(localStorage.getItem(COIN_LOG_KEY)||'[]');
+    log.push({t:Date.now(),a:amount,r:reason,b:next});
+    if(log.length>200)log.splice(0,log.length-200);
+    localStorage.setItem(COIN_LOG_KEY,JSON.stringify(log));
+  }catch(e){}
+  // Pop animation
+  coinPop('+'+amount);
+  // Analytics
+  if(typeof gtag==='function')gtag('event','coin_earn',{amount:amount,reason:reason,balance:next});
+}
+function spendCoins(amount,reason){
+  const cur=getCoins();
+  if(cur<amount)return false;
+  setCoins(cur-amount);
+  if(typeof gtag==='function')gtag('event','coin_spend',{amount:amount,reason:reason,balance:cur-amount});
+  return true;
+}
+function updateCoinDisplay(){
+  const el=document.getElementById('COIN_VAL');
+  if(el)el.textContent=getCoins().toLocaleString('it-IT');
+}
+function coinPop(text){
+  const badge=document.getElementById('COIN_BADGE');
+  if(!badge)return;
+  const r=badge.getBoundingClientRect();
+  const pop=document.createElement('div');
+  pop.className='coin-pop';
+  pop.textContent='🪙 '+text;
+  pop.style.left=(r.left+r.width/2)+'px';
+  pop.style.top=(r.bottom+4)+'px';
+  document.body.appendChild(pop);
+  setTimeout(()=>pop.remove(),1500);
+}
+
+// Init display all'avvio
+updateCoinDisplay();
+
+// ─── PATCH: showVerdict — assegna monete in base al voto ───
+const _origShowVerdictForCoins=showVerdict;
+showVerdict=function(name,sc){
+  const r=_origShowVerdictForCoins(name,sc);
+  // Monete in base al voto
+  if(sc>=10)addCoins(20,'perfect_10');
+  else if(sc>=8)addCoins(10,'great_score');
+  else if(sc>=5)addCoins(3,'decent_score');
+  return r;
+};
+
+// ─── PATCH: soloFinal — bonus completamento + nuovo record ───
+const _origSoloFinal=soloFinal;
+soloFinal=function(){
+  const total=G.scores['TU'];
+  const max=G.rounds*10;
+  const bk='wdym_solo_best_'+G.rounds;
+  const prev=parseInt(localStorage.getItem(bk)||'0');
+  // Bonus base completamento
+  addCoins(10,'solo_complete');
+  // Bonus nuovo record
+  if(total>prev)addCoins(50,'new_record');
+  // Bonus performance
+  const pct=total/max;
+  if(pct>=0.9)addCoins(30,'poliglotta_supremo');
+  return _origSoloFinal();
+};
+
+// ─── PATCH: shareTo — bonus prima share del giorno ───
+const _origShareTo=shareTo;
+shareTo=function(channel){
+  const today=new Date().toISOString().slice(0,10);
+  const last=localStorage.getItem(SHARE_LAST_KEY);
+  if(last!==today){
+    localStorage.setItem(SHARE_LAST_KEY,today);
+    addCoins(5,'daily_share');
+  }
+  return _origShareTo(channel);
+};
+
+// ═══════════════════════════════════════════════════════
+// FASE B.2 — SHOP CON AVATAR SBLOCCABILI 🛍️
+// ═══════════════════════════════════════════════════════
+// 8 avatar default (gratis) + 12 avatar premium (sbloccabili con monete).
+// L'avatar attivo si vede nel podio solo + nei chip player multiplayer.
+
+const SHOP_ITEMS=[
+  // ── Default (gratis, sempre sbloccati) ──
+  {id:'fox',     e:'🦊', n:'Volpe',          p:0,    cat:'default'},
+  {id:'panda',   e:'🐼', n:'Panda',          p:0,    cat:'default'},
+  {id:'lion',    e:'🦁', n:'Leone',          p:0,    cat:'default'},
+  {id:'frog',    e:'🐸', n:'Rana',           p:0,    cat:'default'},
+  {id:'butterfly',e:'🦋',n:'Farfalla',       p:0,    cat:'default'},
+  {id:'star',    e:'🌟', n:'Stella',         p:0,    cat:'default'},
+  {id:'unicorn', e:'🦄', n:'Unicorno',       p:0,    cat:'default'},
+  {id:'dragon',  e:'🐉', n:'Drago',          p:0,    cat:'default'},
+  // ── Premium (sbloccabili) ──
+  {id:'taco',    e:'🌮', n:'Taco Master',    p:100,  cat:'premium'},
+  {id:'sushi',   e:'🍣', n:'Sushi San',      p:150,  cat:'premium'},
+  {id:'baguette',e:'🥖', n:'Baguette Boy',   p:200,  cat:'premium'},
+  {id:'pizza',   e:'🍕', n:'Pizza Lord',     p:200,  cat:'premium'},
+  {id:'camel',   e:'🐪', n:'Beduino',        p:300,  cat:'premium'},
+  {id:'koala',   e:'🐨', n:'Koala Aussie',   p:300,  cat:'premium'},
+  {id:'penguin', e:'🐧', n:'Pinguino Polare',p:400,  cat:'premium'},
+  {id:'octopus', e:'🐙', n:'Polipo Greco',   p:400,  cat:'premium'},
+  {id:'tiger',   e:'🐯', n:'Tigre Indiana',  p:500,  cat:'premium'},
+  {id:'eagle',   e:'🦅', n:'Aquila Russa',   p:600,  cat:'premium'},
+  {id:'wizard',  e:'🧙', n:'Mago Linguista', p:800,  cat:'premium'},
+  {id:'crown',   e:'👑', n:'Re del Mondo',   p:1500, cat:'premium'},
+];
+const UNLOCKED_KEY='wdym_unlocked';
+const EQUIPPED_KEY='wdym_equipped';
+
+function getUnlocked(){
+  try{return JSON.parse(localStorage.getItem(UNLOCKED_KEY)||'[]');}
+  catch(e){return [];}
+}
+function isUnlocked(id){
+  const item=SHOP_ITEMS.find(x=>x.id===id);
+  if(item&&item.cat==='default')return true;
+  return getUnlocked().includes(id);
+}
+function unlock(id){
+  const u=getUnlocked();
+  if(!u.includes(id))u.push(id);
+  localStorage.setItem(UNLOCKED_KEY,JSON.stringify(u));
+}
+function getEquipped(){
+  return localStorage.getItem(EQUIPPED_KEY)||'fox';
+}
+function setEquipped(id){
+  if(!isUnlocked(id))return;
+  localStorage.setItem(EQUIPPED_KEY,id);
+}
+function getEquippedEmoji(){
+  const id=getEquipped();
+  const item=SHOP_ITEMS.find(x=>x.id===id);
+  return item?item.e:'🦊';
+}
+
+function openShop(){
+  sfxClick();
+  document.getElementById('SHOP_OV').classList.add('on');
+  renderShop();
+  if(typeof gtag==='function')gtag('event','shop_open',{balance:getCoins()});
+}
+function closeShop(){
+  document.getElementById('SHOP_OV').classList.remove('on');
+}
+function shopTab(tab){
+  document.querySelectorAll('.shop-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  document.getElementById('SHOP_GRID').style.display=tab==='avatars'?'grid':'none';
+  document.getElementById('SHOP_INFO').style.display=tab==='info'?'block':'none';
+}
+function renderShop(){
+  document.getElementById('SHOP_BAL').textContent=getCoins().toLocaleString('it-IT');
+  const grid=document.getElementById('SHOP_GRID');
+  const coins=getCoins();
+  const equipped=getEquipped();
+  grid.innerHTML=SHOP_ITEMS.map(it=>{
+    const owned=isUnlocked(it.id);
+    const isEq=equipped===it.id;
+    const canBuy=!owned&&coins>=it.p;
+    let cls='shop-item';
+    if(isEq)cls+=' equipped';
+    else if(owned)cls+=' owned';
+    else if(!canBuy)cls+=' cantbuy';
+    let priceHtml;
+    if(it.p===0)priceHtml=`<span class="shop-price free">GRATIS</span>`;
+    else if(owned)priceHtml=`<span class="shop-price" style="background:rgba(0,255,136,.15);color:#00ff88">✓ OWNED</span>`;
+    else priceHtml=`<span class="shop-price">🪙 ${it.p}</span>`;
+    let tag='';
+    if(isEq)tag=`<span class="shop-tag equipped-tag">★ IN USO</span>`;
+    else if(owned)tag=`<span class="shop-tag owned-tag">TUO</span>`;
+    return `<div class="${cls}" onclick="shopItemClick('${it.id}')">
+      ${tag}
+      <span class="shop-emoji">${it.e}</span>
+      <div class="shop-name">${it.n}</div>
+      ${priceHtml}
+    </div>`;
+  }).join('');
+}
+function shopItemClick(id){
+  sfxClick();
+  const it=SHOP_ITEMS.find(x=>x.id===id);
+  if(!it)return;
+  const owned=isUnlocked(id);
+  if(owned){
+    // Equipa
+    setEquipped(id);
+    renderShop();
+    coinPop('★ '+it.n);
+    if(typeof gtag==='function')gtag('event','avatar_equip',{id:id});
+    return;
+  }
+  // Compra
+  if(getCoins()<it.p){
+    alert('🪙 Non hai abbastanza monete!\n\nTi mancano '+(it.p-getCoins())+' monete.\nGioca ancora per guadagnarne.');
+    return;
+  }
+  if(!confirm(`Compri "${it.n}" ${it.e} per ${it.p} 🪙?`))return;
+  if(spendCoins(it.p,'avatar_'+id)){
+    unlock(id);
+    setEquipped(id);
+    sfxFanfare();
+    confetti();
+    renderShop();
+    if(typeof gtag==='function')gtag('event','avatar_buy',{id:id,price:it.p});
+  }
+}
+
+// ─── Integra avatar nel solo final ───
+// Mostra l'avatar dell'utente sopra la medaglia
+const _origSoloFinalAvatar=soloFinal;
+soloFinal=function(){
+  const r=_origSoloFinalAvatar();
+  // Inserisci avatar attivo sopra la medaglia
+  const box=document.getElementById('SOLO_BOX');
+  if(box&&!box.querySelector('.solo-avatar')){
+    const av=document.createElement('div');
+    av.className='solo-avatar';
+    av.style.cssText='text-align:center;font-size:3rem;margin-bottom:-8px;line-height:1';
+    av.textContent=getEquippedEmoji();
+    box.insertBefore(av,box.firstChild);
+  }
+  return r;
+};
+
+// ═══════════════════════════════════════════════════════
+// FASE B.3 — PVP VIA LINK WHATSAPP ⚔️
+// ═══════════════════════════════════════════════════════
+// Stato sfida codificato in URL come ?c=<base64url>
+// Nessun server: il link contiene tutto il necessario.
+
+const PVP_ROUNDS=3;
+const PVP_MAX_SCORE=PVP_ROUNDS*10;
+let _pvp=null; // {mode:'create'|'accept', state, scores:[], cur:0, name}
+
+// ─── Encode/Decode base64url ───
+function b64urlEncode(obj){
+  const json=JSON.stringify(obj);
+  // btoa non gestisce unicode → encodeURIComponent + unescape trick
+  const b64=btoa(unescape(encodeURIComponent(json)));
+  return b64.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlDecode(str){
+  try{
+    let b64=str.replace(/-/g,'+').replace(/_/g,'/');
+    while(b64.length%4)b64+='=';
+    const json=decodeURIComponent(escape(atob(b64)));
+    return JSON.parse(json);
+  }catch(e){console.error('decode error',e);return null;}
+}
+
+// ─── Pesca 3 round random per la sfida ───
+function pvpGenerateQueue(){
+  // V4: 3 round graduati LV1 → LV2 → LV3 (1 parola facile, 1 tosta, 2 parole)
+  const queue=[];
+  [1,2,3].forEach(lv=>{
+    const cfg=pickWordForLevel(lv);
+    const wi=cfg.offset+Math.floor(Math.random()*cfg.pool.length);
+    const li=Math.floor(Math.random()*cfg.langs.length);
+    queue.push({l:cfg.dbKey,w:wi,g:cfg.langs[li].t});
+  });
+  return queue;
+}
+
+// ─── Loads parola/lingua del round corrente in G (riusa il flow esistente) ───
+function pvpLoadRound(){
+  if(!_pvp||_pvp.cur>=_pvp.state.q.length)return false;
+  const q=_pvp.state.q[_pvp.cur];
+  G.phrase=DB[q.l][q.w];
+  G.lang=LANGS.find(l=>l.t===q.g)||LANGS[0];
+  G.tran=G.phrase.tr[G.lang.t].t;
+  G.phon=G.phrase.tr[G.lang.t].p;
+  return true;
+}
+
+// ─── Flow CREATE: Mario apre dalla home ───
+function pvpCreateStart(){
+  sfxClick();
+  closePvp();
+  document.getElementById('PVP_OV').classList.add('on');
+  pvpShowPanel('CREATE');
+  // Pre-fill nome dall'ultimo usato
+  const lastName=localStorage.getItem('wdym_pvp_name')||'';
+  document.getElementById('PVP_NAME').value=lastName;
+  setTimeout(()=>document.getElementById('PVP_NAME').focus(),200);
+  if(typeof gtag==='function')gtag('event','pvp_create_open');
+}
+function pvpCreateConfirm(){
+  const name=(document.getElementById('PVP_NAME').value||'').trim();
+  if(!name){alert('Scrivi prima il tuo nome!');return;}
+  localStorage.setItem('wdym_pvp_name',name);
+  // Genera state iniziale
+  _pvp={
+    mode:'create',
+    state:{a:name,s:0,m:PVP_MAX_SCORE,q:pvpGenerateQueue()},
+    scores:[],
+    cur:0,
+    name:name
+  };
+  // Setup G per riusare il flow gameplay
+  G.solo=false;G.pvp=true;
+  G.players=[name];G.scores={[name]:0};
+  G.rounds=PVP_ROUNDS;G.round=1;G.subRound=0;
+  G.chooser=-1;G.firstChooser=0;G.usedPhrases={1:[],2:[],3:[],4:[]};
+  G.queue=[name];G.pIdx=0;
+  closePvpOverlayKeepState();
+  pvpLoadRound();
+  showListen();
+  if(typeof gtag==='function')gtag('event','pvp_create_start');
+}
+
+// ─── Flow ACCEPT: Anna apre il link ───
+function pvpReceived(state){
+  _pvp={mode:'accept',state:state,scores:[],cur:0,name:null};
+  document.getElementById('PVP_RECV_NAME').textContent=(state.a||'?').toUpperCase();
+  document.getElementById('PVP_RECV_SCORE').textContent=state.s;
+  document.getElementById('PVP_RECV_MAX').textContent=state.m;
+  document.getElementById('PVP_OV').classList.add('on');
+  pvpShowPanel('RECEIVED');
+  if(typeof gtag==='function')gtag('event','pvp_received',{challenger:state.a});
+}
+function pvpAcceptStart(){
+  sfxClick();
+  const name=prompt('Come ti chiami?','TU')||'TU';
+  _pvp.name=name.trim()||'TU';
+  // Setup G per gameplay riusando flow
+  G.solo=false;G.pvp=true;
+  G.players=[_pvp.name];G.scores={[_pvp.name]:0};
+  G.rounds=PVP_ROUNDS;G.round=1;G.subRound=0;
+  G.chooser=-1;G.firstChooser=0;G.usedPhrases={1:[],2:[],3:[],4:[]};
+  G.queue=[_pvp.name];G.pIdx=0;
+  closePvpOverlayKeepState();
+  pvpLoadRound();
+  showListen();
+  if(typeof gtag==='function')gtag('event','pvp_accept_start');
+}
+
+// ─── Hook gameplay: cattura score quando arriva il verdetto ───
+const _origShowVerdictForPvp=showVerdict;
+showVerdict=function(name,sc){
+  const r=_origShowVerdictForPvp(name,sc);
+  if(G.pvp&&_pvp){
+    _pvp.scores.push(sc);
+  }
+  return r;
+};
+
+// ─── Hook nextOrSummary: in PvP avanza al prossimo round o chiudi ───
+const _origNextOrSummaryForPvp=nextOrSummary;
+nextOrSummary=function(){
+  if(!G.pvp)return _origNextOrSummaryForPvp();
+  _pvp.cur++;
+  if(_pvp.cur>=_pvp.state.q.length){
+    // Sfida finita
+    if(_pvp.mode==='create')pvpCreateFinished();
+    else pvpAcceptFinished();
+    return;
+  }
+  G.round++;
+  pvpLoadRound();
+  showListen();
+};
+
+// ─── Hook startPronouncers: in PvP TU pronunci (no chooser) ───
+const _origStartPronouncersForPvp=startPronouncers;
+startPronouncers=function(){
+  if(G.pvp){
+    G.queue=[_pvp.name||'TU'];G.pIdx=0;G.rscores={};
+    showPronounce();return;
+  }
+  _origStartPronouncersForPvp();
+};
+const _origShowPassPhoneForPvp=showPassPhone;
+showPassPhone=function(){
+  if(G.pvp){showPronounce();return;}
+  _origShowPassPhoneForPvp();
+};
+
+// ─── Mario ha finito: genera link e mostra ───
+function pvpCreateFinished(){
+  const total=_pvp.scores.reduce((a,b)=>a+b,0);
+  _pvp.state.s=total;
+  const code=b64urlEncode(_pvp.state);
+  const base='https://luiscasto2000-svg.github.io/What-do-you-mean-/';
+  const link=base+'?c='+code;
+  _pvp.link=link;
+  // Bonus monete per la creazione
+  addCoins(5,'pvp_create');
+  document.getElementById('PVP_SENT_SCORE').textContent=total;
+  document.getElementById('PVP_SENT_MAX').textContent=_pvp.state.m;
+  document.getElementById('PVP_LINK').textContent=link;
+  document.getElementById('PVP_OV').classList.add('on');
+  pvpShowPanel('SENT');
+  if(typeof gtag==='function')gtag('event','pvp_create_finished',{score:total});
+}
+
+// ─── Anna ha finito: confronto e risultato ───
+function pvpAcceptFinished(){
+  const myTotal=_pvp.scores.reduce((a,b)=>a+b,0);
+  const opTotal=_pvp.state.s;
+  const opName=_pvp.state.a||'AMICO';
+  const myName=_pvp.name||'TU';
+  let banner,emoji,bannerClass,coinsEarned=0;
+  if(myTotal>opTotal){
+    banner='HAI VINTO!';emoji='🏆';bannerClass='win';coinsEarned=30;
+    sfxFanfare();confetti();
+  }else if(myTotal<opTotal){
+    banner='HAI PERSO.';emoji='💀';bannerClass='lose';coinsEarned=5;
+    sfxFail();
+  }else{
+    banner='PAREGGIO!';emoji='🤝';bannerClass='tie';coinsEarned=15;
+  }
+  if(coinsEarned>0)addCoins(coinsEarned,'pvp_finish');
+  // Render UI risultato
+  document.getElementById('PVP_RES_EMOJI').textContent=emoji;
+  const bn=document.getElementById('PVP_RES_BANNER');
+  bn.textContent=banner;bn.className='pvp-result-banner '+bannerClass;
+  document.getElementById('PVP_RES_NAME_L').textContent=myName.toUpperCase();
+  document.getElementById('PVP_RES_SC_L').textContent=myTotal;
+  document.getElementById('PVP_RES_NAME_R').textContent=opName.toUpperCase();
+  document.getElementById('PVP_RES_SC_R').textContent=opTotal;
+  const left=document.getElementById('PVP_RES_LEFT');
+  const right=document.getElementById('PVP_RES_RIGHT');
+  left.className='pvp-vs-side '+(myTotal>opTotal?'win':myTotal<opTotal?'lose':'tie');
+  right.className='pvp-vs-side '+(opTotal>myTotal?'win':opTotal<myTotal?'lose':'tie');
+  document.getElementById('PVP_RES_COINS').textContent=coinsEarned>0?`+${coinsEarned} 🪙 monete guadagnate`:'';
+  document.getElementById('PVP_OV').classList.add('on');
+  pvpShowPanel('RESULT');
+  // Salva per rivincita: serve sapere queue da inviare indietro
+  _pvp._myScore=myTotal;_pvp._myName=myName;_pvp._opName=opName;
+  // Pulisci URL per evitare loop al refresh
+  if(window.history&&window.history.replaceState){
+    window.history.replaceState({},document.title,window.location.pathname);
+  }
+  if(typeof gtag==='function')gtag('event','pvp_accept_finished',{
+    result:myTotal>opTotal?'win':myTotal<opTotal?'lose':'tie',
+    my_score:myTotal,op_score:opTotal
+  });
+}
+
+// ─── Share link ───
+function pvpShareLink(channel){
+  sfxClick();
+  if(!_pvp||!_pvp.link)return;
+  const text=`⚔️ Ti sfido a What Do You Mean?! Ho fatto ${_pvp.state.s}/${_pvp.state.m} 💪 Riesci a battermi?`;
+  if(channel==='whatsapp'){
+    window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n'+_pvp.link)}`,'_blank');
+  }else if(channel==='copy'){
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(_pvp.link).then(()=>alert('📋 Link copiato! Incollalo dove vuoi.'));
+    }
+  }
+  if(typeof gtag==='function')gtag('event','pvp_share',{channel:channel});
+}
+
+// ─── Rivincita: Anna genera link risposta a Mario ───
+function pvpRevenge(){
+  sfxClick();
+  if(!_pvp)return;
+  // Inverti i ruoli: Anna diventa challenger, manda link a Mario
+  _pvp.mode='create';
+  _pvp.state={
+    a:_pvp._myName,
+    s:_pvp._myScore,
+    m:PVP_MAX_SCORE,
+    q:_pvp.state.q // STESSI round per fair comparison
+  };
+  const code=b64urlEncode(_pvp.state);
+  const base='https://luiscasto2000-svg.github.io/What-do-you-mean-/';
+  _pvp.link=base+'?c='+code;
+  document.getElementById('PVP_SENT_SCORE').textContent=_pvp._myScore;
+  document.getElementById('PVP_SENT_MAX').textContent=PVP_MAX_SCORE;
+  document.getElementById('PVP_LINK').textContent=_pvp.link;
+  pvpShowPanel('SENT');
+}
+function pvpShareResult(){
+  pvpRevenge(); // riusa logica: la "share result" è essenzialmente un challenge di rivincita
+}
+
+// ─── Helpers ───
+function pvpShowPanel(name){
+  ['CREATE','SENT','RECEIVED','RESULT'].forEach(n=>{
+    document.getElementById('PVP_'+n).style.display=(n===name)?'block':'none';
+  });
+  document.getElementById('PVP_OV').scrollTop=0;
+}
+function closePvp(){
+  document.getElementById('PVP_OV').classList.remove('on');
+  G.pvp=false;_pvp=null;
+}
+function closePvpOverlayKeepState(){
+  document.getElementById('PVP_OV').classList.remove('on');
+}
+
+// ═══════════════════════════════════════════════════════
+// FASE C — UI MOCKUP (Profile, Leaderboard, Online)
+// Backend Firebase: TODO nelle prossime sessioni
+// ═══════════════════════════════════════════════════════
+
+// ─── Stats persistenti locali (saranno sincronizzate con cloud in Sessione 2) ───
+const STATS_KEY='wdym_stats';
+function getStats(){
+  try{return JSON.parse(localStorage.getItem(STATS_KEY)||'{}');}catch(e){return {};}
+}
+function updateStats(patch){
+  const s=getStats();
+  Object.assign(s,patch);
+  // TODO Firebase: sincronizza qui in Sessione 2
+  localStorage.setItem(STATS_KEY,JSON.stringify(s));
+}
+function bumpStat(key,delta=1){
+  const s=getStats();s[key]=(s[key]||0)+delta;
+  localStorage.setItem(STATS_KEY,JSON.stringify(s));
+}
+
+// Hook gameplay → tracking stats
+const _origSoloFinalForStats=soloFinal;
+soloFinal=function(){
+  bumpStat('gamesPlayed');
+  bumpStat('soloPlayed');
+  const r=_origSoloFinalForStats();
+  const total=G.scores['TU'];
+  const bk='wdym_solo_best_'+G.rounds;
+  const best=parseInt(localStorage.getItem(bk)||'0');
+  updateStats({bestSolo:Math.max(getStats().bestSolo||0,best)});
+  if(total/(G.rounds*10)>=0.6)bumpStat('gamesWon');
+  return r;
+};
+
+// PvP win counter
+const _origPvpAcceptFinished=pvpAcceptFinished;
+pvpAcceptFinished=function(){
+  bumpStat('gamesPlayed');
+  bumpStat('pvpPlayed');
+  const my=_pvp.scores.reduce((a,b)=>a+b,0);
+  const op=_pvp.state.s;
+  if(my>op)bumpStat('gamesWon');
+  return _origPvpAcceptFinished();
+};
+
+// ─── PROFILE ───
+const PROF_KEY='wdym_profile';
+function getProfile(){
+  try{return JSON.parse(localStorage.getItem(PROF_KEY)||'null')||{nickname:'GIOCATORE',avatar:'fox'};}
+  catch(e){return {nickname:'GIOCATORE',avatar:'fox'};}
+}
+function saveProfile(p){
+  localStorage.setItem(PROF_KEY,JSON.stringify(p));
+  // TODO Firebase: sync to /users/{uid} in Sessione 2
+}
+function openProfile(){
+  sfxClick();
+  const p=getProfile();
+  const s=getStats();
+  document.getElementById('PROF_AV').textContent=getEquippedEmoji();
+  document.getElementById('PROF_NAME').textContent=(p.nickname||'GIOCATORE').toUpperCase();
+  document.getElementById('PROF_COINS').textContent=getCoins().toLocaleString('it-IT');
+  document.getElementById('PROF_GAMES').textContent=(s.gamesPlayed||0).toLocaleString('it-IT');
+  document.getElementById('PROF_WINS').textContent=(s.gamesWon||0).toLocaleString('it-IT');
+  document.getElementById('PROF_BEST').textContent=(s.bestSolo||0).toLocaleString('it-IT');
+  document.getElementById('PROF_PVP').textContent=(s.pvpPlayed||0).toLocaleString('it-IT');
+  document.getElementById('PROF_UNLOCKED').textContent=getUnlocked().length+8; // +8 default
+  document.getElementById('PROFILE_OV').classList.add('on');
+  if(typeof gtag==='function')gtag('event','profile_open');
+}
+function closeProfile(){document.getElementById('PROFILE_OV').classList.remove('on');}
+function editProfile(){
+  const p=getProfile();
+  const newName=prompt('Scegli il tuo nickname (max 16):',p.nickname||'');
+  if(newName===null)return;
+  const clean=newName.trim().slice(0,16);
+  if(!clean)return;
+  p.nickname=clean;
+  saveProfile(p);
+  document.getElementById('PROF_NAME').textContent=clean.toUpperCase();
+}
+
+// ─── LEADERBOARD (dati DEMO fake — in Sessione 3 diventeranno LIVE da Firestore) ───
+const LB_FAKE_DATA={
+  world: [
+    {n:'Bruno',     c:'IT', av:'crown',    s:1890},
+    {n:'Akira',     c:'JP', av:'sushi',    s:1740},
+    {n:'Mei Ling',  c:'CN', av:'dragon',   s:1680},
+    {n:'Carlos',    c:'ES', av:'taco',     s:1520},
+    {n:'Sophie',    c:'FR', av:'baguette', s:1450},
+    {n:'Hans',      c:'DE', av:'wizard',   s:1380},
+    {n:'Yuki',      c:'JP', av:'tiger',    s:1310},
+    {n:'Mario',     c:'IT', av:'pizza',    s:1220},
+    {n:'Aisha',     c:'AE', av:'camel',    s:1180},
+    {n:'Vlad',      c:'RU', av:'eagle',    s:1120},
+  ],
+  italy: [
+    {n:'Bruno',     c:'IT', av:'crown',    s:1890},
+    {n:'Mario',     c:'IT', av:'pizza',    s:1220},
+    {n:'Giulia',    c:'IT', av:'unicorn',  s:980},
+    {n:'Francesco', c:'IT', av:'lion',     s:870},
+    {n:'Beatrice',  c:'IT', av:'butterfly',s:720},
+    {n:'Alessandro',c:'IT', av:'fox',      s:680},
+    {n:'Chiara',    c:'IT', av:'star',     s:540},
+  ],
+  friends: [
+    // Vuota intenzionalmente — placeholder
+  ]
+};
+function getCountry(){
+  try{
+    const lang=navigator.language||'it-IT';
+    return lang.split('-')[1]||'IT';
+  }catch(e){return 'IT';}
+}
+function openLeaderboard(){
+  sfxClick();
+  document.getElementById('LB_OV').classList.add('on');
+  lbTab('world');
+  if(typeof gtag==='function')gtag('event','leaderboard_open');
+}
+function closeLeaderboard(){document.getElementById('LB_OV').classList.remove('on');}
+function lbTab(name){
+  document.querySelectorAll('.lb-tab').forEach(t=>t.classList.toggle('on',t.dataset.lb===name));
+  const list=document.getElementById('LB_LIST');
+  // TODO Firebase Sessione 3: rimpiazzare con fetch reale da Firestore
+  const data=LB_FAKE_DATA[name]||[];
+  const me=getProfile();
+  if(data.length===0){
+    list.innerHTML=`<div style="text-align:center;color:var(--mt);padding:30px;font-size:.85rem;line-height:1.7">
+      ${name==='friends'?'👥 Nessun amico in classifica.<br>Aggiungili dalla rubrica (Sessione 5)':'Nessun dato'}
+    </div>`;
+    return;
+  }
+  list.innerHTML=data.map((p,i)=>{
+    const item=SHOP_ITEMS.find(x=>x.id===p.av)||SHOP_ITEMS[0];
+    const rank=i+1;
+    let rCls='';
+    if(rank===1)rCls='top1';else if(rank===2)rCls='top2';else if(rank===3)rCls='top3';
+    return `<div class="lb-row ${rCls}">
+      <div class="lb-rank ${rCls}">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank}</div>
+      <div class="lb-av">${item.e}</div>
+      <div class="lb-info">
+        <div class="lb-name">${p.n.toUpperCase()}</div>
+        <div class="lb-meta">${p.c} · punti settimana</div>
+      </div>
+      <div class="lb-score">${p.s.toLocaleString('it-IT')}</div>
+    </div>`;
+  }).join('');
+  // Mostra anche la mia posizione fake
+  if(name!=='friends'){
+    list.innerHTML+=`<div style="text-align:center;margin:14px 0 6px;font-size:.7rem;color:var(--mt);letter-spacing:2px;text-transform:uppercase">tu sei</div>
+    <div class="lb-row me">
+      <div class="lb-rank">#?</div>
+      <div class="lb-av">${getEquippedEmoji()}</div>
+      <div class="lb-info">
+        <div class="lb-name">${(me.nickname||'TU').toUpperCase()}</div>
+        <div class="lb-meta">🔒 sblocca in Sessione 2</div>
+      </div>
+      <div class="lb-score">--</div>
+    </div>`;
+  }
+}
+
+// ─── ONLINE MATCH (placeholder) ───
+function openOnline(){
+  sfxClick();
+  document.getElementById('ONLINE_OV').classList.add('on');
+  if(typeof gtag==='function')gtag('event','online_open');
+}
+function closeOnline(){document.getElementById('ONLINE_OV').classList.remove('on');}
+
+// ═══════════════════════════════════════════════════════
+// FIREBASE CONFIG — placeholder per Sessione 2
+// Quando avrai creato il progetto Firebase, qui andrà la config reale
+// ═══════════════════════════════════════════════════════
+const FIREBASE_CONFIG={
+  // TODO Sessione 2:
+  // apiKey:           "...",
+  // authDomain:       "wdym-app.firebaseapp.com",
+  // projectId:        "wdym-app",
+  // storageBucket:    "wdym-app.appspot.com",
+  // messagingSenderId:"...",
+  // appId:            "..."
+};
+// L'app per ora funziona OFFLINE. Quando Firebase sarà attivo,
+// le funzioni saveProfile / updateStats / lb fetch useranno il cloud.
+
+// ─── All'avvio app: rileva ?c= e mostra sfida ricevuta ───
+(function detectChallenge(){
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const code=params.get('c');
+    if(!code)return;
+    const state=b64urlDecode(code);
+    if(!state||!state.a||!state.q||!Array.isArray(state.q)){
+      console.warn('Invalid challenge state');
+      return;
+    }
+    // Aspetta il caricamento del DOM prima di mostrare l'overlay
+    setTimeout(()=>pvpReceived(state),300);
+  }catch(e){console.error(e);}
+})();
+
+// ═══════════════════════════════════════════════════════
+// V4 — MODALITÀ STORIA, FAB REGOLE, PATCH BANNER
+// ═══════════════════════════════════════════════════════
+
+// ─── DATABASE STORIA ───
+// 4 capitoli × 5 livelli = 20 lezioni. Una lingua per capitolo, parole semplici.
+const STORY_CHAPTERS=[
+  {id:0,title:'SALUTI',emoji:'👋',sub:'le basi della cortesia',lang:'en-GB',langName:'INGLESE',flag:'🇬🇧',
+   levels:[
+     {it:'Ciao',t:'Hello',p:'helou'},
+     {it:'Grazie',t:'Thank you',p:'tenk iu'},
+     {it:'Per favore',t:'Please',p:'pliis'},
+     {it:'Buongiorno',t:'Good morning',p:'gud mooning'},
+     {it:'Buonanotte',t:'Good night',p:'gud nait'},
+   ]},
+  {id:1,title:'ANIMALI',emoji:'🐾',sub:'gli amici a quattro zampe',lang:'es-ES',langName:'SPAGNOLO',flag:'🇪🇸',
+   levels:[
+     {it:'Gatto',t:'Gato',p:'gato'},
+     {it:'Cane',t:'Perro',p:'pero'},
+     {it:'Uccello',t:'Pájaro',p:'paharo'},
+     {it:'Pesce',t:'Pez',p:'pes'},
+     {it:'Cavallo',t:'Caballo',p:'kabaio'},
+   ]},
+  {id:2,title:'CIBO',emoji:'🍕',sub:'la pancia chiama',lang:'fr-FR',langName:'FRANCESE',flag:'🇫🇷',
+   levels:[
+     {it:'Pane',t:'Pain',p:'pan'},
+     {it:'Acqua',t:'Eau',p:'o'},
+     {it:'Caffè',t:'Café',p:'kafé'},
+     {it:'Formaggio',t:'Fromage',p:'fromazh'},
+     {it:'Pizza',t:'Pizza',p:'pitsa'},
+   ]},
+  {id:3,title:'CASA',emoji:'🏠',sub:'il tuo regno',lang:'de-DE',langName:'TEDESCO',flag:'🇩🇪',
+   levels:[
+     {it:'Casa',t:'Haus',p:'haus'},
+     {it:'Porta',t:'Tür',p:'tuer'},
+     {it:'Letto',t:'Bett',p:'bet'},
+     {it:'Tavolo',t:'Tisch',p:'tish'},
+     {it:'Cucina',t:'Küche',p:'kuekhe'},
+   ]},
+];
+
+// ─── Progressi storia ───
+const STORY_KEY='wdym_story_progress';
+function getStoryProgress(){
+  try{return JSON.parse(localStorage.getItem(STORY_KEY)||'{}');}
+  catch(e){return {};}
+}
+function setStoryProgress(p){localStorage.setItem(STORY_KEY,JSON.stringify(p));}
+function getStarsFor(chap,lvl){
+  const p=getStoryProgress();
+  return (p[chap+'_'+lvl])||0;
+}
+function setStarsFor(chap,lvl,stars){
+  const p=getStoryProgress();
+  const k=chap+'_'+lvl;
+  if(!p[k]||p[k]<stars)p[k]=stars;
+  setStoryProgress(p);
+}
+function getTotalStars(){
+  const p=getStoryProgress();
+  return Object.values(p).reduce((a,b)=>a+b,0);
+}
+function isLevelUnlocked(chap,lvl){
+  // Primo livello del primo capitolo: sempre sbloccato
+  if(chap===0&&lvl===0)return true;
+  // Per gli altri livelli del capitolo: serve il precedente con >=1 stella
+  if(lvl>0)return getStarsFor(chap,lvl-1)>=1;
+  // Primo livello di capitolo successivo: serve aver completato l'ultimo del precedente
+  return getStarsFor(chap-1,STORY_CHAPTERS[chap-1].levels.length-1)>=1;
+}
+function scoreToStars(score){
+  if(score>=9)return 3;
+  if(score>=6)return 2;
+  if(score>=3)return 1;
+  return 0;
+}
+
+// ─── Open / render story map ───
+function openStory(){
+  sfxClick();
+  document.getElementById('STORY_OV').classList.add('on');
+  renderStoryMap();
+  if(typeof gtag==='function')gtag('event','story_open');
+}
+function closeStory(){document.getElementById('STORY_OV').classList.remove('on');}
+function renderStoryMap(){
+  document.getElementById('STORY_PROG_TXT').textContent=getTotalStars();
+  const list=document.getElementById('STORY_CHAPTERS_LIST');
+  list.innerHTML=STORY_CHAPTERS.map((c,ci)=>{
+    // È sbloccato il capitolo se il primo livello è sbloccato
+    const chapUnlocked=isLevelUnlocked(ci,0);
+    const cls='story-chapter'+(chapUnlocked?'':' locked');
+    const levelsHtml=c.levels.map((lv,li)=>{
+      const stars=getStarsFor(ci,li);
+      const unlocked=isLevelUnlocked(ci,li);
+      const next=unlocked&&stars===0;
+      const completed=stars>0;
+      let cl='story-level';
+      if(!unlocked)cl+=' locked';
+      if(completed)cl+=' completed';
+      if(next&&!completed)cl+=' next';
+      const starsHtml=stars>0?
+        '⭐'.repeat(stars)+'☆'.repeat(3-stars):
+        '☆☆☆';
+      return `<div class="${cl}" onclick="${unlocked?`startStoryLevel(${ci},${li})`:'sfxFail()'}">
+        <div class="story-level-num">${li+1}</div>
+        <div class="story-level-stars" style="color:${stars>0?'#ffcc00':'#7060a0'};font-size:.65rem">${starsHtml}</div>
+      </div>`;
+    }).join('');
+    return `<div class="${cls}">
+      <div class="story-chap-head">
+        <div class="story-chap-emoji">${c.emoji}</div>
+        <div class="story-chap-info">
+          <div class="story-chap-title">CAP. ${ci+1} · ${c.title}</div>
+          <div class="story-chap-sub">${c.sub} · ${c.langName}</div>
+        </div>
+        <div class="story-chap-flag">${c.flag}</div>
+      </div>
+      <div class="story-levels">${levelsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Avvia livello storia ───
+function startStoryLevel(chap,lvl){
+  sfxClick();
+  const c=STORY_CHAPTERS[chap];
+  const level=c.levels[lvl];
+  // Setup G per single-round con parola specifica
+  G.solo=false;G.pvp=false;G.story=true;
+  G.storyChap=chap;G.storyLvl=lvl;
+  G.players=['TU'];G.scores={'TU':0};
+  G.rounds=1;G.round=1;G.subRound=0;
+  G.chooser=-1;G.firstChooser=0;
+  G.usedPhrases={1:[],2:[],3:[],4:[]};
+  G.queue=['TU'];G.pIdx=0;
+  G.phrase={it:level.it,hint:c.emoji+' '+c.title,tr:{[c.lang]:{t:level.t,p:level.p}}};
+  G.lang=LANGS.find(l=>l.t===c.lang)||LANGS[0];
+  G.tran=level.t;G.phon=level.p;
+  closeStory();
+  showListen();
+  if(typeof gtag==='function')gtag('event','story_level_start',{chapter:chap,level:lvl});
+}
+
+// ─── PATCH: nextOrSummary in story mode → finish story level ───
+const _origNextForStory=nextOrSummary;
+nextOrSummary=function(){
+  if(G.story){
+    storyFinishLevel();
+    return;
+  }
+  return _origNextForStory();
+};
+// ─── PATCH: startPronouncers / showPassPhone per story (come solo) ───
+const _origStartPronForStory=startPronouncers;
+startPronouncers=function(){
+  if(G.story){G.queue=['TU'];G.pIdx=0;G.rscores={};showPronounce();return;}
+  _origStartPronForStory();
+};
+const _origPassPhoneForStory=showPassPhone;
+showPassPhone=function(){
+  if(G.story){showPronounce();return;}
+  _origPassPhoneForStory();
+};
+
+// ─── Conclusione livello storia: stelle + bonus monete ───
+function storyFinishLevel(){
+  const score=G.scores['TU'];
+  const stars=scoreToStars(score);
+  const prevStars=getStarsFor(G.storyChap,G.storyLvl);
+  setStarsFor(G.storyChap,G.storyLvl,stars);
+  // Bonus monete: 5 per stella nuova
+  const newStars=Math.max(0,stars-prevStars);
+  if(newStars>0){
+    addCoins(newStars*5,'story_stars');
+  }
+  // Pulisci flag
+  G.story=false;
+  // Animazione di fine livello
+  const lo=document.getElementById('LOV');
+  document.getElementById('LT').innerHTML=stars>=2?'🌟 BRAVO!':stars>=1?'👏 BENE!':'💪 RITENTA!';
+  document.getElementById('LS').innerHTML=`
+    <div style="font-size:2.5rem;letter-spacing:6px;margin:14px 0;color:${stars>0?'#ffcc00':'#7060a0'}">
+      ${('⭐'.repeat(stars)+'☆'.repeat(3-stars))}
+    </div>
+    Voto Boccalone: <b style="color:#fff">${score}/10</b><br>
+    ${newStars>0?'<span style="color:#ffcc00">+'+(newStars*5)+' monete 🪙</span>':''}
+  `;
+  lo.style.display='flex';
+  if(stars>=3){confetti();sfxFanfare();}
+  else if(stars>=1)sfxSuccess();
+  else sfxFail();
+  setTimeout(()=>{
+    uload();
+    openStory();
+  },2800);
+  if(typeof gtag==='function')gtag('event','story_level_finish',{chapter:G.storyChap,level:G.storyLvl,score:score,stars:stars});
+}
+
+// ═══════════════════════════════════════════════════════
+// TASTINO REGOLE — TEXT-TO-SPEECH (leggimi)
+// ═══════════════════════════════════════════════════════
+let _speaking=false;
+function speakRules(){
+  sfxClick();
+  const syn=window.speechSynthesis;
+  if(!syn){alert('Il tuo browser non supporta la lettura vocale.');return;}
+  const fab=document.getElementById('RULES_FAB');
+  if(_speaking){
+    syn.cancel();_speaking=false;
+    fab.classList.remove('speaking');
+    return;
+  }
+  const text=
+    "Benvenuto in What Do You Mean! "+
+    "Il gioco di pronuncia più folle del mondo. "+
+    "Ascolta una parola pronunciata in una delle dodici lingue disponibili, "+
+    "poi prova a ripeterla con il microfono. "+
+    "Il temibile Maestro Boccalone giudicherà la tua pronuncia con un voto da zero a dieci. "+
+    "Puoi giocare da solo, in modalità storia per imparare passo passo, "+
+    "sfidare un amico via WhatsApp, oppure in gruppo passando il telefono. "+
+    "Guadagna monete vincendo e usale per sbloccare nuovi personaggi nel negozio. "+
+    "Buona fortuna!";
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='it-IT';u.rate=1.05;u.pitch=1.0;u.volume=1.0;
+  // Prova a usare una voce italiana
+  const voices=syn.getVoices();
+  const it=voices.find(v=>v.lang.startsWith('it'));
+  if(it)u.voice=it;
+  u.onstart=()=>{_speaking=true;fab.classList.add('speaking');};
+  u.onend=()=>{_speaking=false;fab.classList.remove('speaking');};
+  u.onerror=()=>{_speaking=false;fab.classList.remove('speaking');};
+  syn.cancel();
+  syn.speak(u);
+  if(typeof gtag==='function')gtag('event','rules_tts');
+}
+
+// ═══════════════════════════════════════════════════════
+// PATCH BANNER V2.0 — mostra al primo avvio dopo update
+// ═══════════════════════════════════════════════════════
+const PATCH_VERSION='2.0';
+function checkPatchBanner(){
+  if(localStorage.getItem('wdym_patch_seen')===PATCH_VERSION)return;
+  // Mostra dopo un piccolo delay per non sovrastare loading
+  setTimeout(()=>{
+    document.getElementById('PATCH_BANNER').classList.add('on');
+  },800);
+  if(typeof gtag==='function')gtag('event','patch_banner_show',{version:PATCH_VERSION});
+}
+function closePatchBanner(){
+  sfxClick();
+  document.getElementById('PATCH_BANNER').classList.remove('on');
+  localStorage.setItem('wdym_patch_seen',PATCH_VERSION);
+}
+
+// Init: controlla patch banner all'avvio (solo se non c'è sfida via link)
+(function initV4(){
+  const params=new URLSearchParams(window.location.search);
+  if(!params.get('c')){
+    checkPatchBanner();
+  }
+})();
+
+// ═══════════════════════════════════════════════════════
+// V5 — ACCOUNT LOCALE, SCELTA LINGUA, PACK MONETE, SKIN, STORIA 8 CAP
+// ═══════════════════════════════════════════════════════
+
+// ─── ONBOARDING (primo avvio: chiede nickname + avatar) ───
+const ONB_KEY='wdym_onboarded';
+function needsOnboarding(){return !localStorage.getItem(ONB_KEY);}
+function showOnboarding(){
+  // Popola griglia avatar (solo i default gratis)
+  const grid=document.getElementById('ONB_AVS');
+  const defaults=SHOP_ITEMS.filter(x=>x.cat==='default');
+  grid.innerHTML=defaults.map((it,i)=>
+    `<div class="onb-av${i===0?' on':''}" data-av="${it.id}" onclick="onbPickAvatar('${it.id}')">${it.e}</div>`
+  ).join('');
+  // Pre-fill nickname dal sistema se possibile
+  document.getElementById('ONB_NAME').value='';
+  document.getElementById('ONB_OV').classList.add('on');
+  setTimeout(()=>document.getElementById('ONB_NAME').focus(),300);
+}
+function onbPickAvatar(id){
+  document.querySelectorAll('#ONB_AVS .onb-av').forEach(e=>e.classList.toggle('on',e.dataset.av===id));
+}
+function onbFinish(){
+  const name=(document.getElementById('ONB_NAME').value||'').trim();
+  if(name.length<2){alert('🤔 Scegli un nickname di almeno 2 caratteri!');return;}
+  const av=document.querySelector('#ONB_AVS .onb-av.on')?.dataset.av||'fox';
+  saveProfile({nickname:name,avatar:av});
+  setEquipped(av);
+  localStorage.setItem(ONB_KEY,'1');
+  document.getElementById('ONB_OV').classList.remove('on');
+  updateCoinDisplay();
+  sfxFanfare();
+  // Welcome bonus
+  addCoins(50,'welcome_bonus');
+  setTimeout(()=>alert('🎁 +50 monete di benvenuto, '+name+'!\nUsale nel Negozio o nella Modalità Storia.'),300);
+  if(typeof gtag==='function')gtag('event','onboarding_complete',{nickname:name,avatar:av});
+}
+
+// ─── LANGUAGE PICKER (Solo + PVP) ───
+let _langCallback=null;
+const LAST_LANG_KEY='wdym_last_lang';
+function openLangPicker(subText,callback){
+  sfxClick();
+  _langCallback=callback;
+  document.getElementById('LANG_SUB').textContent=subText||'in che lingua ti sfidi?';
+  const grid=document.getElementById('LANG_GRID');
+  const last=localStorage.getItem(LAST_LANG_KEY);
+  grid.innerHTML=`
+    <div class="lang-tile random ${last==='random'?'on':''}" onclick="pickLang('random')">
+      <div class="lang-flag">🎲</div><div class="lang-name">RANDOM — TUTTE LE LINGUE</div>
+    </div>
+  `+LANGS.map(l=>`
+    <div class="lang-tile ${last===l.t?'on':''}" onclick="pickLang('${l.t}')">
+      <div class="lang-flag">${l.f}</div><div class="lang-name">${l.n.toUpperCase()}</div>
+    </div>
+  `).join('');
+  document.getElementById('LANG_OV').classList.add('on');
+}
+function closeLangPicker(){
+  document.getElementById('LANG_OV').classList.remove('on');
+  _langCallback=null;
+}
+function pickLang(langCode){
+  sfxClick();
+  localStorage.setItem(LAST_LANG_KEY,langCode);
+  document.getElementById('LANG_OV').classList.remove('on');
+  if(_langCallback){
+    const cb=_langCallback;_langCallback=null;
+    cb(langCode==='random'?null:langCode);
+  }
+  if(typeof gtag==='function')gtag('event','lang_picked',{lang:langCode});
+}
+
+// ─── PATCH: startSolo → prima chiede lingua, poi avvia ───
+const _origStartSolo=startSolo;
+startSolo=function(){
+  openLangPicker('SCEGLI LA LINGUA PER LA SFIDA SOLO',function(langCode){
+    G._chosenLang=langCode; // null = random per ogni round
+    _origStartSolo();
+  });
+};
+// Patch soloAutoPickAndListen per usare G._chosenLang se settato
+const _origSoloAutoPick=soloAutoPickAndListen;
+soloAutoPickAndListen=function(){
+  const lv=getLevel();
+  const cfg=pickWordForLevel(lv);
+  const dbArr=DB[cfg.dbKey];
+  const used=G.usedPhrases[cfg.dbKey]||[];
+  let pool=[];
+  for(let i=0;i<cfg.pool.length;i++){
+    const idx=cfg.offset+i;
+    if(!used.includes(idx))pool.push(idx);
+  }
+  if(pool.length===0){
+    G.usedPhrases[cfg.dbKey]=[];
+    for(let i=0;i<cfg.pool.length;i++)pool.push(cfg.offset+i);
+  }
+  const wi=pool[Math.floor(Math.random()*pool.length)];
+  G.usedPhrases[cfg.dbKey]=(G.usedPhrases[cfg.dbKey]||[]).concat([wi]);
+  G.phrase=dbArr[wi];
+  // V5: se lingua scelta, usala (salvo che il livello non sia LV4 con lingue forzate)
+  let langs=cfg.langs;
+  if(G._chosenLang&&lv!==4){
+    const found=LANGS.find(l=>l.t===G._chosenLang);
+    if(found&&G.phrase.tr[G._chosenLang])langs=[found];
+  }
+  const li=Math.floor(Math.random()*langs.length);
+  G.lang=langs[li];
+  if(!G.phrase.tr[G.lang.t]){
+    const keys=Object.keys(G.phrase.tr);
+    G.lang=LANGS.find(l=>l.t===keys[0])||LANGS[0];
+  }
+  G.tran=G.phrase.tr[G.lang.t].t;
+  G.phon=G.phrase.tr[G.lang.t].p;
+  showListen();
+};
+
+// ─── PATCH: pvpCreateStart → prima chiede lingua, poi nome ───
+const _origPvpCreateStart=pvpCreateStart;
+pvpCreateStart=function(){
+  openLangPicker('LINGUA DELLA SFIDA PVP',function(langCode){
+    G._pvpLang=langCode;
+    _origPvpCreateStart();
+  });
+};
+// Patch pvpGenerateQueue per usare G._pvpLang
+const _origPvpGenerateQueue=pvpGenerateQueue;
+pvpGenerateQueue=function(){
+  const queue=[];
+  [1,2,3].forEach(lv=>{
+    const cfg=pickWordForLevel(lv);
+    const wi=cfg.offset+Math.floor(Math.random()*cfg.pool.length);
+    let langs=cfg.langs;
+    if(G._pvpLang){
+      const found=LANGS.find(l=>l.t===G._pvpLang);
+      if(found)langs=[found];
+    }
+    const li=Math.floor(Math.random()*langs.length);
+    queue.push({l:cfg.dbKey,w:wi,g:langs[li].t});
+  });
+  return queue;
+};
+
+// ─── FRASE PERSONALIZZATA → 250 monete ───
+const CUSTOM_PHRASE_COST=250;
+const _origShowCustomPhrase=showCustomPhrase;
+showCustomPhrase=function(){
+  const c=getCoins();
+  if(c<CUSTOM_PHRASE_COST){
+    alert(
+      '💸 Ti servono '+CUSTOM_PHRASE_COST+' monete per scrivere una frase personalizzata.\n\n'+
+      '🪙 Hai: '+c+' monete\n'+
+      '🎯 Ne mancano: '+(CUSTOM_PHRASE_COST-c)+'\n\n'+
+      'Gioca ancora per guadagnarne!'
+    );
+    return;
+  }
+  if(!confirm('✍️ Scrivere una frase personalizzata costa '+CUSTOM_PHRASE_COST+' 🪙\nVuoi spenderle?')){
+    return;
+  }
+  if(spendCoins(CUSTOM_PHRASE_COST,'custom_phrase')){
+    coinPop('-'+CUSTOM_PHRASE_COST);
+    _origShowCustomPhrase();
+  }
+};
+
+// ─── SHOP ESPANSO: tab Pack Monete + Skin Premium ───
+const COIN_PACKS=[
+  {id:'pack_small',  coins:250,  price:'€ 2,99',  icon:'💰', label:'STARTER PACK',  bonus:null},
+  {id:'pack_medium', coins:750,  price:'€ 8,99',  icon:'💎', label:'BIG PACK',      bonus:'+50 GRATIS'},
+  {id:'pack_big',    coins:1500, price:'€ 15,99', icon:'👑', label:'MEGA PACK',     bonus:'+200 GRATIS'},
+];
+const PREMIUM_SKINS=[
+  {id:'sk_gold',     e:'🥇', name:'CORONA D\'ORO',    grade:'legendary', req:'Arriva TOP 1 mondiale'},
+  {id:'sk_silver',   e:'🥈', name:'MEDAGLIA ARGENTO', grade:'epic',      req:'Arriva TOP 3 mondiale'},
+  {id:'sk_bronze',   e:'🥉', name:'MEDAGLIA BRONZO',  grade:'rare',      req:'Arriva TOP 10 mondiale'},
+  {id:'sk_dragon',   e:'🐲', name:'DRAGO LEGGENDARIO',grade:'legendary', req:'Vinci 50 sfide PvP'},
+  {id:'sk_phoenix',  e:'🔥', name:'FENICE EREDITARIA',grade:'epic',      req:'Completa 8 cap. STORIA con 24+ stelle'},
+  {id:'sk_supreme',  e:'👑', name:'BOCCALONE SUPREMO',grade:'legendary', req:'Acquista MEGA PACK monete'},
+];
+
+// Sovrascrivo shopTab originale per supportare i 4 tab
+shopTab=function(tab){
+  document.querySelectorAll('.shop-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
+  document.getElementById('SHOP_GRID').style.display=tab==='avatars'?'grid':'none';
+  document.getElementById('SHOP_PACKS').style.display=tab==='packs'?'block':'none';
+  document.getElementById('SHOP_PREMIUM').style.display=tab==='premium'?'block':'none';
+  document.getElementById('SHOP_INFO').style.display=tab==='info'?'block':'none';
+  if(tab==='packs')renderCoinPacks();
+  if(tab==='premium')renderPremiumSkins();
+};
+function renderCoinPacks(){
+  const wrap=document.getElementById('SHOP_PACKS');
+  wrap.innerHTML=`
+    <div class="coming-info">
+      🔒 Gli acquisti con soldi reali si attiveranno quando l'app uscirà sul <b>Play Store</b> e <b>App Store</b>.<br>
+      Intanto guarda i prezzi e dimmi se ti convincono!
+    </div>
+  `+COIN_PACKS.map(p=>`
+    <div class="pack-card locked">
+      <span class="pack-locked-tag">🔒 IN ARRIVO</span>
+      <div class="pack-icon">${p.icon}</div>
+      <div class="pack-info">
+        <div class="pack-amount">${p.coins.toLocaleString('it-IT')} 🪙</div>
+        <div style="font-size:.65rem;color:var(--mt);letter-spacing:1.5px">${p.label}</div>
+        ${p.bonus?`<div class="pack-bonus">🎁 ${p.bonus}</div>`:''}
+      </div>
+      <div class="pack-price">${p.price}</div>
+    </div>
+  `).join('');
+}
+function renderPremiumSkins(){
+  const wrap=document.getElementById('SHOP_PREMIUM');
+  wrap.innerHTML=`
+    <div class="coming-info">
+      💎 Skin <b>esclusive</b> sbloccabili con achievement.<br>
+      I primi della classifica mondiale ottengono skin <b>uniche</b>.
+    </div>
+  `+PREMIUM_SKINS.map(s=>`
+    <div class="skin-row locked">
+      <div class="skin-emoji">${s.e}</div>
+      <div class="skin-info">
+        <div class="skin-name">${s.name}</div>
+        <div class="skin-req">🔓 ${s.req}</div>
+      </div>
+      <div class="skin-grade ${s.grade}">${s.grade.toUpperCase()}</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// STORIA V5 — 8 CAPITOLI, SCELTA LINGUA UTENTE, DIFFICOLTÀ CRESCENTE
+// ═══════════════════════════════════════════════════════
+// Riusiamo DB[1] (35 parole) e DB[2] (30 frasi 2-parole) come pool
+// Lingua principale scelta dall'utente al primo avvio storia
+// Cap. 7-8 forzano lingue toste (cinese, arabo)
+
+const STORY_USER_LANG_KEY='wdym_story_lang';
+const STORY_CHAPTERS_V5=[
+  {id:0,title:'PRIMI PASSI',         emoji:'👶',sub:'le prime parole',           difficulty:1,dbKey:1,dbStart:5, len:5,useUserLang:true,forceLang:null},
+  {id:1,title:'CONFIDENZA',          emoji:'🚶',sub:'prendi il ritmo',           difficulty:1,dbKey:1,dbStart:10,len:5,useUserLang:true,forceLang:null},
+  {id:2,title:'IN FORMA',            emoji:'💪',sub:'sali di livello',           difficulty:2,dbKey:1,dbStart:15,len:5,useUserLang:true,forceLang:null},
+  {id:3,title:'INTERMEDIO',          emoji:'⚡',sub:'qui inizia il divertimento',difficulty:2,dbKey:1,dbStart:20,len:5,useUserLang:true,forceLang:null},
+  {id:4,title:'COMBO 2 PAROLE',      emoji:'🔥',sub:'due parole insieme',        difficulty:3,dbKey:2,dbStart:0, len:5,useUserLang:true,forceLang:null},
+  {id:5,title:'MAESTRO',             emoji:'🎓',sub:'sei diventato bravo',       difficulty:3,dbKey:2,dbStart:5, len:5,useUserLang:true,forceLang:null},
+  {id:6,title:'BONUS CINESE 🐉',     emoji:'🐉',sub:'i toni che spaccano tutto', difficulty:4,dbKey:1,dbStart:25,len:5,useUserLang:false,forceLang:'zh-CN'},
+  {id:7,title:'BOSS ARABO 🐪',       emoji:'🐪',sub:'la lingua finale',          difficulty:5,dbKey:1,dbStart:0, len:5,useUserLang:false,forceLang:'ar-SA'},
+];
+
+// Sovrascrivo STORY_CHAPTERS V4 con V5
+const STORY_CHAPTERS_V4=STORY_CHAPTERS; // mantengo riferimento per compatibilità
+// Riassegno il riferimento globale usato dalle funzioni story
+window.STORY_CHAPTERS=STORY_CHAPTERS_V5;
+
+// Helper sicuro per accedere a STORY_CHAPTERS in tutte le funzioni
+function _CHAP(){return window.STORY_CHAPTERS||STORY_CHAPTERS_V5;}
+
+// Sovrascrivo renderStoryMap per usare V5 chapters
+renderStoryMap=function(){
+  const CHAPS=_CHAP();
+  document.getElementById('STORY_PROG_TXT').textContent=getTotalStars()+' / '+(CHAPS.length*5*3);
+  const list=document.getElementById('STORY_CHAPTERS_LIST');
+  list.innerHTML=CHAPS.map((c,ci)=>{
+    const chapUnlocked=isLevelUnlocked(ci,0);
+    const cls='story-chapter'+(chapUnlocked?'':' locked');
+    const levelsHtml=Array.from({length:c.len},(_,li)=>{
+      const stars=getStarsFor(ci,li);
+      const unlocked=isLevelUnlocked(ci,li);
+      const next=unlocked&&stars===0;
+      const completed=stars>0;
+      let cl='story-level';
+      if(!unlocked)cl+=' locked';
+      if(completed)cl+=' completed';
+      if(next&&!completed)cl+=' next';
+      const starsHtml=stars>0?'⭐'.repeat(stars)+'☆'.repeat(3-stars):'☆☆☆';
+      return `<div class="${cl}" onclick="${unlocked?`startStoryLevel(${ci},${li})`:'sfxFail()'}">
+        <div class="story-level-num">${li+1}</div>
+        <div class="story-level-stars" style="color:${stars>0?'#ffcc00':'#7060a0'};font-size:.65rem">${starsHtml}</div>
+      </div>`;
+    }).join('');
+    const userLangFlag=getStoryUserLang()?LANGS.find(l=>l.t===getStoryUserLang())?.f:'🌐';
+    const flag=c.forceLang?LANGS.find(l=>l.t===c.forceLang)?.f:userLangFlag;
+    const diffStars='🔥'.repeat(Math.min(c.difficulty,5));
+    return `<div class="${cls}">
+      <div class="story-chap-head">
+        <div class="story-chap-emoji">${c.emoji}</div>
+        <div class="story-chap-info">
+          <div class="story-chap-title">CAP. ${ci+1} · ${c.title}</div>
+          <div class="story-chap-sub">${c.sub} · ${diffStars}</div>
+        </div>
+        <div class="story-chap-flag">${flag}</div>
+      </div>
+      <div class="story-levels">${levelsHtml}</div>
+    </div>`;
+  }).join('');
+};
+
+// Helper lingua utente storia
+function getStoryUserLang(){return localStorage.getItem(STORY_USER_LANG_KEY)||null;}
+function setStoryUserLang(t){localStorage.setItem(STORY_USER_LANG_KEY,t);}
+
+// Sovrascrivo openStory: la prima volta chiede la lingua principale
+const _origOpenStory=openStory;
+openStory=function(){
+  sfxClick();
+  if(!getStoryUserLang()){
+    openLangPicker('SCEGLI LA LINGUA DELLA TUA STORIA',function(langCode){
+      if(!langCode){
+        // Random non valido per storia: chiedo di nuovo o uso inglese di default
+        const langCode2=prompt('Per la storia serve una lingua specifica.\nSceglila (es: en-GB, es-ES, fr-FR, de-DE, ja-JP...):','en-GB');
+        if(!langCode2)return;
+        setStoryUserLang(langCode2);
+      } else {
+        setStoryUserLang(langCode);
+      }
+      _origOpenStory();
+    });
+    return;
+  }
+  _origOpenStory();
+};
+
+// Sovrascrivo startStoryLevel per V5: usa dbKey/dbStart/forceLang/useUserLang
+startStoryLevel=function(chap,lvl){
+  sfxClick();
+  const c=_CHAP()[chap];
+  if(!c)return;
+  const wordIdx=c.dbStart+lvl;
+  const word=DB[c.dbKey][wordIdx];
+  if(!word){console.error('Story word not found',c,lvl);return;}
+  // Determina lingua
+  let langCode=c.forceLang||getStoryUserLang()||'en-GB';
+  // Fallback se la parola non ha quella traduzione
+  if(!word.tr[langCode]){
+    const keys=Object.keys(word.tr);
+    langCode=keys[0];
+  }
+  const lang=LANGS.find(l=>l.t===langCode)||LANGS[0];
+  const tr=word.tr[langCode];
+  // Setup G
+  G.solo=false;G.pvp=false;G.story=true;
+  G.storyChap=chap;G.storyLvl=lvl;
+  G.players=['TU'];G.scores={'TU':0};
+  G.rounds=1;G.round=1;G.subRound=0;
+  G.chooser=-1;G.firstChooser=0;
+  G.usedPhrases={1:[],2:[],3:[],4:[]};
+  G.queue=['TU'];G.pIdx=0;
+  G.phrase={it:word.it,hint:c.emoji+' '+c.title,tr:word.tr};
+  G.lang=lang;G.tran=tr.t;G.phon=tr.p;
+  closeStory();
+  showListen();
+  if(typeof gtag==='function')gtag('event','story_level_start',{chapter:chap,level:lvl,lang:langCode});
+}
+
+// ─── Avvio app: controlla onboarding ───
+(function initV5(){
+  // Aspetta che il patch banner sia gestito, poi onboarding
+  setTimeout(()=>{
+    if(needsOnboarding()){
+      // Se patch banner è aperto, chiudilo prima
+      document.getElementById('PATCH_BANNER').classList.remove('on');
+      localStorage.setItem('wdym_patch_seen',PATCH_VERSION);
+      showOnboarding();
+    }
+  },300);
+})();
+
+// ═══════════════════════════════════════════════════════
+// V6 — PVP con SCELTA lingua+parola PER OGNI ROUND
+// + Ribilancio livelli più chiaro
+// + Frase personalizzata già visibile con prezzo (fatto in DOM)
+// ═══════════════════════════════════════════════════════
+
+// ─── Ribilancio livelli V6 ───
+// LV1 = parole brevi/facili (whitelist)
+// LV2 = parole italiane TOSTE (prime 5 + parole con cluster consonantici)
+// LV3 = 2 parole DB[2]
+// LV4 = 2 parole DB[2] con lingue impossibili forzate
+const LV1_INDICES=[8,9,10,11,13,16,18,22,24,28,29,30,32,33,34]; // brevi+facili da DB[1]
+const LV2_INDICES=[0,1,2,3,4,5,6,7,12,14,15,17,19,20,21,25,26,27]; // toste italiane
+
+// Sovrascrivo pickWordForLevel con whitelist
+pickWordForLevel=function(lv){
+  if(lv===1){
+    const pool=LV1_INDICES.map(i=>DB[1][i]).filter(Boolean);
+    return {pool:pool,langs:LANGS,dbKey:1,offset:-1,indices:LV1_INDICES};
+  }
+  if(lv===2){
+    const pool=LV2_INDICES.map(i=>DB[1][i]).filter(Boolean);
+    return {pool:pool,langs:LANGS,dbKey:1,offset:-1,indices:LV2_INDICES};
+  }
+  if(lv===3){
+    return {pool:DB[2],langs:LANGS,dbKey:2,offset:0,indices:DB[2].map((_,i)=>i)};
+  }
+  // LV4
+  const harshLangs=LANGS.filter(l=>HARD_LANGS.includes(l.t));
+  return {pool:DB[2],langs:harshLangs,dbKey:2,offset:0,indices:DB[2].map((_,i)=>i)};
+};
+
+// Patch soloAutoPickAndListen per usare cfg.indices (whitelist)
+soloAutoPickAndListen=function(){
+  const lv=getLevel();
+  const cfg=pickWordForLevel(lv);
+  const dbArr=DB[cfg.dbKey];
+  const usedKey=cfg.dbKey+'_lv'+lv;
+  G.usedPhrases[usedKey]=G.usedPhrases[usedKey]||[];
+  const used=G.usedPhrases[usedKey];
+  let avail=cfg.indices.filter(i=>!used.includes(i));
+  if(avail.length===0){G.usedPhrases[usedKey]=[];avail=cfg.indices.slice();}
+  const wi=avail[Math.floor(Math.random()*avail.length)];
+  G.usedPhrases[usedKey].push(wi);
+  G.phrase=dbArr[wi];
+  let langs=cfg.langs;
+  if(G._chosenLang&&lv!==4){
+    const found=LANGS.find(l=>l.t===G._chosenLang);
+    if(found&&G.phrase.tr[G._chosenLang])langs=[found];
+  }
+  const li=Math.floor(Math.random()*langs.length);
+  G.lang=langs[li];
+  if(!G.phrase.tr[G.lang.t]){
+    const keys=Object.keys(G.phrase.tr);
+    G.lang=LANGS.find(l=>l.t===keys[0])||LANGS[0];
+  }
+  G.tran=G.phrase.tr[G.lang.t].t;
+  G.phon=G.phrase.tr[G.lang.t].p;
+  showListen();
+};
+
+// ═══════════════════════════════════════════════════════
+// PVP SCELTA INTERATTIVA PER OGNI ROUND (V6)
+// ═══════════════════════════════════════════════════════
+
+// Rimuovo il language picker iniziale per PVP — ora la lingua si sceglie round per round
+pvpCreateStart=function(){
+  sfxClick();
+  closePvp();
+  document.getElementById('PVP_OV').classList.add('on');
+  pvpShowPanel('CREATE');
+  const lastName=getProfile().nickname||localStorage.getItem('wdym_pvp_name')||'';
+  document.getElementById('PVP_NAME').value=lastName;
+  setTimeout(()=>document.getElementById('PVP_NAME').focus(),200);
+  if(typeof gtag==='function')gtag('event','pvp_create_open');
+};
+
+// Override pvpCreateConfirm: dopo nome, mostra schermata scelta round 1
+pvpCreateConfirm=function(){
+  const name=(document.getElementById('PVP_NAME').value||'').trim();
+  if(!name){alert('🤔 Scrivi prima il tuo nome!');return;}
+  localStorage.setItem('wdym_pvp_name',name);
+  // Setup state pvp
+  _pvp={
+    mode:'create',
+    state:{a:name,s:0,m:PVP_MAX_SCORE,q:[]}, // q vuota — verrà riempita una scelta alla volta
+    scores:[],
+    cur:0,
+    name:name,
+    pickedLangs:[],
+    pickedWordIdx:[],
+    _curLang:null,
+    _curWordIdx:null
+  };
+  G.solo=false;G.pvp=true;
+  G.players=[name];G.scores={[name]:0};
+  G.rounds=PVP_ROUNDS;G.round=1;G.subRound=0;
+  G.chooser=-1;G.firstChooser=0;
+  G.usedPhrases={};
+  G.queue=[name];G.pIdx=0;
+  // Mostra picker round 1
+  pvpShowPickScreen(0);
+};
+
+// Mostra schermata "scegli lingua + parola" per il round corrente
+function pvpShowPickScreen(roundIdx){
+  _pvp.curPick=roundIdx;
+  _pvp._curLang=null;
+  _pvp._curWordIdx=null;
+  // Determina livello per il round (1,2,3 → LV1, LV2, LV3)
+  const lv=roundIdx+1;
+  const cfg=pickWordForLevel(lv);
+  // Lingue disponibili (escluse quelle già usate)
+  const usedLangs=_pvp.pickedLangs||[];
+  // Parole disponibili: prendo 4 random dal pool, escluse quelle già usate
+  const usedIdx=_pvp.pickedWordIdx||[];
+  const avail=cfg.indices.filter(i=>!usedIdx.includes(i));
+  // Mescola e prende 4
+  const shuffled=avail.slice().sort(()=>Math.random()-0.5);
+  const choices=shuffled.slice(0,4);
+  _pvp._curChoices=choices.map(i=>({idx:i,word:DB[cfg.dbKey][i],dbKey:cfg.dbKey}));
+  _pvp._curLv=lv;
+  // Render UI
+  document.getElementById('PVP_PICK_SUB').textContent=`round ${roundIdx+1} di ${PVP_ROUNDS} · LV${lv} · ${LEVELS[lv].label.replace(/^[\W_]+/,'')}`;
+  // Progress dots
+  let progHtml='';
+  for(let i=0;i<PVP_ROUNDS;i++){
+    let dc='pvp-pick-dot';
+    if(i<roundIdx)dc+=' done';
+    else if(i===roundIdx)dc+=' current';
+    progHtml+=`<div class="${dc}"></div>`;
+  }
+  document.getElementById('PVP_PICK_PROG').innerHTML=progHtml;
+  // Lingue (filtro: escludo quelle usate)
+  document.getElementById('PVP_PICK_LANGS').innerHTML=LANGS.map(l=>{
+    const used=usedLangs.includes(l.t);
+    return `<div class="pvp-lang-tile ${used?'used':''}" data-lang="${l.t}" onclick="${used?'':`pvpPickLangChoice('${l.t}')`}">
+      <div class="f">${l.f}</div><div class="n">${l.n.toUpperCase()}</div>
+    </div>`;
+  }).join('');
+  // Parole
+  document.getElementById('PVP_PICK_WORDS').innerHTML=_pvp._curChoices.map((c,i)=>`
+    <div class="pvp-word-tile" data-idx="${i}" onclick="pvpPickWordChoice(${i})">
+      <div class="w-it">${c.word.it}</div>
+      <div class="w-hint">${c.word.hint||''}</div>
+    </div>
+  `).join('');
+  pvpShowPanel('PICK');
+  pvpUpdatePickGoButton();
+}
+
+function pvpPickLangChoice(langCode){
+  sfxClick();
+  _pvp._curLang=langCode;
+  document.querySelectorAll('#PVP_PICK_LANGS .pvp-lang-tile').forEach(e=>{
+    e.classList.toggle('on',e.dataset.lang===langCode);
+  });
+  pvpUpdatePickGoButton();
+}
+function pvpPickWordChoice(idx){
+  sfxClick();
+  _pvp._curWordIdx=idx;
+  document.querySelectorAll('#PVP_PICK_WORDS .pvp-word-tile').forEach(e=>{
+    e.classList.toggle('on',parseInt(e.dataset.idx)===idx);
+  });
+  pvpUpdatePickGoButton();
+}
+function pvpUpdatePickGoButton(){
+  const b=document.getElementById('PVP_PICK_GO');
+  const ok=_pvp._curLang!==null&&_pvp._curWordIdx!==null;
+  b.disabled=!ok;
+  b.style.opacity=ok?'1':'.4';
+}
+
+// Quando l'utente conferma scelta → avvia il round usando S3/S4/S5
+function pvpStartCurrentRound(){
+  if(_pvp._curLang===null||_pvp._curWordIdx===null)return;
+  const choice=_pvp._curChoices[_pvp._curWordIdx];
+  // Salva nello state
+  _pvp.state.q.push({l:choice.dbKey,w:choice.idx,g:_pvp._curLang});
+  _pvp.pickedLangs.push(_pvp._curLang);
+  _pvp.pickedWordIdx.push(choice.idx);
+  // Setup G
+  G.phrase=choice.word;
+  G.lang=LANGS.find(l=>l.t===_pvp._curLang)||LANGS[0];
+  // Fallback se traduzione mancante
+  if(!G.phrase.tr[G.lang.t]){
+    const keys=Object.keys(G.phrase.tr);
+    G.lang=LANGS.find(l=>l.t===keys[0])||LANGS[0];
+  }
+  G.tran=G.phrase.tr[G.lang.t].t;
+  G.phon=G.phrase.tr[G.lang.t].p;
+  // Chiudi overlay e parti
+  closePvpOverlayKeepState();
+  showListen();
+  if(typeof gtag==='function')gtag('event','pvp_round_start',{round:_pvp.curPick+1,lang:_pvp._curLang});
+}
+
+// Override nextOrSummary in PVP create mode: dopo verdetto, torna a pick screen
+const _origNextForPvpV6=nextOrSummary;
+nextOrSummary=function(){
+  if(G.pvp&&_pvp&&_pvp.mode==='create'){
+    _pvp.cur++;
+    if(_pvp.cur>=PVP_ROUNDS){
+      pvpCreateFinished();
+      return;
+    }
+    // Torna a pick screen per il prossimo round
+    G.round++;
+    document.getElementById('PVP_OV').classList.add('on');
+    pvpShowPickScreen(_pvp.cur);
+    return;
+  }
+  return _origNextForPvpV6();
+};
+
+// ─── Aggiungo PICK al pvpShowPanel ───
+(function patchPvpShowPanel(){
+  const _origShowPanel=pvpShowPanel;
+  pvpShowPanel=function(name){
+    ['CREATE','PICK','SENT','RECEIVED','RESULT'].forEach(n=>{
+      const el=document.getElementById('PVP_'+n);
+      if(el)el.style.display=(n===name)?'block':'none';
+    });
+    document.getElementById('PVP_OV').scrollTop=0;
+  };
+})();
 </script>
 </body>
 </html>
