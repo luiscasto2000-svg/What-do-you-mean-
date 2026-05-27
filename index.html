@@ -5112,7 +5112,7 @@ function renderMail(){
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;letter-spacing:1px;margin-bottom:6px">${m.title}</div>
       <div style="font-size:.8rem;color:var(--mt);line-height:1.5;margin-bottom:8px">${m.body}</div>
       ${m.reward&&!m.read?`<button onclick="claimMailReward('${m.id}')" style="background:linear-gradient(135deg,#ffcc00,#ff8800);color:#000;border:none;border-radius:8px;padding:8px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;font-size:.8rem">🎁 RISCATTA +${m.reward} 🪙</button>`:''}
-      ${m.read?'':`<button onclick="markMailRead('${m.id}')" style="background:transparent;color:var(--bl);border:1px solid rgba(0,200,255,.4);border-radius:8px;padding:6px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;font-size:.7rem;margin-left:6px">✓ LETTO</button>`:''}
+      ${m.read?'':`<button onclick="markMailRead('${m.id}')" style="background:transparent;color:var(--bl);border:1px solid rgba(0,200,255,.4);border-radius:8px;padding:6px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;font-size:.7rem;margin-left:6px">✓ LETTO</button>`}
     </div>`;
   }).join('');
 }
