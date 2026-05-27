@@ -941,8 +941,8 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <span class="ci">🪙</span><span class="cv" id="COIN_VAL">0</span>
 </div>
 
-<!-- RULES FAB (top-left, parla con TTS) -->
-<button id="RULES_FAB" class="rules-fab" onclick="speakRules()" aria-label="Leggi le regole">
+<!-- RULES FAB (top-left, apre regole + parla con TTS) -->
+<button id="RULES_FAB" class="rules-fab" onclick="openRulesBook()" aria-label="Apri regole">
   📖
   <span class="tip" id="RULES_TIP">🔊 LEGGIMI SE HAI IL CORAGGIO!</span>
 </button>
@@ -954,7 +954,7 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <span class="hamb-line"></span>
 </button>
 
-<!-- HAMBURGER DRAWER (slide-in da destra) -->
+<!-- HAMBURGER DRAWER V9 (4 voci stile gaming: Settings/Mail/Bag/Gift) -->
 <div id="HAMB_BACKDROP" class="hamb-drawer-backdrop" onclick="toggleHamburger()"></div>
 <aside id="HAMB_DRAWER" class="hamb-drawer">
   <div class="hd-header">
@@ -964,41 +964,134 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
       <div class="hd-coins">🪙 <span id="HD_COINS">0</span></div>
     </div>
   </div>
-  <div class="hd-section-title">🎮 IL TUO ACCOUNT</div>
-  <div class="hd-item" onclick="closeHamburger();openProfile()">
-    <span class="ico">👤</span><span class="txt">PROFILO E STATISTICHE</span><span class="arrow">→</span>
+  <div class="hd-item" onclick="closeHamburger();openSettings()">
+    <span class="ico">⚙️</span><span class="txt">IMPOSTAZIONI</span><span class="arrow">→</span>
   </div>
-  <div class="hd-item" onclick="closeHamburger();openLeaderboard()">
-    <span class="ico">🏆</span><span class="txt">CLASSIFICA MONDIALE</span><span class="arrow">→</span>
+  <div class="hd-item" onclick="closeHamburger();openMail()">
+    <span class="ico">📬</span><span class="txt">MESSAGGI</span><span class="arrow" id="MAIL_BADGE">→</span>
   </div>
-  <div class="hd-section-title">🔊 AUDIO</div>
-  <div class="hd-toggle">
-    <span class="ico">🔊</span><span class="txt">EFFETTI SONORI</span>
-    <div class="hd-switch on" id="SW_SFX" onclick="toggleSfx()"></div>
+  <div class="hd-item" onclick="closeHamburger();openBag()">
+    <span class="ico">🎒</span><span class="txt">INVENTARIO</span><span class="arrow">→</span>
   </div>
-  <div class="hd-toggle">
-    <span class="ico">🎵</span><span class="txt">MUSICA DI SOTTOFONDO</span>
-    <div class="hd-switch" id="SW_MUSIC" onclick="toggleMusic()"></div>
-  </div>
-  <div class="hd-section-title">📢 CONDIVIDI L'APP</div>
-  <div class="hd-socials">
-    <div class="hd-soc wa" onclick="shareApp('whatsapp')" aria-label="WhatsApp">💚</div>
-    <div class="hd-soc tg" onclick="shareApp('telegram')" aria-label="Telegram">✈️</div>
-    <div class="hd-soc x" onclick="shareApp('x')" aria-label="X">𝕏</div>
-    <div class="hd-soc ig" onclick="shareApp('instagram')" aria-label="Instagram">📷</div>
-  </div>
-  <div class="hd-section-title">📖 INFO</div>
-  <div class="hd-item" onclick="closeHamburger();showRules()">
-    <span class="ico">📖</span><span class="txt">REGOLE COMPLETE</span><span class="arrow">→</span>
-  </div>
-  <div class="hd-item" onclick="closeHamburger();speakRules()">
-    <span class="ico">🔊</span><span class="txt">REGOLE AD ALTA VOCE</span><span class="arrow">→</span>
+  <div class="hd-item" onclick="closeHamburger();openGiftCode()">
+    <span class="ico">🎁</span><span class="txt">CODICE PROMO</span><span class="arrow">→</span>
   </div>
   <div class="hd-footer">
     What Do You Mean? · v2.0<br>
     by Luigi Casto · 2026
   </div>
 </aside>
+
+<!-- SETTINGS MODAL (apre da hamburger → Impostazioni) -->
+<div id="SETTINGS_OV" class="fc-overlay">
+  <div class="fc-header">
+    <div class="fc-title" style="background:linear-gradient(135deg,#9b30ff,#ff2d78);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">⚙️ IMPOSTAZIONI</div>
+    <div class="fc-sub">configura il tuo gioco</div>
+  </div>
+  <!-- Tab Game / Account -->
+  <div class="shop-tabs" style="width:100%;max-width:520px">
+    <div class="shop-tab on" data-stab="game" onclick="settingsTab('game')">🎮 GIOCO</div>
+    <div class="shop-tab" data-stab="account" onclick="settingsTab('account')">👤 ACCOUNT</div>
+  </div>
+  <!-- GAME SETTINGS -->
+  <div id="SET_GAME" style="width:100%;max-width:520px">
+    <div class="prof-card" style="padding:8px 0">
+      <div class="hd-toggle" style="border-radius:0;border:none;background:transparent;border-bottom:1px solid rgba(155,48,255,.15)">
+        <span class="ico">🎵</span><span class="txt">MUSICA</span>
+        <div class="hd-switch" id="SW_MUSIC" onclick="toggleMusic()"></div>
+      </div>
+      <div class="hd-toggle" style="border-radius:0;border:none;background:transparent;border-bottom:1px solid rgba(155,48,255,.15)">
+        <span class="ico">🔊</span><span class="txt">EFFETTI SONORI</span>
+        <div class="hd-switch on" id="SW_SFX" onclick="toggleSfx()"></div>
+      </div>
+      <div class="hd-toggle" style="border-radius:0;border:none;background:transparent;border-bottom:1px solid rgba(155,48,255,.15)">
+        <span class="ico">📳</span><span class="txt">VIBRAZIONE</span>
+        <div class="hd-switch on" id="SW_VIBRATION" onclick="toggleVibration()"></div>
+      </div>
+      <div class="hd-toggle" style="border-radius:0;border:none;background:transparent;border-bottom:1px solid rgba(155,48,255,.15)">
+        <span class="ico">🔔</span><span class="txt">NOTIFICHE</span>
+        <div class="hd-switch" id="SW_NOTIF" onclick="toggleNotifications()"></div>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-size:.65rem;color:var(--mt);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">🆔 USER ID</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <code id="USER_ID_VAL" style="flex:1;font-size:.72rem;color:var(--bl);background:rgba(0,0,0,.3);
+            padding:8px 10px;border-radius:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></code>
+          <button onclick="copyUserId()" style="background:linear-gradient(135deg,var(--pk),var(--pu));
+            color:#fff;border:none;border-radius:8px;padding:8px 14px;font-family:'Bebas Neue',sans-serif;
+            font-size:.78rem;letter-spacing:1px;cursor:pointer">📋 COPIA</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-pvp" onclick="openSupport()" style="width:100%">📧 CONTATTA SUPPORTO</button>
+    <div style="display:flex;gap:10px;font-size:.72rem;color:var(--bl);text-align:center;justify-content:center;margin-top:8px">
+      <a href="#" onclick="showTerms();return false" style="color:var(--bl);text-decoration:underline">Termini di Uso</a>
+      <span style="color:var(--mt)">·</span>
+      <a href="#" onclick="showPrivacy();return false" style="color:var(--bl);text-decoration:underline">Privacy Policy</a>
+    </div>
+    <div style="text-align:center;font-size:.65rem;color:var(--mt);margin-top:10px;letter-spacing:1.5px">Version: 2.0.0</div>
+  </div>
+  <!-- ACCOUNT SETTINGS -->
+  <div id="SET_ACCOUNT" style="display:none;width:100%;max-width:520px">
+    <div class="coming-info">
+      🎁 <b>Collega un account social</b> e ricevi <b style="color:#ffcc00">+50 monete 🪙</b> per ognuno!<br>
+      <span style="font-size:.65rem;color:var(--mt)">I tuoi dati ti seguiranno su tutti i dispositivi (in arrivo Sessione 2)</span>
+    </div>
+    <div id="ACC_LIST"></div>
+    <div style="background:rgba(255,45,120,.08);border:1px solid rgba(255,45,120,.25);
+      border-radius:14px;padding:14px;margin-top:14px;text-align:center;font-size:.72rem;color:var(--mt);line-height:1.7">
+      ⚠️ <b style="color:var(--pk)">L'account reale arriva con Firebase</b> nella Sessione 2.<br>
+      Per ora i bonus si attivano localmente per testare il flusso.
+    </div>
+  </div>
+  <button class="fc-close" onclick="closeSettings()">CHIUDI</button>
+</div>
+
+<!-- MAIL MODAL (messaggi/notifiche dal sistema) -->
+<div id="MAIL_OV" class="fc-overlay">
+  <div class="fc-header">
+    <div class="fc-title" style="background:linear-gradient(135deg,#00c8ff,#9b30ff);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">📬 MESSAGGI</div>
+    <div class="fc-sub">notifiche e ricompense</div>
+  </div>
+  <div id="MAIL_LIST" style="width:100%;max-width:520px"></div>
+  <button class="fc-close" onclick="closeMail()">CHIUDI</button>
+</div>
+
+<!-- BAG MODAL (inventario) -->
+<div id="BAG_OV" class="fc-overlay">
+  <div class="fc-header">
+    <div class="fc-title" style="background:linear-gradient(135deg,#ffcc00,#ff8800);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🎒 INVENTARIO</div>
+    <div class="fc-sub">i tuoi tesori</div>
+  </div>
+  <div id="BAG_LIST" style="width:100%;max-width:520px"></div>
+  <button class="fc-close" onclick="closeBag()">CHIUDI</button>
+</div>
+
+<!-- GIFT CODE MODAL -->
+<div id="GIFT_OV" class="fc-overlay">
+  <div class="fc-header">
+    <div class="fc-title" style="background:linear-gradient(135deg,#ff2d78,#ffcc00);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🎁 CODICE PROMO</div>
+    <div class="fc-sub">riscatta una ricompensa</div>
+  </div>
+  <div class="prof-card">
+    <div class="onb-label">Inserisci il codice</div>
+    <input id="GIFT_INPUT" class="onb-input" placeholder="ES: BENVENUTO2026" maxlength="20"
+      style="text-transform:uppercase;font-family:monospace;letter-spacing:2px">
+    <button class="btn bp" onclick="redeemGiftCode()" style="margin-top:6px">🎁 RISCATTA</button>
+    <div class="onb-note">
+      I codici si possono ricevere dai social ufficiali, dagli eventi, o dagli streamer partner.
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(155,48,255,.15);
+      font-size:.7rem;color:var(--mt);text-align:center">
+      💡 Prova: <b style="color:var(--gd)">WDYM2026</b> per 100 monete bonus!
+    </div>
+  </div>
+  <button class="fc-close" onclick="closeGiftCode()">CHIUDI</button>
+</div>
 
 <!-- MODAL GIOCA: scegli tra Solo o Gruppo -->
 <div id="GAME_CHOICE" class="choice-overlay">
@@ -1190,13 +1283,6 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
       </div>
     </div>
   </div>
-  <div style="background:rgba(155,48,255,.08);border:1px solid rgba(155,48,255,.3);
-       border-radius:14px;padding:14px 16px;width:100%;max-width:460px;text-align:center;
-       font-size:.85rem;color:var(--tx);line-height:1.7">
-    👇 Usa il <b style="color:var(--gn)">menu in basso</b> per giocare<br>
-    <span style="font-size:.72rem;color:var(--mt)">🎮 Gioca · ⚔️ PvP · 📚 Storia · 🛍️ Negozio · 💎 Skin</span>
-  </div>
-  <button class="btn bs" onclick="showRules()" style="margin-top:14px">📖 REGOLE COMPLETE (testo)</button>
 </div>
 
 <!-- ═══════ SETUP ═══════ -->
@@ -4269,33 +4355,31 @@ function renderPremiumSkins(){
 }
 
 // ═══════════════════════════════════════════════════════
-// STORIA V5 — 8 CAPITOLI, SCELTA LINGUA UTENTE, DIFFICOLTÀ CRESCENTE
+// STORIA V9 — 8 CAPITOLI con MIX DI LINGUE AUTOMATICO
+// Difficoltà graduale: prime cap. solo lingue europee facili
+// Cap. avanzati: si aggiungono lingue toste (cinese, arabo, hindi)
+// NESSUNA scelta lingua dall'utente — mix automatico per capitolo
 // ═══════════════════════════════════════════════════════
-// Riusiamo DB[1] (35 parole) e DB[2] (30 frasi 2-parole) come pool
-// Lingua principale scelta dall'utente al primo avvio storia
-// Cap. 7-8 forzano lingue toste (cinese, arabo)
 
-const STORY_USER_LANG_KEY='wdym_story_lang';
 const STORY_CHAPTERS_V5=[
-  {id:0,title:'PRIMI PASSI',         emoji:'👶',sub:'le prime parole',           difficulty:1,dbKey:1,dbStart:5, len:5,useUserLang:true,forceLang:null},
-  {id:1,title:'CONFIDENZA',          emoji:'🚶',sub:'prendi il ritmo',           difficulty:1,dbKey:1,dbStart:10,len:5,useUserLang:true,forceLang:null},
-  {id:2,title:'IN FORMA',            emoji:'💪',sub:'sali di livello',           difficulty:2,dbKey:1,dbStart:15,len:5,useUserLang:true,forceLang:null},
-  {id:3,title:'INTERMEDIO',          emoji:'⚡',sub:'qui inizia il divertimento',difficulty:2,dbKey:1,dbStart:20,len:5,useUserLang:true,forceLang:null},
-  {id:4,title:'COMBO 2 PAROLE',      emoji:'🔥',sub:'due parole insieme',        difficulty:3,dbKey:2,dbStart:0, len:5,useUserLang:true,forceLang:null},
-  {id:5,title:'MAESTRO',             emoji:'🎓',sub:'sei diventato bravo',       difficulty:3,dbKey:2,dbStart:5, len:5,useUserLang:true,forceLang:null},
-  {id:6,title:'BONUS CINESE 🐉',     emoji:'🐉',sub:'i toni che spaccano tutto', difficulty:4,dbKey:1,dbStart:25,len:5,useUserLang:false,forceLang:'zh-CN'},
-  {id:7,title:'BOSS ARABO 🐪',       emoji:'🐪',sub:'la lingua finale',          difficulty:5,dbKey:1,dbStart:0, len:5,useUserLang:false,forceLang:'ar-SA'},
+  {id:0,title:'PRIMI PASSI',     emoji:'👶',sub:'le prime parole',      difficulty:1,dbKey:1,dbStart:5, len:5,langPool:['en-GB','es-ES','pt-BR']},
+  {id:1,title:'CONFIDENZA',      emoji:'🚶',sub:'prendi il ritmo',      difficulty:1,dbKey:1,dbStart:10,len:5,langPool:['en-GB','es-ES','fr-FR','pt-BR']},
+  {id:2,title:'IN FORMA',        emoji:'💪',sub:'sali di livello',      difficulty:2,dbKey:1,dbStart:15,len:5,langPool:['en-GB','es-ES','fr-FR','de-DE','pt-BR','tr-TR']},
+  {id:3,title:'INTERMEDIO',      emoji:'⚡',sub:'inizia il divertimento',difficulty:2,dbKey:1,dbStart:20,len:5,langPool:['fr-FR','de-DE','tr-TR','ru-RU']},
+  {id:4,title:'COMBO 2 PAROLE',  emoji:'🔥',sub:'due parole insieme',   difficulty:3,dbKey:2,dbStart:0, len:5,langPool:['en-GB','es-ES','fr-FR','de-DE','pt-BR']},
+  {id:5,title:'MAESTRO',         emoji:'🎓',sub:'sei diventato bravo',  difficulty:3,dbKey:2,dbStart:5, len:5,langPool:['ru-RU','ko-KR','tr-TR','de-DE']},
+  {id:6,title:'BONUS ESTREMO',   emoji:'🐉',sub:'lingue toste',         difficulty:4,dbKey:1,dbStart:25,len:5,langPool:['zh-CN','ja-JP','ko-KR']},
+  {id:7,title:'BOSS FINALE',     emoji:'🐪',sub:'le impossibili',       difficulty:5,dbKey:1,dbStart:0, len:5,langPool:['ar-SA','hi-IN','zh-CN','ja-JP']},
 ];
 
 // Sovrascrivo STORY_CHAPTERS V4 con V5
-const STORY_CHAPTERS_V4=STORY_CHAPTERS; // mantengo riferimento per compatibilità
-// Riassegno il riferimento globale usato dalle funzioni story
+const STORY_CHAPTERS_V4=STORY_CHAPTERS;
 window.STORY_CHAPTERS=STORY_CHAPTERS_V5;
 
 // Helper sicuro per accedere a STORY_CHAPTERS in tutte le funzioni
 function _CHAP(){return window.STORY_CHAPTERS||STORY_CHAPTERS_V5;}
 
-// Sovrascrivo renderStoryMap per usare V5 chapters
+// Sovrascrivo renderStoryMap per usare V5 chapters (mix lingue automatico)
 renderStoryMap=function(){
   const CHAPS=_CHAP();
   document.getElementById('STORY_PROG_TXT').textContent=getTotalStars()+' / '+(CHAPS.length*5*3);
@@ -4318,8 +4402,8 @@ renderStoryMap=function(){
         <div class="story-level-stars" style="color:${stars>0?'#ffcc00':'#7060a0'};font-size:.65rem">${starsHtml}</div>
       </div>`;
     }).join('');
-    const userLangFlag=getStoryUserLang()?LANGS.find(l=>l.t===getStoryUserLang())?.f:'🌐';
-    const flag=c.forceLang?LANGS.find(l=>l.t===c.forceLang)?.f:userLangFlag;
+    // Mostro le bandiere del langPool come "ingredienti" del capitolo
+    const flags=(c.langPool||[]).map(t=>LANGS.find(l=>l.t===t)?.f||'').join('');
     const diffStars='🔥'.repeat(Math.min(c.difficulty,5));
     return `<div class="${cls}">
       <div class="story-chap-head">
@@ -4328,39 +4412,22 @@ renderStoryMap=function(){
           <div class="story-chap-title">CAP. ${ci+1} · ${c.title}</div>
           <div class="story-chap-sub">${c.sub} · ${diffStars}</div>
         </div>
-        <div class="story-chap-flag">${flag}</div>
+        <div class="story-chap-flag" style="font-size:1rem;letter-spacing:1px">${flags}</div>
       </div>
       <div class="story-levels">${levelsHtml}</div>
     </div>`;
   }).join('');
 };
 
-// Helper lingua utente storia
-function getStoryUserLang(){return localStorage.getItem(STORY_USER_LANG_KEY)||null;}
-function setStoryUserLang(t){localStorage.setItem(STORY_USER_LANG_KEY,t);}
-
-// Sovrascrivo openStory: la prima volta chiede la lingua principale
-const _origOpenStory=openStory;
+// openStory ora apre DIRETTAMENTE — no scelta lingua, mix automatico
 openStory=function(){
   sfxClick();
-  if(!getStoryUserLang()){
-    openLangPicker('SCEGLI LA LINGUA DELLA TUA STORIA',function(langCode){
-      if(!langCode){
-        // Random non valido per storia: chiedo di nuovo o uso inglese di default
-        const langCode2=prompt('Per la storia serve una lingua specifica.\nSceglila (es: en-GB, es-ES, fr-FR, de-DE, ja-JP...):','en-GB');
-        if(!langCode2)return;
-        setStoryUserLang(langCode2);
-      } else {
-        setStoryUserLang(langCode);
-      }
-      _origOpenStory();
-    });
-    return;
-  }
-  _origOpenStory();
+  document.getElementById('STORY_OV').classList.add('on');
+  renderStoryMap();
+  if(typeof gtag==='function')gtag('event','story_open');
 };
 
-// Sovrascrivo startStoryLevel per V5: usa dbKey/dbStart/forceLang/useUserLang
+// startStoryLevel V9: pesca lingua RANDOM dal langPool del capitolo
 startStoryLevel=function(chap,lvl){
   sfxClick();
   const c=_CHAP()[chap];
@@ -4368,9 +4435,11 @@ startStoryLevel=function(chap,lvl){
   const wordIdx=c.dbStart+lvl;
   const word=DB[c.dbKey][wordIdx];
   if(!word){console.error('Story word not found',c,lvl);return;}
-  // Determina lingua
-  let langCode=c.forceLang||getStoryUserLang()||'en-GB';
-  // Fallback se la parola non ha quella traduzione
+  // Pesca lingua RANDOM dal langPool del capitolo (mix lingue automatico)
+  const pool=c.langPool||['en-GB'];
+  // Filtro pool solo lingue con traduzione disponibile
+  const validPool=pool.filter(t=>word.tr[t]);
+  let langCode=(validPool.length>0?validPool:pool)[Math.floor(Math.random()*(validPool.length>0?validPool:pool).length)];
   if(!word.tr[langCode]){
     const keys=Object.keys(word.tr);
     langCode=keys[0];
@@ -4390,7 +4459,7 @@ startStoryLevel=function(chap,lvl){
   closeStory();
   showListen();
   if(typeof gtag==='function')gtag('event','story_level_start',{chapter:chap,level:lvl,lang:langCode});
-}
+};
 
 // ─── Avvio app: controlla onboarding ───
 (function initV5(){
@@ -4783,6 +4852,362 @@ function shareApp(channel){
       }
       break;
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// V9 — Settings completo, Mail, Bag, Gift Code, FAB regole
+// ═══════════════════════════════════════════════════════
+
+// ─── FAB regole: apre modal regole COMPLETE + parla ───
+function openRulesBook(){
+  sfxClick();
+  showRules(); // apre il modal con regole testuali
+  // Avvia anche TTS dopo un attimo (lascia che modal si apra prima)
+  setTimeout(()=>speakRules(),400);
+}
+
+// ─── USER ID univoco (per support / future sync) ───
+const USER_ID_KEY='wdym_user_id';
+function getUserId(){
+  let id=localStorage.getItem(USER_ID_KEY);
+  if(!id){
+    // Genera ID casuale tipo "vbhcIqXSlphPWGz6dZ75mjkxI3T2" (24 char)
+    const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    id='';
+    for(let i=0;i<24;i++)id+=chars[Math.floor(Math.random()*chars.length)];
+    localStorage.setItem(USER_ID_KEY,id);
+  }
+  return id;
+}
+function copyUserId(){
+  sfxClick();
+  const id=getUserId();
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(id).then(()=>{
+      alert('📋 User ID copiato!\n\n'+id+'\n\nUsalo se contatti il supporto.');
+    });
+  } else {
+    prompt('Copia questo User ID:',id);
+  }
+}
+
+// ─── SETTINGS MODAL ───
+function openSettings(){
+  sfxClick();
+  document.getElementById('SETTINGS_OV').classList.add('on');
+  document.getElementById('USER_ID_VAL').textContent=getUserId();
+  // Aggiorna toggles
+  document.getElementById('SW_SFX').classList.toggle('on',isSfxOn());
+  document.getElementById('SW_MUSIC').classList.toggle('on',isMusicOn());
+  document.getElementById('SW_VIBRATION').classList.toggle('on',isVibrationOn());
+  document.getElementById('SW_NOTIF').classList.toggle('on',isNotifOn());
+  renderAccountList();
+  settingsTab('game');
+  if(typeof gtag==='function')gtag('event','settings_open');
+}
+function closeSettings(){document.getElementById('SETTINGS_OV').classList.remove('on');}
+function settingsTab(tab){
+  document.querySelectorAll('[data-stab]').forEach(t=>t.classList.toggle('on',t.dataset.stab===tab));
+  document.getElementById('SET_GAME').style.display=tab==='game'?'block':'none';
+  document.getElementById('SET_ACCOUNT').style.display=tab==='account'?'block':'none';
+}
+
+// ─── VIBRATION ───
+const VIB_KEY='wdym_vibration_on';
+function isVibrationOn(){return localStorage.getItem(VIB_KEY)!=='0';}
+function toggleVibration(){
+  const cur=isVibrationOn();
+  localStorage.setItem(VIB_KEY,cur?'0':'1');
+  document.getElementById('SW_VIBRATION').classList.toggle('on',!cur);
+  if(!cur)vibrate(50); // feedback haptic
+  if(typeof gtag==='function')gtag('event','vibration_toggle',{on:!cur});
+}
+function vibrate(ms){
+  if(!isVibrationOn())return;
+  if(navigator.vibrate)try{navigator.vibrate(ms);}catch(e){}
+}
+
+// ─── NOTIFICATIONS ───
+const NOTIF_KEY='wdym_notif_on';
+function isNotifOn(){return localStorage.getItem(NOTIF_KEY)==='1';}
+function toggleNotifications(){
+  const cur=isNotifOn();
+  if(!cur){
+    // Richiedi permission
+    if('Notification' in window){
+      Notification.requestPermission().then(perm=>{
+        if(perm==='granted'){
+          localStorage.setItem(NOTIF_KEY,'1');
+          document.getElementById('SW_NOTIF').classList.add('on');
+          new Notification('What Do You Mean?',{body:'🔔 Notifiche attivate! Riceverai avvisi delle sfide.',icon:'./icons/icon-192.png'});
+        } else {
+          alert('❌ Hai negato le notifiche. Riattivale dalle impostazioni del browser.');
+        }
+      });
+    } else {
+      alert('Le notifiche non sono supportate da questo browser.');
+    }
+  } else {
+    localStorage.setItem(NOTIF_KEY,'0');
+    document.getElementById('SW_NOTIF').classList.remove('on');
+  }
+  if(typeof gtag==='function')gtag('event','notif_toggle',{on:!cur});
+}
+
+// ─── SUPPORT / TERMS / PRIVACY ───
+function openSupport(){
+  sfxClick();
+  const uid=getUserId();
+  const subject='[WDYM Support] Richiesta aiuto';
+  const body=`Ciao team WDYM,\n\nUser ID: ${uid}\nVersione: 2.0.0\nDispositivo: ${navigator.userAgent}\n\nDescrivi qui il problema:\n\n`;
+  window.location.href=`mailto:luiscasto2000@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+function showTerms(){
+  alert('📜 TERMINI DI USO\n\n'+
+    'What Do You Mean? è un gioco gratuito di pronuncia linguistica.\n\n'+
+    '✓ L\'app è offerta "così com\'è" senza garanzie.\n'+
+    '✓ Le monete in-game NON hanno valore reale.\n'+
+    '✓ Vietato uso commerciale non autorizzato.\n'+
+    '✓ Età minima consigliata: 13 anni.\n\n'+
+    'Per la versione completa, contatta luiscasto2000@gmail.com');
+}
+function showPrivacy(){
+  alert('🔒 PRIVACY POLICY\n\n'+
+    'I tuoi dati restano sul tuo telefono:\n\n'+
+    '✓ Nessun account email/password (per ora)\n'+
+    '✓ Nickname e statistiche in localStorage\n'+
+    '✓ Google Analytics anonimo per metriche\n'+
+    '✓ Nessuna posizione GPS\n'+
+    '✓ Microfono usato SOLO durante il gioco, niente registrato\n\n'+
+    'Quando arriverà Firebase, ti chiederemo consenso esplicito.');
+}
+
+// ─── ACCOUNT SOCIAL (con bonus monete) ───
+const SOCIAL_PROVIDERS=[
+  {id:'google', name:'Google',   icon:'🇬', color:'#4285F4', bonus:50},
+  {id:'apple',  name:'Apple ID', icon:'',  color:'#000000', bonus:50},
+  {id:'facebook',name:'Facebook',icon:'f',  color:'#1877F2', bonus:50},
+  {id:'email',  name:'Email',    icon:'📧', color:'#9b30ff', bonus:50},
+];
+function getConnectedAccounts(){
+  try{return JSON.parse(localStorage.getItem('wdym_social')||'{}');}catch(e){return {};}
+}
+function renderAccountList(){
+  const wrap=document.getElementById('ACC_LIST');
+  const connected=getConnectedAccounts();
+  wrap.innerHTML=SOCIAL_PROVIDERS.map(p=>{
+    const isConn=connected[p.id];
+    return `<div style="display:flex;align-items:center;gap:14px;background:rgba(15,0,48,.7);
+      border:1.5px solid ${isConn?'rgba(0,255,136,.5)':'rgba(155,48,255,.25)'};border-radius:14px;
+      padding:14px;margin-bottom:8px;cursor:${isConn?'default':'pointer'}"
+      ${isConn?'':`onclick="connectSocial('${p.id}')"`}>
+      <div style="width:38px;height:38px;border-radius:50%;background:${p.color};color:#fff;
+        display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:bold;
+        font-family:system-ui,Arial,sans-serif">${p.icon}</div>
+      <div style="flex:1">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;letter-spacing:1.5px">
+          ${isConn?'✓ COLLEGATO':'COLLEGA'} ${p.name.toUpperCase()}
+        </div>
+        <div style="font-size:.7rem;color:${isConn?'var(--gn)':'var(--gd)'}">
+          ${isConn?'Bonus +50 monete ricevuto':'+50 🪙 bonus al collegamento'}
+        </div>
+      </div>
+      <div style="font-size:1.4rem;color:${isConn?'var(--gn)':'var(--mt)'}">${isConn?'✓':'→'}</div>
+    </div>`;
+  }).join('');
+}
+function connectSocial(id){
+  sfxClick();
+  const provider=SOCIAL_PROVIDERS.find(p=>p.id===id);
+  if(!provider)return;
+  const connected=getConnectedAccounts();
+  if(connected[id]){alert('Già collegato!');return;}
+  // Per ora simulazione locale (in Sessione 2 sarà vero OAuth)
+  if(!confirm(`Collegare ${provider.name}?\n\n+${provider.bonus} monete in regalo!\n\n⚠️ Per ora è una simulazione locale.\nIl collegamento reale arriva con Firebase.`))return;
+  connected[id]=Date.now();
+  localStorage.setItem('wdym_social',JSON.stringify(connected));
+  addCoins(provider.bonus,'social_connect_'+id);
+  vibrate(100);
+  sfxFanfare();
+  confetti();
+  renderAccountList();
+}
+
+// ─── MAIL / MESSAGES ───
+const MAIL_KEY='wdym_mail';
+function getMail(){
+  let mail;
+  try{mail=JSON.parse(localStorage.getItem(MAIL_KEY)||'null');}catch(e){mail=null;}
+  if(!mail){
+    // Seed iniziale
+    mail=[
+      {id:'welcome',title:'🎉 Benvenuto in WDYM!',body:'Grazie per aver scaricato What Do You Mean! Hai ricevuto 50 monete bonus.',date:Date.now(),read:false,reward:null},
+      {id:'patch2',title:'🚀 Patch 2.0 disponibile',body:'Modalità Storia, PvP via WhatsApp, Negozio, Classifica! Esplora tutte le novità.',date:Date.now(),read:false,reward:null},
+      {id:'bonus_early',title:'🎁 Regalo Early Adopter',body:'Sei tra i primi giocatori! +100 monete in regalo. Riscatta qui sotto.',date:Date.now(),read:false,reward:100},
+    ];
+    localStorage.setItem(MAIL_KEY,JSON.stringify(mail));
+  }
+  return mail;
+}
+function getUnreadMailCount(){
+  return getMail().filter(m=>!m.read).length;
+}
+function openMail(){
+  sfxClick();
+  document.getElementById('MAIL_OV').classList.add('on');
+  renderMail();
+}
+function closeMail(){document.getElementById('MAIL_OV').classList.remove('on');updateMailBadge();}
+function renderMail(){
+  const list=document.getElementById('MAIL_LIST');
+  const mail=getMail();
+  if(mail.length===0){
+    list.innerHTML='<div style="text-align:center;color:var(--mt);padding:30px">📭 Nessun messaggio</div>';
+    return;
+  }
+  list.innerHTML=mail.map(m=>{
+    const cls=m.read?'':'unread';
+    return `<div style="background:rgba(15,0,48,${m.read?'.5':'.85'});
+      border:1.5px solid ${m.read?'rgba(155,48,255,.15)':'rgba(255,45,120,.4)'};
+      border-radius:14px;padding:14px;margin-bottom:10px;position:relative">
+      ${m.read?'':'<span style="position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--pk);box-shadow:0 0 8px var(--pk)"></span>'}
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;letter-spacing:1px;margin-bottom:6px">${m.title}</div>
+      <div style="font-size:.8rem;color:var(--mt);line-height:1.5;margin-bottom:8px">${m.body}</div>
+      ${m.reward&&!m.read?`<button onclick="claimMailReward('${m.id}')" style="background:linear-gradient(135deg,#ffcc00,#ff8800);color:#000;border:none;border-radius:8px;padding:8px 16px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;font-size:.8rem">🎁 RISCATTA +${m.reward} 🪙</button>`:''}
+      ${m.read?'':`<button onclick="markMailRead('${m.id}')" style="background:transparent;color:var(--bl);border:1px solid rgba(0,200,255,.4);border-radius:8px;padding:6px 12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;font-size:.7rem;margin-left:6px">✓ LETTO</button>`:''}
+    </div>`;
+  }).join('');
+}
+function markMailRead(id){
+  const mail=getMail();
+  const m=mail.find(x=>x.id===id);
+  if(!m)return;
+  m.read=true;
+  localStorage.setItem(MAIL_KEY,JSON.stringify(mail));
+  renderMail();
+  updateMailBadge();
+}
+function claimMailReward(id){
+  const mail=getMail();
+  const m=mail.find(x=>x.id===id);
+  if(!m||!m.reward||m.read)return;
+  addCoins(m.reward,'mail_reward');
+  m.read=true;m.reward=null;
+  localStorage.setItem(MAIL_KEY,JSON.stringify(mail));
+  sfxFanfare();
+  confetti();
+  renderMail();
+  updateMailBadge();
+}
+function updateMailBadge(){
+  const badge=document.getElementById('MAIL_BADGE');
+  const count=getUnreadMailCount();
+  if(!badge)return;
+  if(count>0){
+    badge.innerHTML=`<span style="background:#ff2d78;color:#fff;border-radius:100px;padding:2px 7px;font-size:.6rem;font-weight:bold;font-family:Arial">${count}</span>`;
+  } else {
+    badge.textContent='→';
+  }
+}
+
+// ─── BAG / INVENTARIO ───
+function openBag(){
+  sfxClick();
+  document.getElementById('BAG_OV').classList.add('on');
+  renderBag();
+}
+function closeBag(){document.getElementById('BAG_OV').classList.remove('on');}
+function renderBag(){
+  const list=document.getElementById('BAG_LIST');
+  const unlocked=getUnlocked();
+  const equipped=getEquipped();
+  // Default 8 + unlocked
+  const ownedIds=SHOP_ITEMS.filter(x=>x.cat==='default').map(x=>x.id).concat(unlocked);
+  const owned=ownedIds.map(id=>SHOP_ITEMS.find(x=>x.id===id)).filter(Boolean);
+  const coins=getCoins();
+  list.innerHTML=`
+    <div class="coming-info">🎒 Hai <b style="color:var(--gd)">${owned.length}</b> avatar · <b style="color:var(--gd)">${coins.toLocaleString('it-IT')} 🪙</b> monete</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+  `+owned.map(it=>{
+    const isEq=equipped===it.id;
+    return `<div onclick="setEquipped('${it.id}');renderBag();refreshDrawer();sfxClick()"
+      style="background:rgba(15,0,48,.7);border:1.5px solid ${isEq?'rgba(255,45,120,.6)':'rgba(155,48,255,.25)'};
+      border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;position:relative;
+      ${isEq?'box-shadow:0 0 24px rgba(255,45,120,.3)':''}">
+      ${isEq?'<div style="position:absolute;top:6px;right:6px;background:rgba(255,45,120,.25);color:#ff2d78;border:1px solid rgba(255,45,120,.5);border-radius:6px;padding:2px 6px;font-size:.55rem;letter-spacing:1.5px;font-family:Bebas Neue">★ IN USO</div>':''}
+      <div style="font-size:2.5rem;margin-bottom:6px;line-height:1">${it.e}</div>
+      <div style="font-size:.7rem;color:#fff;line-height:1.2;min-height:1.8em">${it.n}</div>
+    </div>`;
+  }).join('')+`</div>`;
+}
+
+// ─── GIFT CODE ───
+const GIFT_CODES={
+  'WDYM2026':{coins:100,name:'Lancio 2026',used:false},
+  'BOCCALONE':{coins:50,name:'Bonus Maestro',used:false},
+  'BENVENUTO':{coins:25,name:'Welcome',used:false},
+  'TIKTOK':{coins:150,name:'TikTok Fan',used:false},
+  'INSTAGRAM':{coins:150,name:'Instagram Fan',used:false},
+};
+function openGiftCode(){
+  sfxClick();
+  document.getElementById('GIFT_OV').classList.add('on');
+  document.getElementById('GIFT_INPUT').value='';
+}
+function closeGiftCode(){document.getElementById('GIFT_OV').classList.remove('on');}
+function redeemGiftCode(){
+  const code=document.getElementById('GIFT_INPUT').value.trim().toUpperCase();
+  if(!code){alert('Inserisci un codice!');return;}
+  const used=JSON.parse(localStorage.getItem('wdym_gift_used')||'[]');
+  if(used.includes(code)){alert('❌ Codice già usato!');return;}
+  const giftDef=GIFT_CODES[code];
+  if(!giftDef){alert('❌ Codice non valido!\n\nControlla che sia scritto bene.');return;}
+  // Riscatta
+  used.push(code);
+  localStorage.setItem('wdym_gift_used',JSON.stringify(used));
+  addCoins(giftDef.coins,'gift_'+code);
+  sfxFanfare();
+  confetti();
+  alert(`🎉 Codice riscattato!\n\n${giftDef.name}\n+${giftDef.coins} monete 🪙`);
+  closeGiftCode();
+  if(typeof gtag==='function')gtag('event','gift_redeem',{code:code,coins:giftDef.coins});
+}
+
+// Inizializza badge mail al primo load
+setTimeout(updateMailBadge,500);
+
+// ═══════════════════════════════════════════════════════
+// V9 — AVATAR PIÙ EPICI (rinomino + prezzi più alti)
+// ═══════════════════════════════════════════════════════
+// Sovrascrivo SHOP_ITEMS con avatar premium più curati
+window.SHOP_ITEMS=[
+  // Default (gratis, sempre sbloccati)
+  {id:'fox',     e:'🦊', n:'Volpe Astuta',        p:0,    cat:'default'},
+  {id:'panda',   e:'🐼', n:'Panda Saggio',        p:0,    cat:'default'},
+  {id:'lion',    e:'🦁', n:'Re Leone',            p:0,    cat:'default'},
+  {id:'frog',    e:'🐸', n:'Rana Verde',          p:0,    cat:'default'},
+  {id:'butterfly',e:'🦋',n:'Farfalla',            p:0,    cat:'default'},
+  {id:'star',    e:'🌟', n:'Stella Splendente',   p:0,    cat:'default'},
+  {id:'unicorn', e:'🦄', n:'Unicorno Mistico',    p:0,    cat:'default'},
+  {id:'dragon',  e:'🐉', n:'Drago Antico',        p:0,    cat:'default'},
+  // Premium (V9: prezzi rivisti e nomi più epici)
+  {id:'taco',    e:'🌮', n:'Capitano Taco',       p:250,  cat:'premium'},
+  {id:'sushi',   e:'🍣', n:'Maestro Sushi',       p:350,  cat:'premium'},
+  {id:'baguette',e:'🥖', n:'Cavaliere Baguette',  p:450,  cat:'premium'},
+  {id:'pizza',   e:'🍕', n:'Signore della Pizza', p:500,  cat:'premium'},
+  {id:'camel',   e:'🐪', n:'Beduino del Deserto', p:700,  cat:'premium'},
+  {id:'koala',   e:'🐨', n:'Koala Mistico',       p:800,  cat:'premium'},
+  {id:'penguin', e:'🐧', n:'Pinguino Imperatore', p:1000, cat:'premium'},
+  {id:'octopus', e:'🐙', n:'Polipo Oracolo',      p:1200, cat:'premium'},
+  {id:'tiger',   e:'🐯', n:'Tigre delle Brume',   p:1500, cat:'premium'},
+  {id:'eagle',   e:'🦅', n:'Aquila Imperiale',    p:1800, cat:'premium'},
+  {id:'wizard',  e:'🧙', n:'Mago dei Linguaggi',  p:2500, cat:'premium'},
+  {id:'crown',   e:'👑', n:'Re del Mondo',        p:3500, cat:'premium'},
+];
+// Aggiorno la lista globale che usano shop e bag
+if(typeof SHOP_ITEMS!=='undefined'){
+  SHOP_ITEMS.length=0;
+  window.SHOP_ITEMS.forEach(it=>SHOP_ITEMS.push(it));
 }
 </script>
 </body>
