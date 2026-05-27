@@ -2813,9 +2813,47 @@ document.addEventListener('touchend',e=>{
 // V2 ADDITIONS — Single-Player + Share + Confetti + Sound + PWA
 // ═══════════════════════════════════════════════════════
 
-// ─── Service Worker ───
+// ─── Service Worker V9 — auto-update e force reload ───
+const APP_VERSION='9.0.0';
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').then(reg=>{
+      // Controlla aggiornamenti ogni volta che la pagina si apre
+      reg.update();
+      // Quando un nuovo SW è installato e in attesa, attivalo subito
+      reg.addEventListener('updatefound',()=>{
+        const newSW=reg.installing;
+        if(!newSW)return;
+        newSW.addEventListener('statechange',()=>{
+          if(newSW.state==='installed'&&navigator.serviceWorker.controller){
+            // C'è un aggiornamento pronto → attiva subito
+            newSW.postMessage({type:'SKIP_WAITING'});
+          }
+        });
+      });
+    }).catch(()=>{});
+    // Quando il SW prende controllo (cambio versione), ricarica la pagina UNA SOLA VOLTA
+    let _reloadDone=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(_reloadDone)return;
+      _reloadDone=true;
+      console.log('SW aggiornato → reload');
+      window.location.reload();
+    });
+    // Messaggio dal SW quando attiva nuova versione
+    navigator.serviceWorker.addEventListener('message',e=>{
+      if(e.data&&e.data.type==='SW_UPDATED'){
+        console.log('Nuova versione SW attiva:',e.data.version);
+      }
+    });
+  });
+  // Forza update se la versione salvata è diversa
+  const savedVer=localStorage.getItem('wdym_app_version');
+  if(savedVer&&savedVer!==APP_VERSION){
+    // Pulisci tutte le cache vecchie
+    if(window.caches)caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
+  }
+  localStorage.setItem('wdym_app_version',APP_VERSION);
 }
 
 // ─── Install Prompt (Android Chrome) ───
