@@ -595,6 +595,118 @@ input::placeholder{color:var(--mt);opacity:.7}
 
 body{padding-bottom:104px} /* spazio per bottom nav più grande */
 
+/* ── HAMBURGER MENU (V8) — tondo in alto a destra ── */
+.hamb-fab{position:fixed;top:14px;right:14px;z-index:200;
+  width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);
+  background:linear-gradient(135deg,#1a0050,#0f0030);color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);transition:transform .15s;
+  flex-direction:column;gap:4px;padding:0}
+.hamb-fab:active{transform:scale(.88)}
+.hamb-line{width:20px;height:2.5px;background:#fff;border-radius:2px;
+  transition:transform .3s,opacity .2s}
+.hamb-fab.open .hamb-line:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.hamb-fab.open .hamb-line:nth-child(2){opacity:0}
+.hamb-fab.open .hamb-line:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+/* Coin badge si sposta a sinistra del hamburger */
+/* Era top:14px right:14px — lo sposto */
+.coin-badge{right:74px !important}
+
+/* ── HAMBURGER DRAWER (slide-in da destra) ── */
+.hamb-drawer-backdrop{position:fixed;inset:0;background:rgba(7,0,26,.6);
+  backdrop-filter:blur(6px);z-index:680;display:none;animation:fin .25s ease}
+.hamb-drawer-backdrop.on{display:block}
+.hamb-drawer{position:fixed;top:0;right:-360px;height:100vh;width:320px;max-width:85vw;
+  background:linear-gradient(180deg,#0f0030 0%,#07001a 100%);
+  border-left:2px solid rgba(155,48,255,.4);
+  box-shadow:-12px 0 40px rgba(0,0,0,.6);
+  z-index:690;transition:right .3s ease;overflow-y:auto;padding:20px 18px 30px;
+  display:flex;flex-direction:column;gap:14px}
+.hamb-drawer.on{right:0}
+.hd-header{display:flex;align-items:center;gap:12px;padding:14px;
+  background:linear-gradient(135deg,rgba(155,48,255,.15),rgba(0,200,255,.08));
+  border:1px solid rgba(155,48,255,.3);border-radius:14px;margin-bottom:6px}
+.hd-avatar{font-size:2.2rem;line-height:1}
+.hd-info{flex:1;min-width:0}
+.hd-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;color:#fff;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd-coins{font-size:.7rem;color:var(--gd);letter-spacing:1px;margin-top:2px}
+.hd-section-title{font-size:.6rem;color:var(--mt);letter-spacing:3px;text-transform:uppercase;
+  padding:0 6px;margin-top:6px;margin-bottom:-4px}
+.hd-item{display:flex;align-items:center;gap:12px;padding:13px 14px;
+  background:rgba(15,0,48,.6);border:1px solid rgba(155,48,255,.18);border-radius:12px;
+  cursor:pointer;transition:all .15s;color:var(--tx);font-family:'Bebas Neue',sans-serif;
+  font-size:.9rem;letter-spacing:1.5px}
+.hd-item:active{transform:scale(.97);background:rgba(15,0,48,.85)}
+.hd-item .ico{font-size:1.3rem;line-height:1;flex-shrink:0}
+.hd-item .txt{flex:1}
+.hd-item .arrow{color:var(--mt);font-size:.85rem}
+.hd-toggle{display:flex;align-items:center;gap:12px;padding:13px 14px;
+  background:rgba(15,0,48,.6);border:1px solid rgba(155,48,255,.18);border-radius:12px;
+  font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:1.5px;color:var(--tx)}
+.hd-toggle .ico{font-size:1.3rem;flex-shrink:0}
+.hd-toggle .txt{flex:1}
+.hd-switch{position:relative;width:46px;height:26px;background:rgba(255,255,255,.1);
+  border-radius:14px;cursor:pointer;transition:background .2s;flex-shrink:0;
+  border:1px solid rgba(255,255,255,.1)}
+.hd-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;
+  background:#fff;border-radius:50%;transition:left .2s,background .2s;
+  box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.hd-switch.on{background:linear-gradient(135deg,#00ff88,#00c8ff)}
+.hd-switch.on::after{left:22px}
+.hd-socials{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.hd-soc{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  background:rgba(15,0,48,.7);border:1px solid rgba(155,48,255,.25);border-radius:12px;
+  cursor:pointer;font-size:1.5rem;transition:all .15s}
+.hd-soc:active{transform:scale(.92)}
+.hd-soc.wa{background:linear-gradient(135deg,rgba(37,211,102,.15),rgba(18,140,126,.1));border-color:rgba(37,211,102,.4)}
+.hd-soc.tg{background:linear-gradient(135deg,rgba(34,158,217,.15),rgba(0,136,204,.1));border-color:rgba(34,158,217,.4)}
+.hd-soc.x{background:linear-gradient(135deg,rgba(0,0,0,.5),rgba(34,34,34,.4));border-color:rgba(255,255,255,.2)}
+.hd-soc.ig{background:linear-gradient(135deg,rgba(254,218,117,.15),rgba(214,41,118,.1));border-color:rgba(214,41,118,.4)}
+.hd-footer{margin-top:auto;padding-top:14px;border-top:1px solid rgba(155,48,255,.15);
+  font-size:.62rem;color:var(--mt);text-align:center;letter-spacing:1.5px}
+
+/* ── MODAL GIOCA / PVP (V8) ── */
+.choice-overlay{position:fixed;inset:0;background:rgba(7,0,26,.95);backdrop-filter:blur(10px);
+  z-index:625;display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 18px;animation:fin .25s ease}
+.choice-overlay.on{display:flex}
+.choice-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;
+  margin-bottom:4px;text-align:center;line-height:1}
+.choice-sub{font-size:.72rem;color:var(--mt);letter-spacing:3px;text-transform:uppercase;
+  margin-bottom:22px;text-align:center}
+.choice-cards{display:flex;flex-direction:column;gap:12px;width:100%;max-width:460px;margin-bottom:14px}
+.choice-card{background:linear-gradient(135deg,rgba(15,0,48,.85),rgba(26,0,80,.85));
+  border:1.5px solid rgba(155,48,255,.35);border-radius:18px;padding:18px 18px 16px;
+  cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.choice-card:active{transform:scale(.97)}
+.choice-card::before{content:'';position:absolute;inset:0;border-radius:18px;
+  background:radial-gradient(ellipse at top right,rgba(255,255,255,.06),transparent 70%);
+  pointer-events:none}
+.choice-card-row{display:flex;align-items:center;gap:14px}
+.choice-emoji{font-size:3rem;line-height:1;flex-shrink:0}
+.choice-card-body{flex:1;min-width:0}
+.choice-card-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;
+  color:#fff;margin-bottom:3px;line-height:1.1}
+.choice-card-desc{font-size:.72rem;color:var(--mt);line-height:1.5}
+.choice-card-arrow{font-size:1.4rem;color:var(--pk);flex-shrink:0;line-height:1}
+.choice-card.green{border-color:rgba(0,255,136,.5);
+  background:linear-gradient(135deg,rgba(0,255,136,.1),rgba(0,200,255,.06))}
+.choice-card.pink{border-color:rgba(255,45,120,.5);
+  background:linear-gradient(135deg,rgba(255,45,120,.1),rgba(155,48,255,.06))}
+.choice-card.blue{border-color:rgba(0,200,255,.5);
+  background:linear-gradient(135deg,rgba(0,200,255,.1),rgba(155,48,255,.06))}
+.choice-card.yellow{border-color:rgba(255,204,0,.5);
+  background:linear-gradient(135deg,rgba(255,204,0,.1),rgba(255,45,120,.06))}
+.choice-coming{display:inline-block;background:rgba(255,255,255,.08);color:var(--mt);
+  font-family:'Bebas Neue',sans-serif;font-size:.6rem;padding:2px 8px;border-radius:6px;
+  letter-spacing:1px;margin-left:6px}
+.choice-close{width:100%;max-width:460px;padding:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);
+  color:var(--mt);border-radius:12px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px}
+
 /* ── PVP PICK SCREEN (V6) — scegli lingua + parola per ogni round ── */
 .pvp-pick-section{margin-bottom:14px}
 .pvp-pick-label{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:2px;
@@ -832,27 +944,141 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
 <!-- RULES FAB (top-left, parla con TTS) -->
 <button id="RULES_FAB" class="rules-fab" onclick="speakRules()" aria-label="Leggi le regole">
   📖
-  <span class="tip" id="RULES_TIP">🔊 LEGGIMI!</span>
+  <span class="tip" id="RULES_TIP">🔊 LEGGIMI SE HAI IL CORAGGIO!</span>
 </button>
 
-<!-- BOTTOM NAVIGATION V7 — 5 tab, centrale rialzato come FAB -->
+<!-- HAMBURGER MENU (top-right) -->
+<button id="HAMB_FAB" class="hamb-fab" onclick="toggleHamburger()" aria-label="Menu">
+  <span class="hamb-line"></span>
+  <span class="hamb-line"></span>
+  <span class="hamb-line"></span>
+</button>
+
+<!-- HAMBURGER DRAWER (slide-in da destra) -->
+<div id="HAMB_BACKDROP" class="hamb-drawer-backdrop" onclick="toggleHamburger()"></div>
+<aside id="HAMB_DRAWER" class="hamb-drawer">
+  <div class="hd-header">
+    <div class="hd-avatar" id="HD_AV">🦊</div>
+    <div class="hd-info">
+      <div class="hd-name" id="HD_NAME">GIOCATORE</div>
+      <div class="hd-coins">🪙 <span id="HD_COINS">0</span></div>
+    </div>
+  </div>
+  <div class="hd-section-title">🎮 IL TUO ACCOUNT</div>
+  <div class="hd-item" onclick="closeHamburger();openProfile()">
+    <span class="ico">👤</span><span class="txt">PROFILO E STATISTICHE</span><span class="arrow">→</span>
+  </div>
+  <div class="hd-item" onclick="closeHamburger();openLeaderboard()">
+    <span class="ico">🏆</span><span class="txt">CLASSIFICA MONDIALE</span><span class="arrow">→</span>
+  </div>
+  <div class="hd-section-title">🔊 AUDIO</div>
+  <div class="hd-toggle">
+    <span class="ico">🔊</span><span class="txt">EFFETTI SONORI</span>
+    <div class="hd-switch on" id="SW_SFX" onclick="toggleSfx()"></div>
+  </div>
+  <div class="hd-toggle">
+    <span class="ico">🎵</span><span class="txt">MUSICA DI SOTTOFONDO</span>
+    <div class="hd-switch" id="SW_MUSIC" onclick="toggleMusic()"></div>
+  </div>
+  <div class="hd-section-title">📢 CONDIVIDI L'APP</div>
+  <div class="hd-socials">
+    <div class="hd-soc wa" onclick="shareApp('whatsapp')" aria-label="WhatsApp">💚</div>
+    <div class="hd-soc tg" onclick="shareApp('telegram')" aria-label="Telegram">✈️</div>
+    <div class="hd-soc x" onclick="shareApp('x')" aria-label="X">𝕏</div>
+    <div class="hd-soc ig" onclick="shareApp('instagram')" aria-label="Instagram">📷</div>
+  </div>
+  <div class="hd-section-title">📖 INFO</div>
+  <div class="hd-item" onclick="closeHamburger();showRules()">
+    <span class="ico">📖</span><span class="txt">REGOLE COMPLETE</span><span class="arrow">→</span>
+  </div>
+  <div class="hd-item" onclick="closeHamburger();speakRules()">
+    <span class="ico">🔊</span><span class="txt">REGOLE AD ALTA VOCE</span><span class="arrow">→</span>
+  </div>
+  <div class="hd-footer">
+    What Do You Mean? · v2.0<br>
+    by Luigi Casto · 2026
+  </div>
+</aside>
+
+<!-- MODAL GIOCA: scegli tra Solo o Gruppo -->
+<div id="GAME_CHOICE" class="choice-overlay">
+  <div style="font-size:4rem;margin-bottom:6px">🎮</div>
+  <div class="choice-title" style="background:linear-gradient(135deg,#ffcc00,#ff2d78);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">GIOCA</div>
+  <div class="choice-sub">scegli la modalità</div>
+  <div class="choice-cards">
+    <div class="choice-card yellow" onclick="closeGameChoice();startSolo()">
+      <div class="choice-card-row">
+        <div class="choice-emoji">🎯</div>
+        <div class="choice-card-body">
+          <div class="choice-card-title">SOLO BOCCALONE</div>
+          <div class="choice-card-desc">Sfida solo contro il Maestro Boccalone. 5 round, medaglia personale, record salvato.</div>
+        </div>
+        <div class="choice-card-arrow">→</div>
+      </div>
+    </div>
+    <div class="choice-card green" onclick="closeGameChoice();go('S1')">
+      <div class="choice-card-row">
+        <div class="choice-emoji">🎮</div>
+        <div class="choice-card-body">
+          <div class="choice-card-title">GRUPPO 2-8 GIOCATORI</div>
+          <div class="choice-card-desc">Passa il telefono tra amici. Uno sceglie parola e lingua, gli altri pronunciano.</div>
+        </div>
+        <div class="choice-card-arrow">→</div>
+      </div>
+    </div>
+  </div>
+  <button class="choice-close" onclick="closeGameChoice()">CHIUDI</button>
+</div>
+
+<!-- MODAL PVP: scegli tra Mondo random o Amico -->
+<div id="PVP_CHOICE" class="choice-overlay">
+  <div style="font-size:4rem;margin-bottom:6px">⚔️</div>
+  <div class="choice-title" style="background:linear-gradient(135deg,#ff2d78,#9b30ff,#00c8ff);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">SFIDA PVP</div>
+  <div class="choice-sub">scegli l'avversario</div>
+  <div class="choice-cards">
+    <div class="choice-card blue" onclick="closePvpChoice();openOnline()">
+      <div class="choice-card-row">
+        <div class="choice-emoji">🌐</div>
+        <div class="choice-card-body">
+          <div class="choice-card-title">MONDO RANDOM <span class="choice-coming">🔒 IN ARRIVO</span></div>
+          <div class="choice-card-desc">Sfida un giocatore random nel mondo intero, real-time via internet. Vincere = +50 monete.</div>
+        </div>
+        <div class="choice-card-arrow">→</div>
+      </div>
+    </div>
+    <div class="choice-card pink" onclick="closePvpChoice();pvpCreateStart()">
+      <div class="choice-card-row">
+        <div class="choice-emoji">📱</div>
+        <div class="choice-card-body">
+          <div class="choice-card-title">SFIDA UN AMICO</div>
+          <div class="choice-card-desc">Crea sfida con 3 round, manda il link via WhatsApp/SMS. L'amico fa le stesse pronunce.</div>
+        </div>
+        <div class="choice-card-arrow">→</div>
+      </div>
+    </div>
+  </div>
+  <button class="choice-close" onclick="closePvpChoice()">CHIUDI</button>
+</div>
+
+<!-- BOTTOM NAVIGATION V8 — 5 tasti con GIOCA al centro (FAB rialzato) -->
 <nav class="bnav" id="BNAV">
   <button class="bnav-btn shop" onclick="openShop()" aria-label="Negozio">
     <span class="bi">🛍️</span><span class="bl">NEGOZIO</span>
-    <span class="bnav-dot" id="DOT_SHOP" style="display:none"></span>
   </button>
-  <button class="bnav-btn pvp" onclick="pvpCreateStart()" aria-label="PvP">
+  <button class="bnav-btn prof" onclick="openShop();shopTab('premium')" aria-label="Skin">
+    <span class="bi">💎</span><span class="bl">SKIN</span>
+  </button>
+  <button class="bnav-btn story-fab" onclick="openGameChoice()" aria-label="Gioca">
+    <span class="bi">🎮</span><span class="bl">GIOCA</span>
+    <span class="bnav-dot">!</span>
+  </button>
+  <button class="bnav-btn pvp" onclick="openPvpChoice()" aria-label="PvP">
     <span class="bi">⚔️</span><span class="bl">PVP</span>
   </button>
-  <button class="bnav-btn story-fab" onclick="openStory()" aria-label="Storia">
+  <button class="bnav-btn lb" onclick="openStory()" aria-label="Storia">
     <span class="bi">📚</span><span class="bl">STORIA</span>
-    <span class="bnav-dot" id="DOT_STORY">!</span>
-  </button>
-  <button class="bnav-btn lb" onclick="openLeaderboard()" aria-label="Classifica">
-    <span class="bi">🏆</span><span class="bl">CLASSIFICA</span>
-  </button>
-  <button class="bnav-btn prof" onclick="openProfile()" aria-label="Profilo">
-    <span class="bi">👤</span><span class="bl">PROFILO</span>
   </button>
 </nav>
 
@@ -964,12 +1190,13 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
       </div>
     </div>
   </div>
-  <button class="btn btn-story-home" onclick="openStory()">📚 STORIA — IMPARA CON BOCCALONE</button>
-  <button class="btn btn-solo" onclick="startSolo()">🎯 SFIDA BOCCALONE (DA SOLO)</button>
-  <button class="btn btn-online" onclick="openOnline()">🌐 MATCH ONLINE (giocatori random)</button>
-  <button class="btn bp" onclick="go('S1')">🎮 GIOCA IN GRUPPO (2-8)</button>
-  <button class="btn btn-profile" onclick="openProfile()">👤 PROFILO PERSONALE</button>
-  <button class="btn bs" onclick="showRules()">📖 REGOLE COMPLETE</button>
+  <div style="background:rgba(155,48,255,.08);border:1px solid rgba(155,48,255,.3);
+       border-radius:14px;padding:14px 16px;width:100%;max-width:460px;text-align:center;
+       font-size:.85rem;color:var(--tx);line-height:1.7">
+    👇 Usa il <b style="color:var(--gn)">menu in basso</b> per giocare<br>
+    <span style="font-size:.72rem;color:var(--mt)">🎮 Gioca · ⚔️ PvP · 📚 Storia · 🛍️ Negozio · 💎 Skin</span>
+  </div>
+  <button class="btn bs" onclick="showRules()" style="margin-top:14px">📖 REGOLE COMPLETE (testo)</button>
 </div>
 
 <!-- ═══════ SETUP ═══════ -->
@@ -4405,6 +4632,158 @@ nextOrSummary=function(){
     document.getElementById('PVP_OV').scrollTop=0;
   };
 })();
+
+// ═══════════════════════════════════════════════════════
+// V8 — HAMBURGER MENU, MODAL GIOCA/PVP, AUDIO SETTINGS, SHARE APP
+// ═══════════════════════════════════════════════════════
+
+// ─── HAMBURGER MENU ───
+function toggleHamburger(){
+  sfxClick();
+  const fab=document.getElementById('HAMB_FAB');
+  const drawer=document.getElementById('HAMB_DRAWER');
+  const backdrop=document.getElementById('HAMB_BACKDROP');
+  const isOpen=drawer.classList.contains('on');
+  if(isOpen){
+    drawer.classList.remove('on');
+    backdrop.classList.remove('on');
+    fab.classList.remove('open');
+  } else {
+    // Aggiorna i valori prima di aprire
+    refreshDrawer();
+    drawer.classList.add('on');
+    backdrop.classList.add('on');
+    fab.classList.add('open');
+    if(typeof gtag==='function')gtag('event','hamburger_open');
+  }
+}
+function closeHamburger(){
+  const fab=document.getElementById('HAMB_FAB');
+  const drawer=document.getElementById('HAMB_DRAWER');
+  const backdrop=document.getElementById('HAMB_BACKDROP');
+  drawer.classList.remove('on');
+  backdrop.classList.remove('on');
+  fab.classList.remove('open');
+}
+function refreshDrawer(){
+  const p=getProfile();
+  document.getElementById('HD_AV').textContent=getEquippedEmoji();
+  document.getElementById('HD_NAME').textContent=(p.nickname||'GIOCATORE').toUpperCase();
+  document.getElementById('HD_COINS').textContent=getCoins().toLocaleString('it-IT');
+  // Toggles
+  document.getElementById('SW_SFX').classList.toggle('on',isSfxOn());
+  document.getElementById('SW_MUSIC').classList.toggle('on',isMusicOn());
+}
+
+// ─── MODAL GIOCA (Solo vs Gruppo) ───
+function openGameChoice(){
+  sfxClick();
+  document.getElementById('GAME_CHOICE').classList.add('on');
+  if(typeof gtag==='function')gtag('event','game_choice_open');
+}
+function closeGameChoice(){document.getElementById('GAME_CHOICE').classList.remove('on');}
+
+// ─── MODAL PVP (Mondo vs Amico) ───
+function openPvpChoice(){
+  sfxClick();
+  document.getElementById('PVP_CHOICE').classList.add('on');
+  if(typeof gtag==='function')gtag('event','pvp_choice_open');
+}
+function closePvpChoice(){document.getElementById('PVP_CHOICE').classList.remove('on');}
+
+// ─── AUDIO SETTINGS ───
+const SFX_KEY='wdym_sfx_on';
+const MUSIC_KEY='wdym_music_on';
+function isSfxOn(){return localStorage.getItem(SFX_KEY)!=='0';} // default ON
+function isMusicOn(){return localStorage.getItem(MUSIC_KEY)==='1';} // default OFF
+
+// Override beep per rispettare toggle SFX
+const _origBeep=beep;
+beep=function(f,d,t,v){
+  if(!isSfxOn())return;
+  return _origBeep(f,d,t,v);
+};
+
+function toggleSfx(){
+  const cur=isSfxOn();
+  localStorage.setItem(SFX_KEY,cur?'0':'1');
+  document.getElementById('SW_SFX').classList.toggle('on',!cur);
+  if(!cur)sfxSuccess();
+  if(typeof gtag==='function')gtag('event','sfx_toggle',{on:!cur});
+}
+
+// ─── BACKGROUND MUSIC (procedural ambient con Web Audio) ───
+let _musicCtx=null;
+let _musicNodes=null;
+function startMusic(){
+  if(_musicNodes)return;
+  try{
+    const ctx=ac();
+    _musicCtx=ctx;
+    // Drone leggero: 2 oscillatori a frequenze basse + LFO
+    const o1=ctx.createOscillator(); o1.type='sine'; o1.frequency.value=110;
+    const o2=ctx.createOscillator(); o2.type='triangle'; o2.frequency.value=165;
+    const o3=ctx.createOscillator(); o3.type='sine'; o3.frequency.value=220;
+    const g=ctx.createGain(); g.gain.value=0.025; // VOLUME BASSO
+    const filter=ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value=600;
+    // LFO per modulazione
+    const lfo=ctx.createOscillator(); lfo.frequency.value=0.15;
+    const lfoGain=ctx.createGain(); lfoGain.gain.value=80;
+    lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+    o1.connect(filter); o2.connect(filter); o3.connect(filter);
+    filter.connect(g); g.connect(ctx.destination);
+    o1.start(); o2.start(); o3.start(); lfo.start();
+    _musicNodes={o1,o2,o3,lfo,g};
+  }catch(e){console.warn('music start failed',e);}
+}
+function stopMusic(){
+  if(!_musicNodes)return;
+  try{
+    _musicNodes.g.gain.exponentialRampToValueAtTime(0.001,_musicCtx.currentTime+0.3);
+    setTimeout(()=>{
+      _musicNodes.o1.stop();_musicNodes.o2.stop();_musicNodes.o3.stop();_musicNodes.lfo.stop();
+      _musicNodes=null;
+    },350);
+  }catch(e){_musicNodes=null;}
+}
+function toggleMusic(){
+  const cur=isMusicOn();
+  localStorage.setItem(MUSIC_KEY,cur?'0':'1');
+  document.getElementById('SW_MUSIC').classList.toggle('on',!cur);
+  if(cur)stopMusic(); else startMusic();
+  if(typeof gtag==='function')gtag('event','music_toggle',{on:!cur});
+}
+// Auto-start music se era ON (richiede prima interazione utente per Web Audio policy)
+document.addEventListener('click',function autoStartMusic(){
+  if(isMusicOn()&&!_musicNodes)startMusic();
+  document.removeEventListener('click',autoStartMusic);
+},{once:true});
+
+// ─── SHARE APP ───
+function shareApp(channel){
+  sfxClick();
+  closeHamburger();
+  const url='https://luiscasto2000-svg.github.io/What-do-you-mean-/';
+  const text='🌍 Prova What Do You Mean? Il gioco di pronuncia più folle del mondo. Sfida il Maestro Boccalone!';
+  if(typeof gtag==='function')gtag('event','share_app',{channel:channel});
+  switch(channel){
+    case 'whatsapp':
+      window.open(`https://wa.me/?text=${encodeURIComponent(text+' '+url)}`,'_blank');break;
+    case 'telegram':
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,'_blank');break;
+    case 'x':
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,'_blank');break;
+    case 'instagram':
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(url).then(()=>{
+          alert('📋 Link copiato negli appunti!\n\nApri Instagram → tocca "+" → Storia → incolla il link.');
+        });
+      } else {
+        prompt('Copia questo link e incollalo su Instagram:',url);
+      }
+      break;
+  }
+}
 </script>
 </body>
 </html>
