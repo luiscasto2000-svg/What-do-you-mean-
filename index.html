@@ -1313,22 +1313,22 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <button class="choice-close" onclick="closePvpChoice()">CHIUDI</button>
 </div>
 
-<!-- BOTTOM NAVIGATION V8 — 5 tasti con GIOCA al centro (FAB rialzato) -->
+<!-- BOTTOM NAVIGATION V12 — 5 tasti con GIOCA al centro (FAB rialzato) -->
 <nav class="bnav" id="BNAV">
-  <button class="bnav-btn shop" onclick="openShop()" aria-label="Negozio">
+  <button class="bnav-btn shop" onclick="safeCall('openShop')" aria-label="Negozio">
     <span class="bi">🛍️</span><span class="bl">NEGOZIO</span>
   </button>
-  <button class="bnav-btn prof" onclick="openShop();shopTab('premium')" aria-label="Skin">
-    <span class="bi">💎</span><span class="bl">SKIN</span>
+  <button class="bnav-btn lb" onclick="safeCall('openLeaderboard')" aria-label="Classifica">
+    <span class="bi">🏆</span><span class="bl">CLASSIFICA</span>
   </button>
-  <button class="bnav-btn story-fab" onclick="openGameChoice()" aria-label="Gioca">
+  <button class="bnav-btn story-fab" onclick="safeCall('openGameChoice')" aria-label="Gioca">
     <span class="bi">🎮</span><span class="bl">GIOCA</span>
     <span class="bnav-dot">!</span>
   </button>
-  <button class="bnav-btn pvp" onclick="openPvpChoice()" aria-label="PvP">
+  <button class="bnav-btn pvp" onclick="safeCall('openPvpChoice')" aria-label="PvP">
     <span class="bi">⚔️</span><span class="bl">PVP</span>
   </button>
-  <button class="bnav-btn lb" onclick="openStory()" aria-label="Storia">
+  <button class="bnav-btn prof" onclick="safeCall('openStory')" aria-label="Storia">
     <span class="bi">📚</span><span class="bl">STORIA</span>
   </button>
 </nav>
@@ -1416,6 +1416,22 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <!-- STREAK BADGE -->
   <div id="STREAK_BADGE_HOME" class="streak-badge cold">
     <span class="sf">🔥</span><span id="STREAK_TXT">0 GIORNI DI FILA</span>
+  </div>
+  <!-- OFFERTA LANCIO BANNER -->
+  <div id="LAUNCH_OFFER" class="daily-card" onclick="openShop();shopTab('packs')"
+    style="background:linear-gradient(135deg,rgba(255,45,120,.22),rgba(155,48,255,.15),rgba(0,200,255,.1));
+    border-color:rgba(255,45,120,.6);box-shadow:0 4px 28px rgba(255,45,120,.35)">
+    <div class="daily-row">
+      <div class="daily-icon">🎁</div>
+      <div class="daily-info">
+        <div class="daily-title" style="background:linear-gradient(135deg,#ff2d78,#ffcc00,#00c8ff);
+          -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+          OFFERTA LANCIO!
+        </div>
+        <div class="daily-sub">Starter Pack: 250 monete + Avatar EPICO gratis!</div>
+      </div>
+      <div class="daily-reward" style="background:rgba(255,45,120,.2);color:#ff2d78;border-color:rgba(255,45,120,.5)">€ 2,99</div>
+    </div>
   </div>
   <!-- DAILY CHALLENGE CARD -->
   <div id="DAILY_CARD" class="daily-card" onclick="startDailyChallenge()">
@@ -5843,38 +5859,136 @@ go=function(id){
 };
 
 // ═══════════════════════════════════════════════════════
-// V9 — AVATAR PIÙ EPICI (rinomino + prezzi più alti)
+// V12 — AVATAR EPICI a tema SUPEREROI (no Marvel per copyright)
 // ═══════════════════════════════════════════════════════
-// Sovrascrivo SHOP_ITEMS con avatar premium più curati
 window.SHOP_ITEMS=[
-  // Default (gratis, sempre sbloccati)
-  {id:'fox',     e:'🦊', n:'Volpe Astuta',        p:0,    cat:'default'},
-  {id:'panda',   e:'🐼', n:'Panda Saggio',        p:0,    cat:'default'},
-  {id:'lion',    e:'🦁', n:'Re Leone',            p:0,    cat:'default'},
-  {id:'frog',    e:'🐸', n:'Rana Verde',          p:0,    cat:'default'},
-  {id:'butterfly',e:'🦋',n:'Farfalla',            p:0,    cat:'default'},
-  {id:'star',    e:'🌟', n:'Stella Splendente',   p:0,    cat:'default'},
-  {id:'unicorn', e:'🦄', n:'Unicorno Mistico',    p:0,    cat:'default'},
-  {id:'dragon',  e:'🐉', n:'Drago Antico',        p:0,    cat:'default'},
-  // Premium (V9: prezzi rivisti e nomi più epici)
-  {id:'taco',    e:'🌮', n:'Capitano Taco',       p:250,  cat:'premium'},
-  {id:'sushi',   e:'🍣', n:'Maestro Sushi',       p:350,  cat:'premium'},
-  {id:'baguette',e:'🥖', n:'Cavaliere Baguette',  p:450,  cat:'premium'},
-  {id:'pizza',   e:'🍕', n:'Signore della Pizza', p:500,  cat:'premium'},
-  {id:'camel',   e:'🐪', n:'Beduino del Deserto', p:700,  cat:'premium'},
-  {id:'koala',   e:'🐨', n:'Koala Mistico',       p:800,  cat:'premium'},
-  {id:'penguin', e:'🐧', n:'Pinguino Imperatore', p:1000, cat:'premium'},
-  {id:'octopus', e:'🐙', n:'Polipo Oracolo',      p:1200, cat:'premium'},
-  {id:'tiger',   e:'🐯', n:'Tigre delle Brume',   p:1500, cat:'premium'},
-  {id:'eagle',   e:'🦅', n:'Aquila Imperiale',    p:1800, cat:'premium'},
-  {id:'wizard',  e:'🧙', n:'Mago dei Linguaggi',  p:2500, cat:'premium'},
-  {id:'crown',   e:'👑', n:'Re del Mondo',        p:3500, cat:'premium'},
+  // Default (GRATIS, 8 mascotte simpatiche per tutte le età)
+  {id:'fox',     e:'🦊', n:'Volpe Astuta',         p:0,    cat:'default', rarity:'common'},
+  {id:'panda',   e:'🐼', n:'Panda Saggio',         p:0,    cat:'default', rarity:'common'},
+  {id:'lion',    e:'🦁', n:'Re Leone',             p:0,    cat:'default', rarity:'common'},
+  {id:'frog',    e:'🐸', n:'Rana Verde',           p:0,    cat:'default', rarity:'common'},
+  {id:'cat',     e:'😺', n:'Gatto Felice',         p:0,    cat:'default', rarity:'common'},
+  {id:'star',    e:'🌟', n:'Stella Splendente',    p:0,    cat:'default', rarity:'common'},
+  {id:'unicorn', e:'🦄', n:'Unicorno Mistico',     p:0,    cat:'default', rarity:'common'},
+  {id:'dragon',  e:'🐲', n:'Draghetto Verde',      p:0,    cat:'default', rarity:'common'},
+
+  // 🟢 RARI — 250-700 monete (acquistabili presto)
+  {id:'pirate',  e:'🏴‍☠️', n:'Capitan Pirata',     p:250,  cat:'premium', rarity:'rare'},
+  {id:'robot',   e:'🤖', n:'Cyborg Z',             p:350,  cat:'premium', rarity:'rare'},
+  {id:'ninja',   e:'🥷', n:'Ombra Ninja',          p:500,  cat:'premium', rarity:'rare'},
+  {id:'wizard',  e:'🧙', n:'Mago Cosmico',         p:700,  cat:'premium', rarity:'rare'},
+
+  // 🔵 EPICI — 1000-2000 monete (vere skin "supereroi")
+  {id:'spider',  e:'🕷️', n:'Web Slinger',         p:1200, cat:'premium', rarity:'epic'},
+  {id:'iron',    e:'⚙️', n:'Iron Knight',         p:1500, cat:'premium', rarity:'epic'},
+  {id:'thunder', e:'⚡', n:'Thunder Lord',         p:1800, cat:'premium', rarity:'epic'},
+  {id:'phoenix', e:'🔥', n:'Fenice Ardente',       p:2000, cat:'premium', rarity:'epic'},
+
+  // 🟣 LEGGENDARI — 3500-6000 monete (top tier)
+  {id:'galaxy',  e:'🌌', n:'Galaxy Guardian',      p:3500, cat:'premium', rarity:'legendary'},
+  {id:'tiger',   e:'🐯', n:'Tigre delle Ombre',    p:4500, cat:'premium', rarity:'legendary'},
+  {id:'dragonk', e:'🐉', n:'Drago Imperiale',      p:6000, cat:'premium', rarity:'legendary'},
+
+  // 🟡 MITICO — 12.000 monete (status absoluto)
+  {id:'crown',   e:'👑', n:'Re del Mondo',         p:12000,cat:'premium', rarity:'mythic'},
 ];
-// Aggiorno la lista globale che usano shop e bag
-if(typeof SHOP_ITEMS!=='undefined'){
-  SHOP_ITEMS.length=0;
-  window.SHOP_ITEMS.forEach(it=>SHOP_ITEMS.push(it));
+// Update reference array
+try{
+  if(typeof SHOP_ITEMS!=='undefined'){
+    SHOP_ITEMS.length=0;
+    window.SHOP_ITEMS.forEach(it=>SHOP_ITEMS.push(it));
+  }
+}catch(e){console.warn('SHOP_ITEMS update failed',e);}
+
+// ═══════════════════════════════════════════════════════
+// V12 — PACK MONETE: badge promo aggressivi
+// ═══════════════════════════════════════════════════════
+window.COIN_PACKS=[
+  {id:'pack_small',  coins:250,  price:'€ 2,99',  icon:'💰', label:'STARTER PACK',  bonus:null,             tag:''},
+  {id:'pack_medium', coins:750,  price:'€ 8,99',  icon:'💎', label:'BIG PACK',      bonus:'+50 GRATIS',     tag:'🔥 POPOLARE'},
+  {id:'pack_big',    coins:1500, price:'€ 15,99', icon:'👑', label:'MEGA PACK',     bonus:'+200 GRATIS',    tag:'💎 MIGLIOR VALORE'},
+  {id:'pack_ultra',  coins:5000, price:'€ 49,99', icon:'🏆', label:'CHAMPION PACK', bonus:'+1500 GRATIS',   tag:'⭐ TOP VIP'},
+];
+try{
+  if(typeof COIN_PACKS!=='undefined'){
+    COIN_PACKS.length=0;
+    window.COIN_PACKS.forEach(p=>COIN_PACKS.push(p));
+  }
+}catch(e){console.warn('COIN_PACKS update failed',e);}
+
+// Override renderCoinPacks per mostrare badge promo
+if(typeof renderCoinPacks==='function'){
+  window.renderCoinPacks=function(){
+    const wrap=document.getElementById('SHOP_PACKS');
+    if(!wrap)return;
+    wrap.innerHTML=`
+      <div class="coming-info" style="background:rgba(255,45,120,.12);border-color:rgba(255,45,120,.4)">
+        🚀 <b style="color:var(--pk)">OFFERTA LANCIO!</b> Sostieni lo sviluppo<br>
+        <span style="font-size:.65rem;color:var(--mt)">Pagamenti reali si attivano al lancio Play Store / App Store</span>
+      </div>
+    `+COIN_PACKS.map(p=>`
+      <div class="pack-card locked" onclick="alert('🔒 Pack disponibili dal lancio Play Store!\\n\\nProssimamente potrai acquistare ${p.coins} monete per ${p.price}')">
+        ${p.tag?`<span class="pack-locked-tag" style="background:linear-gradient(135deg,#ff2d78,#ffcc00);color:#000;border:none">${p.tag}</span>`:'<span class="pack-locked-tag">🔒 IN ARRIVO</span>'}
+        <div class="pack-icon">${p.icon}</div>
+        <div class="pack-info">
+          <div class="pack-amount">${p.coins.toLocaleString('it-IT')} 🪙</div>
+          <div style="font-size:.65rem;color:var(--mt);letter-spacing:1.5px">${p.label}</div>
+          ${p.bonus?`<div class="pack-bonus">🎁 ${p.bonus}</div>`:''}
+        </div>
+        <div class="pack-price">${p.price}</div>
+      </div>
+    `).join('');
+  };
+  renderCoinPacks=window.renderCoinPacks;
 }
+
+// ═══════════════════════════════════════════════════════
+// V12 — safeCall: wrapper difensivo per tutti gli onclick del bottom nav
+// Evita che un singolo bug rompa la navigation di tutta l'app
+// ═══════════════════════════════════════════════════════
+window.safeCall=function(fnName,...args){
+  try{
+    const fn=window[fnName];
+    if(typeof fn==='function'){
+      return fn.apply(null,args);
+    }else{
+      console.error('safeCall: '+fnName+' non e una funzione');
+    }
+  }catch(e){
+    console.error('safeCall error in '+fnName+':',e);
+    alert('⚠️ Errore temporaneo. Riprova!');
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// V12 — Defense in depth: hardening dei flussi critici
+// ═══════════════════════════════════════════════════════
+
+// Garantisci che openStory non crashi mai
+const _origOpenStoryV12=openStory;
+openStory=function(){
+  try{
+    _origOpenStoryV12();
+  }catch(e){
+    console.error('openStory crash:',e);
+    // Fallback: mostra l'overlay anche se renderStoryMap crasha
+    const ov=document.getElementById('STORY_OV');
+    if(ov)ov.classList.add('on');
+    const map=document.getElementById('STORY_MAP');
+    if(map)map.innerHTML='<div style="padding:30px;text-align:center;color:var(--tx)">⚠️ Caricamento mappa fallito.<br><br>Premi CHIUDI e riprova.</div>';
+  }
+};
+
+// Garantisci che openGameChoice / openPvpChoice non crashino
+['openGameChoice','openPvpChoice','openShop','openLeaderboard','openProfile','openSettings','openMail','openBag','openGiftCode','toggleHamburger','pvpCreateStart','startSolo'].forEach(fn=>{
+  if(typeof window[fn]==='function'){
+    const orig=window[fn];
+    window[fn]=function(...args){
+      try{return orig.apply(this,args);}
+      catch(e){console.error(fn+' crash:',e);alert('⚠️ Errore temporaneo nella schermata. Riprova!');}
+    };
+  }
+});
 </script>
 </body>
 </html>
