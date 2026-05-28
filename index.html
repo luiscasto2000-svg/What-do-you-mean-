@@ -4593,8 +4593,20 @@ window.STORY_CHAPTERS=STORY_CHAPTERS_V5;
 // Helper sicuro per accedere a STORY_CHAPTERS in tutte le funzioni
 function _CHAP(){return window.STORY_CHAPTERS||STORY_CHAPTERS_V5;}
 
+// FIX V11.1 — isLevelUnlocked usa .len (V5+ schema), non .levels[]
+isLevelUnlocked=function(chap,lvl){
+  if(chap===0&&lvl===0)return true;
+  if(lvl>0)return getStarsFor(chap,lvl-1)>=1;
+  const CHAPS=(typeof _CHAP==='function')?_CHAP():(window.STORY_CHAPTERS||[]);
+  const prev=CHAPS[chap-1];
+  if(!prev)return false;
+  const prevLen=prev.len||(prev.levels?prev.levels.length:5);
+  return getStarsFor(chap-1,prevLen-1)>=1;
+};
+
 // Sovrascrivo renderStoryMap V10 - mappa Candy Crush con percorso zigzag
 renderStoryMap=function(){
+  try{
   const CHAPS=_CHAP();
   const totalLevels=CHAPS.reduce((sum,c)=>sum+c.len,0); // 8*5 = 40
   const totalStars=totalLevels*3; // 120
@@ -4714,6 +4726,29 @@ renderStoryMap=function(){
       ov.scrollTop=ov.scrollTop+rect.top-containerRect.top-window.innerHeight/3;
     }
   },150);
+  }catch(err){
+    // Fallback: se la mappa fancy crasha, mostra fallback semplice cliccabile
+    console.error('Story render error:',err);
+    const map=document.getElementById('STORY_MAP');
+    const CHAPS=_CHAP();
+    let total=0;CHAPS.forEach(c=>total+=c.len);
+    map.style.height='auto';map.style.position='static';
+    let html='<div style="padding:14px;background:rgba(255,45,120,.1);border:1px solid rgba(255,45,120,.3);border-radius:12px;margin-bottom:14px;font-size:.78rem;color:var(--tx);text-align:center">⚠️ Mappa semplificata attiva. Tocca un livello per giocare.</div>';
+    let idx=0;
+    CHAPS.forEach((c,ci)=>{
+      html+=`<div style="margin-bottom:14px"><div style="font-family:'Bebas Neue',sans-serif;color:#fff;letter-spacing:2px;margin-bottom:8px;font-size:1rem">${c.emoji} CAP. ${ci+1} · ${c.title}</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">`;
+      for(let li=0;li<c.len;li++){
+        const stars=getStarsFor(ci,li);
+        const unlocked=isLevelUnlocked(ci,li);
+        const bg=stars>0?'#10b981':(unlocked?'linear-gradient(135deg,#ff2d78,#9b30ff)':'#2a1a45');
+        const op=unlocked?1:.5;
+        html+=`<div onclick="${unlocked?`startStoryLevel(${ci},${li})`:''}" style="aspect-ratio:1;background:${bg};border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Bebas Neue',sans-serif;cursor:${unlocked?'pointer':'not-allowed'};opacity:${op};font-size:1.1rem">${unlocked?(idx+1):'🔒'}<div style="font-size:.6rem;color:#ffcc00">${'⭐'.repeat(stars)}</div></div>`;
+        idx++;
+      }
+      html+=`</div></div>`;
+    });
+    map.innerHTML=html;
+  }
 };
 
 // openStory ora apre DIRETTAMENTE — no scelta lingua, mix automatico
