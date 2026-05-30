@@ -4377,19 +4377,38 @@ function onbPickAvatar(id){
   document.querySelectorAll('#ONB_AVS .onb-av').forEach(e=>e.classList.toggle('on',e.dataset.av===id));
 }
 function onbFinish(){
-  const name=(document.getElementById('ONB_NAME').value||'').trim();
-  if(name.length<2){alert('🤔 Scegli un nickname di almeno 2 caratteri!');return;}
-  const av=document.querySelector('#ONB_AVS .onb-av.on')?.dataset.av||'fox';
-  saveProfile({nickname:name,avatar:av});
-  setEquipped(av);
-  localStorage.setItem(ONB_KEY,'1');
-  document.getElementById('ONB_OV').classList.remove('on');
-  updateCoinDisplay();
-  sfxFanfare();
-  // Welcome bonus
-  addCoins(50,'welcome_bonus');
-  setTimeout(()=>alert('🎁 +50 monete di benvenuto, '+name+'!\nUsale nel Negozio o nella Modalità Storia.'),300);
-  if(typeof gtag==='function')gtag('event','onboarding_complete',{nickname:name,avatar:av});
+  try{
+    const name=(document.getElementById('ONB_NAME').value||'').trim();
+    if(name.length<2){alert('🤔 Scegli un nickname di almeno 2 caratteri!');return;}
+    const av=document.querySelector('#ONB_AVS .onb-av.on')?.dataset.av||'fox';
+    // Setup base sicuro
+    saveProfile({nickname:name,avatar:av});
+    // Forza unlock dell'avatar scelto (anche se default lo è gia)
+    try{
+      const u=getUnlocked();
+      if(!u.includes(av)){u.push(av);localStorage.setItem(UNLOCKED_KEY,JSON.stringify(u));}
+    }catch(e){}
+    localStorage.setItem(EQUIPPED_KEY,av);
+    localStorage.setItem(ONB_KEY,'1');
+    // ASSEGNA monete PRIMA di chiudere overlay (evita race condition)
+    const prev=getCoins();
+    localStorage.setItem(COIN_KEY,String(prev+50));
+    // Chiudi overlay
+    document.getElementById('ONB_OV').classList.remove('on');
+    // Aggiorna UI
+    updateCoinDisplay();
+    try{updateStreakBadge();updateDailyCard();}catch(e){}
+    // Effetti dopo aver chiuso
+    setTimeout(()=>{
+      try{sfxFanfare();confetti();}catch(e){}
+      coinPop('+50');
+      alert('🎁 +50 monete di benvenuto, '+name+'!\nUsale nel Negozio o nella Modalità Storia.');
+    },350);
+    if(typeof gtag==='function')gtag('event','onboarding_complete',{nickname:name,avatar:av});
+  }catch(err){
+    console.error('onbFinish error',err);
+    alert('⚠️ Errore durante la creazione del profilo. Riprova!');
+  }
 }
 
 // ─── LANGUAGE PICKER (Solo + PVP) ───
@@ -5989,6 +6008,395 @@ openStory=function(){
     };
   }
 });
+
+// ═══════════════════════════════════════════════════════
+// V13 — BUG FIXES + NUOVE FEATURE
+// ═══════════════════════════════════════════════════════
+
+// ───── 1. BROWSER BACK BUTTON FIX ─────
+// Intercetta il tasto indietro del browser/telefono
+// Se c'è un overlay aperto, lo chiude. Altrimenti conferma uscita.
+(function setupBackButton(){
+  // Pusha uno state fittizio così c'è una history da gestire
+  try{history.pushState({wdym:true,init:true},'',location.href);}catch(e){}
+
+  window.addEventListener('popstate',function(e){
+    // Lista overlay aperti (in ordine di priorità)
+    const overlays=[
+      {id:'HAMB_DRAWER',off:()=>closeHamburger()},
+      {id:'SHARE_OV',off:()=>closeShare()},
+      {id:'SHOP_OV',off:()=>closeShop()},
+      {id:'STORY_OV',off:()=>closeStory()},
+      {id:'LB_OV',off:()=>closeLeaderboard()},
+      {id:'PROFILE_OV',off:()=>closeProfile()},
+      {id:'SETTINGS_OV',off:()=>closeSettings()},
+      {id:'MAIL_OV',off:()=>closeMail()},
+      {id:'BAG_OV',off:()=>closeBag()},
+      {id:'GIFT_OV',off:()=>closeGiftCode()},
+      {id:'PVP_OV',off:()=>closePvp()},
+      {id:'GAME_CHOICE',off:()=>closeGameChoice()},
+      {id:'PVP_CHOICE',off:()=>closePvpChoice()},
+      {id:'ONLINE_OV',off:()=>closeOnline()},
+      {id:'LANG_OV',off:()=>closeLangPicker()},
+      {id:'PATCH_BANNER',off:()=>closePatchBanner()}
+    ];
+    for(const o of overlays){
+      const el=document.getElementById(o.id);
+      if(el&&el.classList.contains('on')){
+        try{o.off();}catch(e){}
+        // Re-pusha uno state per non uscire al prossimo back
+        try{history.pushState({wdym:true},'',location.href);}catch(e){}
+        return;
+      }
+    }
+    // Se siamo in una schermata di gioco (S2-S6), conferma uscita
+    const activeScreen=document.querySelector('.sc.on');
+    if(activeScreen&&['S2','S3','S4','S5','S6'].includes(activeScreen.id)){
+      // Re-pusha per non uscire
+      try{history.pushState({wdym:true},'',location.href);}catch(e){}
+      if(confirm('⚠️ Vuoi davvero abbandonare questa partita?')){
+        doExitMatch('back_button');
+      }
+      return;
+    }
+    // Se siamo in home, riconferma
+    try{history.pushState({wdym:true},'',location.href);}catch(e){}
+  });
+})();
+
+// ───── 2. AUDIO STOP — bottone stop attivo durante riproduzione ─────
+// Modifico doSpeak: il bottone resta cliccabile per fermare
+(function patchDoSpeak(){
+  const _orig=doSpeak;
+  doSpeak=function(){
+    // Se sta già parlando, fermalo
+    if(_spk){
+      try{stopSpeak();}catch(e){}
+      return;
+    }
+    return _orig();
+  };
+  // Cambio il CSS .spkbtn.spk per renderlo cliccabile (stop)
+  const style=document.createElement('style');
+  style.textContent=`
+    .spkbtn.spk{opacity:1!important;pointer-events:auto!important;
+      background:linear-gradient(135deg,#ff2d78,#9b30ff)!important;
+      animation:stopPulse 1s ease-in-out infinite}
+    @keyframes stopPulse{
+      0%,100%{box-shadow:0 6px 28px rgba(255,45,120,.35)}
+      50%{box-shadow:0 6px 36px rgba(255,45,120,.8)}
+    }
+    .spkbtn.spk .spk-icon{display:inline}
+    .spkbtn.spk .play-icon{display:none}
+  `;
+  document.head.appendChild(style);
+  // Patch il button text durante speak
+  const _spkOrig=doSpeak;
+  doSpeak=function(){
+    const btn=document.getElementById('SPKB');
+    if(btn&&!_spk){
+      // Cambia testo a STOP quando inizia
+      setTimeout(()=>{
+        if(_spk){
+          const span=btn.querySelector('span:not(:first-child)');
+          if(span)span.dataset.orig=span.innerHTML;
+          if(span)span.innerHTML='⏸ FERMA AUDIO';
+        }
+      },50);
+    }
+    const r=_spkOrig();
+    return r;
+  };
+  // Quando finisce, ripristina testo
+  const _stopOrig=stopSpeak;
+  stopSpeak=function(){
+    const btn=document.getElementById('SPKB');
+    if(btn){
+      const span=btn.querySelector('span:not(:first-child)');
+      if(span&&span.dataset.orig){span.innerHTML=span.dataset.orig;delete span.dataset.orig;}
+    }
+    return _stopOrig();
+  };
+})();
+
+// ───── 3. HINDI / VOICES UNAVAILABLE — avviso chiaro ─────
+// Pre-warn quando una lingua TTS non e' disponibile
+(function patchSpeakWithVoiceCheck(){
+  const _origShowListen=showListen;
+  showListen=function(){
+    const r=_origShowListen();
+    // Avvisa se la lingua non e' disponibile
+    try{
+      const syn=window.speechSynthesis;
+      if(!syn)return r;
+      const voices=syn.getVoices();
+      const lc=G.lang?.t?.split('-')[0];
+      if(!lc)return r;
+      const hasVoice=voices.some(v=>v.lang.startsWith(lc));
+      const hardLangs=['hi','ar','zh','ja','ko'];
+      if(!hasVoice&&hardLangs.includes(lc)){
+        // Mostra hint sotto il bottone audio
+        const lb=document.getElementById('LB');
+        if(lb&&!lb.querySelector('.tts-warn')){
+          const warn=document.createElement('div');
+          warn.className='tts-warn';
+          warn.style.cssText='margin-top:8px;padding:8px 12px;background:rgba(255,204,0,.12);border:1px solid rgba(255,204,0,.35);border-radius:10px;font-size:.7rem;color:var(--gd);line-height:1.4;text-align:center';
+          warn.innerHTML='⚠️ La voce '+(G.lang.n||'')+' non e\' installata sul tuo telefono.<br>Leggi la <b>pronuncia fonetica gialla</b> ☝️';
+          lb.appendChild(warn);
+        }
+      }
+    }catch(e){}
+    return r;
+  };
+})();
+
+// ───── 4. CHOOSER ASCOLTA + GIOCA ─────
+// In modalità Gruppo, il chooser ora pronuncia anche lui (incluso nella queue)
+// Inoltre: tutti hanno tempo di ascoltare PRIMA di passare il telefono
+(function patchStartPronouncers(){
+  const _orig=startPronouncers;
+  startPronouncers=function(){
+    if(G.story||G.pvp||G.solo){return _orig();}
+    // Modalità GRUPPO: include anche il chooser nella queue
+    G.queue=G.players.slice(); // TUTTI giocano, anche il chooser
+    G.pIdx=0;
+    if(G.subRound===0)G.rscores={};
+    showPassPhone();
+  };
+})();
+// Anche aggiusto la rotazione chooser in nextRound: gia ruota OK ma assicuro
+// che il chooser non sia escluso dal pool.
+
+// ───── 5. GIRO CRAZY — round speciale ─────
+// In modalita Gruppo, ogni 3-4 round c'e una possibilita di Giro Crazy
+// Sistema sceglie automaticamente parola+lingua, fonetica nascosta in S3
+window._crazyChance=0.30; // 30% di chance per round successivo al primo
+function shouldTriggerCrazy(){
+  if(G.story||G.pvp||G.solo||G._isDailyChallenge)return false;
+  if(G.round<2)return false; // No al primo round
+  return Math.random()<window._crazyChance;
+}
+// Hook nextRound per attivare crazy
+const _origNextRoundCrazy=nextRound;
+nextRound=function(){
+  G._crazyRound=shouldTriggerCrazy();
+  if(G._crazyRound){
+    // Mostra schermata avviso Crazy
+    showCrazyIntro();
+    return;
+  }
+  return _origNextRoundCrazy();
+};
+function showCrazyIntro(){
+  // Toast invadente per annunciare il round crazy
+  const lo=document.getElementById('LOV');
+  document.getElementById('LT').innerHTML='🤪 GIRO CRAZY!';
+  document.getElementById('LS').innerHTML=`
+    <div style="font-size:.85rem;color:var(--tx);line-height:1.7;max-width:280px">
+      Il <b style="color:var(--pk)">robot</b> sceglie una frase speciale.<br>
+      <b style="color:var(--gd)">NESSUNA fonetica visibile</b> — solo audio!<br>
+      Punti doppi per i coraggiosi 🔥
+    </div>`;
+  lo.style.display='flex';
+  vibrate(100);
+  setTimeout(()=>{
+    uload();
+    G.round++;
+    G.subRound=0;
+    G.chooser=(G.firstChooser+1)%G.players.length;
+    G.firstChooser=G.chooser;
+    // Auto-pick parola crazy da DB[3] o DB[4] (frasi lunghe)
+    autoPickCrazyWord();
+    // Skip S2 (scelta) e vai diretto a S3
+    showListen();
+  },2500);
+}
+function autoPickCrazyWord(){
+  // Frasi piu lunghe per crazy mode
+  const dbKeys=[3,4].filter(k=>DB[k]&&DB[k].length>0);
+  const dbKey=dbKeys.length>0?dbKeys[Math.floor(Math.random()*dbKeys.length)]:2;
+  const pool=DB[dbKey];
+  const wi=Math.floor(Math.random()*pool.length);
+  G.phrase=pool[wi];
+  // Lingua tosta
+  const harshLangs=LANGS.filter(l=>['zh-CN','ja-JP','ar-SA','hi-IN','ru-RU','ko-KR'].includes(l.t));
+  const lang=harshLangs[Math.floor(Math.random()*harshLangs.length)];
+  G.lang=lang;
+  if(!G.phrase.tr[lang.t]){
+    const keys=Object.keys(G.phrase.tr);
+    G.lang=LANGS.find(l=>l.t===keys[0])||LANGS[0];
+  }
+  G.tran=G.phrase.tr[G.lang.t].t;
+  G.phon=G.phrase.tr[G.lang.t].p;
+}
+// Hook showListen per nascondere fonetica durante crazy
+const _origShowListenCrazy=showListen;
+showListen=function(){
+  const r=_origShowListenCrazy();
+  if(G._crazyRound){
+    setTimeout(()=>{
+      const lb=document.getElementById('LB');
+      if(lb){
+        // Nascondi pronuncia fonetica gialla (.pphon)
+        lb.querySelectorAll('.pphon').forEach(el=>{
+          el.style.filter='blur(8px)';
+          el.style.opacity='.4';
+          el.title='Hidden in CRAZY mode';
+        });
+        // Aggiungi badge crazy in cima
+        if(!lb.querySelector('.crazy-tag')){
+          const tag=document.createElement('div');
+          tag.className='crazy-tag';
+          tag.style.cssText='display:inline-block;background:linear-gradient(135deg,#ff2d78,#9b30ff,#00c8ff);color:#fff;font-family:\'Bebas Neue\',sans-serif;letter-spacing:2px;padding:4px 12px;border-radius:100px;font-size:.78rem;margin-bottom:8px;box-shadow:0 0 16px rgba(255,45,120,.6);animation:bnc 1.5s ease-in-out infinite';
+          tag.textContent='🤪 GIRO CRAZY · solo AUDIO';
+          lb.insertBefore(tag,lb.firstChild);
+        }
+      }
+    },120);
+  }
+  return r;
+};
+// Reset flag dopo verdetto
+const _origNextOrSummaryCrazy=nextOrSummary;
+nextOrSummary=function(){
+  const wasCrazy=G._crazyRound;
+  const r=_origNextOrSummaryCrazy();
+  if(wasCrazy){G._crazyRound=false;}
+  return r;
+};
+// Bonus monete x2 in crazy mode
+const _origShowVerdictCrazy=showVerdict;
+showVerdict=function(name,sc){
+  const r=_origShowVerdictCrazy(name,sc);
+  if(G._crazyRound&&sc>=7){
+    // Bonus crazy: monete doppie su voti alti
+    setTimeout(()=>{
+      addCoins(sc*2,'crazy_bonus');
+    },300);
+  }
+  return r;
+};
+
+// ───── 6. i18n — MULTILINGUA INTERFACCIA (autodetect) ─────
+window.I18N={
+  it:{
+    play:'GIOCA',shop:'NEGOZIO',pvp:'PVP',story:'STORIA',ranking:'CLASSIFICA',
+    play_solo:'SOLO BOCCALONE',play_group:'GRUPPO 2-8',
+    rules:'REGOLE',rules_btn:'LEGGIMI SE HAI IL CORAGGIO',
+    daily:'SFIDA GIORNALIERA',streak:'GIORNI DI FILA',
+    coins:'monete',exit:'ABBANDONA'
+  },
+  en:{
+    play:'PLAY',shop:'SHOP',pvp:'PVP',story:'STORY',ranking:'LEADERBOARD',
+    play_solo:'SOLO BOCCALONE',play_group:'GROUP 2-8',
+    rules:'RULES',rules_btn:'READ ME IF YOU DARE',
+    daily:'DAILY CHALLENGE',streak:'DAY STREAK',
+    coins:'coins',exit:'QUIT'
+  },
+  es:{
+    play:'JUGAR',shop:'TIENDA',pvp:'PVP',story:'HISTORIA',ranking:'CLASIFICACIÓN',
+    play_solo:'SOLO BOCCALONE',play_group:'GRUPO 2-8',
+    rules:'REGLAS',rules_btn:'LÉEME SI TE ATREVES',
+    daily:'RETO DIARIO',streak:'DÍAS SEGUIDOS',
+    coins:'monedas',exit:'ABANDONAR'
+  },
+  fr:{
+    play:'JOUER',shop:'BOUTIQUE',pvp:'PVP',story:'HISTOIRE',ranking:'CLASSEMENT',
+    play_solo:'SOLO BOCCALONE',play_group:'GROUPE 2-8',
+    rules:'RÈGLES',rules_btn:'LIS-MOI SI TU OSES',
+    daily:'DÉFI QUOTIDIEN',streak:'JOURS DE SUITE',
+    coins:'pièces',exit:'ABANDONNER'
+  },
+  de:{
+    play:'SPIELEN',shop:'SHOP',pvp:'PVP',story:'STORY',ranking:'RANGLISTE',
+    play_solo:'SOLO BOCCALONE',play_group:'GRUPPE 2-8',
+    rules:'REGELN',rules_btn:'LIES MICH WENN DU DICH TRAUST',
+    daily:'TAGESHERAUSFORDERUNG',streak:'TAGE IN FOLGE',
+    coins:'Münzen',exit:'BEENDEN'
+  }
+};
+function detectAppLang(){
+  const saved=localStorage.getItem('wdym_ui_lang');
+  if(saved&&I18N[saved])return saved;
+  const nav=(navigator.language||'it').toLowerCase().split('-')[0];
+  if(I18N[nav])return nav;
+  return 'it';
+}
+window._uiLang=detectAppLang();
+window.t=function(key){return (I18N[_uiLang]&&I18N[_uiLang][key])||(I18N.it[key]||key);};
+
+// Applica le traduzioni ai testi principali al caricamento
+function applyI18n(){
+  try{
+    // Bottom nav labels
+    const navMap={shop:0,lb:1,'story-fab':2,pvp:3,prof:4};
+    document.querySelectorAll('.bnav-btn').forEach((btn,i)=>{
+      const lbl=btn.querySelector('.bl');
+      if(!lbl)return;
+      const cls=btn.className.split(' ').find(c=>['shop','lb','pvp','prof','story-fab'].includes(c));
+      const map={shop:'shop',lb:'ranking','story-fab':'play',pvp:'pvp',prof:'story'};
+      if(cls&&map[cls])lbl.textContent=t(map[cls]);
+    });
+    // FAB regole tooltip
+    const tip=document.getElementById('RULES_TIP');
+    if(tip)tip.textContent='🔊 '+t('rules_btn')+'!';
+  }catch(e){console.warn('i18n apply error',e);}
+}
+
+// ───── 7. SKIN RARITY COSMETICS ─────
+// Aggiungo bordo colorato in base alla rarità
+(function injectSkinRarityCss(){
+  const style=document.createElement('style');
+  style.textContent=`
+    .shop-item.rarity-common{border-color:rgba(155,170,200,.4)}
+    .shop-item.rarity-rare{border-color:rgba(0,200,255,.6);box-shadow:0 0 12px rgba(0,200,255,.2)}
+    .shop-item.rarity-epic{border-color:rgba(155,48,255,.7);box-shadow:0 0 16px rgba(155,48,255,.3)}
+    .shop-item.rarity-legendary{border-color:rgba(255,204,0,.7);box-shadow:0 0 20px rgba(255,204,0,.35),inset 0 0 12px rgba(255,204,0,.1)}
+    .shop-item.rarity-mythic{border-color:rgba(255,45,120,.8);box-shadow:0 0 24px rgba(255,45,120,.5),inset 0 0 16px rgba(255,45,120,.15);
+      background:linear-gradient(135deg,rgba(255,45,120,.08),rgba(255,204,0,.08))}
+    .shop-rarity-tag{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+      font-size:.5rem;font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;
+      padding:1px 7px;border-radius:6px;background:rgba(0,0,0,.4)}
+    .shop-rarity-tag.common{color:#a8b5cf}
+    .shop-rarity-tag.rare{color:#00c8ff;background:rgba(0,200,255,.15)}
+    .shop-rarity-tag.epic{color:#9b30ff;background:rgba(155,48,255,.18)}
+    .shop-rarity-tag.legendary{color:#ffcc00;background:rgba(255,204,0,.2)}
+    .shop-rarity-tag.mythic{color:#ff2d78;background:rgba(255,45,120,.2);
+      animation:mythPulse 1.5s ease-in-out infinite}
+    @keyframes mythPulse{0%,100%{box-shadow:0 0 0 rgba(255,45,120,.3)}50%{box-shadow:0 0 10px rgba(255,45,120,.6)}}
+  `;
+  document.head.appendChild(style);
+})();
+// Override renderShop per applicare classe rarity
+if(typeof renderShop==='function'){
+  const _origRenderShop=renderShop;
+  window.renderShop=function(){
+    _origRenderShop();
+    // Patch dom dopo render: aggiungi rarity class
+    try{
+      document.querySelectorAll('.shop-item').forEach(el=>{
+        const txt=el.textContent;
+        SHOP_ITEMS.forEach(it=>{
+          if(txt.includes(it.n)&&it.rarity){
+            el.classList.add('rarity-'+it.rarity);
+            if(!el.querySelector('.shop-rarity-tag')){
+              const t=document.createElement('div');
+              t.className='shop-rarity-tag '+it.rarity;
+              t.textContent=it.rarity.toUpperCase();
+              el.appendChild(t);
+            }
+          }
+        });
+      });
+    }catch(e){}
+  };
+  renderShop=window.renderShop;
+}
+
+// Init V13: applica i18n al load
+setTimeout(()=>{
+  try{applyI18n();}catch(e){}
+},900);
 </script>
 </body>
 </html>
