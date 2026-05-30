@@ -356,13 +356,15 @@ input::placeholder{color:var(--mt);opacity:.7}
 .coin-badge .ci{font-size:1.1rem;line-height:1}
 .coin-badge .cv{font-size:.95rem;font-weight:700}
 .coin-pop{position:fixed;z-index:560;pointer-events:none;
-  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#ffcc00;
-  text-shadow:0 0 12px rgba(255,204,0,.8),0 0 24px rgba(255,204,0,.4);
-  letter-spacing:1px;animation:coinFly 1.4s ease-out forwards}
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#ffcc00;
+  text-shadow:0 0 8px rgba(255,204,0,.7);letter-spacing:1px;
+  background:rgba(7,0,26,.85);border:1px solid rgba(255,204,0,.4);
+  padding:3px 9px;border-radius:100px;
+  animation:coinFly 1.6s ease-out forwards}
 @keyframes coinFly{
-  0%{transform:translate(-50%,0) scale(.5);opacity:0}
-  20%{transform:translate(-50%,-20px) scale(1.2);opacity:1}
-  100%{transform:translate(-50%,-90px) scale(.8);opacity:0}
+  0%{transform:translate(-50%,4px) scale(.6);opacity:0}
+  25%{transform:translate(-50%,8px) scale(1);opacity:1}
+  100%{transform:translate(-50%,36px) scale(.9);opacity:0}
 }
 
 /* ── SHOP ── */
@@ -756,16 +758,17 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   0%,100%{transform:scale(1)}
   50%{transform:scale(1.12)}
 }
-.rules-fab .tip{position:absolute;left:54px;top:50%;transform:translateY(-50%);
+.rules-fab .tip{position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);
   background:rgba(15,0,48,.95);color:#fff;font-family:'Bebas Neue',sans-serif;
-  font-size:.72rem;letter-spacing:1.5px;padding:6px 11px;border-radius:8px;
+  font-size:.65rem;letter-spacing:1px;padding:5px 9px;border-radius:8px;
   border:1px solid rgba(155,48,255,.4);white-space:nowrap;pointer-events:none;
-  opacity:0;animation:tipShow 6s ease-in-out 1s forwards}
+  opacity:0;animation:tipShow 4s ease-in-out 1s forwards}
 @keyframes tipShow{
-  0%{opacity:0;transform:translate(-10px,-50%)}
-  15%,75%{opacity:1;transform:translate(0,-50%)}
-  100%{opacity:0;transform:translate(0,-50%)}
+  0%{opacity:0;transform:translate(-50%,-6px)}
+  18%,75%{opacity:1;transform:translate(-50%,0)}
+  100%{opacity:0;transform:translate(-50%,0)}
 }
+.rules-fab.tip-seen .tip{display:none}
 
 /* ── PATCH BANNER V2 ── */
 .patch-banner{position:fixed;inset:0;background:rgba(7,0,26,.95);backdrop-filter:blur(12px);
@@ -1134,11 +1137,25 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <div class="hd-item" onclick="closeHamburger();openGiftCode()">
     <span class="ico">🎁</span><span class="txt">CODICE PROMO</span><span class="arrow">→</span>
   </div>
+  <div class="hd-item" onclick="closeHamburger();openRoadmap()">
+    <span class="ico">🗺️</span><span class="txt">ROADMAP</span><span class="arrow">→</span>
+  </div>
   <div class="hd-footer">
     What Do You Mean? · v2.0<br>
     by Luigi Casto · 2026
   </div>
 </aside>
+
+<!-- ROADMAP OVERLAY -->
+<div id="ROADMAP_OV" class="fc-overlay">
+  <div class="fc-header">
+    <div class="fc-title" style="background:linear-gradient(135deg,#00c8ff,#9b30ff,#ff2d78);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🗺️ ROADMAP</div>
+    <div class="fc-sub">cosa arriva nelle prossime versioni</div>
+  </div>
+  <div id="ROADMAP_LIST" style="width:100%;max-width:520px"></div>
+  <button class="fc-close" onclick="closeRoadmap()">CHIUDI</button>
+</div>
 
 <!-- SETTINGS MODAL (apre da hamburger → Impostazioni) -->
 <div id="SETTINGS_OV" class="fc-overlay">
@@ -6397,6 +6414,162 @@ if(typeof renderShop==='function'){
 setTimeout(()=>{
   try{applyI18n();}catch(e){}
 },900);
+
+// ═══════════════════════════════════════════════════════
+// V14 — Fix layout top + Doppia registrazione + Roadmap
+// ═══════════════════════════════════════════════════════
+
+// ───── 1. TOOLTIP "LEGGIMI" auto-hide dopo prima visione ─────
+(function setupTipSeen(){
+  const seen=localStorage.getItem('wdym_tip_rules_seen');
+  const fab=document.getElementById('RULES_FAB');
+  if(seen&&fab)fab.classList.add('tip-seen');
+  // Quando l'utente clicca o tocca il rules fab, lo nascondi per sempre
+  document.addEventListener('click',function(e){
+    const t=e.target.closest('.rules-fab');
+    if(t&&!localStorage.getItem('wdym_tip_rules_seen')){
+      localStorage.setItem('wdym_tip_rules_seen','1');
+      t.classList.add('tip-seen');
+    }
+  });
+  // Dopo 6 secondi nasconde comunque
+  setTimeout(()=>{
+    if(fab&&!localStorage.getItem('wdym_tip_rules_seen')){
+      localStorage.setItem('wdym_tip_rules_seen','1');
+      fab.classList.add('tip-seen');
+    }
+  },6500);
+})();
+
+// ───── 2. RIPROVA REGISTRAZIONE (1 retry per round) ─────
+// Quando l'utente ferma la registrazione, mostra: "Riprova" o "Vai al verdetto"
+// L'utente può registrare massimo 2 volte (1 originale + 1 retry)
+(function patchToggleMic(){
+  // Aggiunge un overlay di conferma in S4 dopo lo stop della registrazione
+  const _origDoJudge=doJudge;
+  doJudge=function(){
+    // Controlla se c'è già stata una registrazione (retry usato?)
+    const used=G._micRetryUsed||0;
+    if(used<1){
+      // Mostra dialog di conferma con 2 opzioni
+      showRetryDialog();
+      return;
+    }
+    return _origDoJudge();
+  };
+})();
+function showRetryDialog(){
+  // Dialog floating dopo stop registrazione
+  let ov=document.getElementById('RETRY_OV');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='RETRY_OV';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(7,0,26,.92);backdrop-filter:blur(8px);z-index:660;display:flex;align-items:center;justify-content:center;padding:24px';
+    ov.innerHTML=`
+      <div style="background:linear-gradient(180deg,#1a0050,#0f0030);border:2px solid rgba(155,48,255,.4);border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,.6)">
+        <div style="font-size:3rem;margin-bottom:8px">🎤</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;letter-spacing:2px;margin-bottom:6px">REGISTRAZIONE FATTA!</div>
+        <div style="font-size:.82rem;color:var(--mt);margin-bottom:18px;line-height:1.5">Sei soddisfatto della pronuncia?<br><b style="color:var(--gd)">Hai 1 sola possibilità di riprovare</b></div>
+        <button id="RETRY_BTN" style="width:100%;padding:14px;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#00c8ff,#9b30ff);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;margin-bottom:8px;box-shadow:0 4px 20px rgba(0,200,255,.35)">↺ RIPROVA (1 volta)</button>
+        <button id="CONFIRM_BTN" style="width:100%;padding:14px;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#00ff88,#00c8ff);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;box-shadow:0 4px 20px rgba(0,255,136,.35)">✅ CONFERMA E VEDI VOTO</button>
+      </div>
+    `;
+    document.body.appendChild(ov);
+    document.getElementById('RETRY_BTN').onclick=function(){
+      sfxClick();
+      G._micRetryUsed=(G._micRetryUsed||0)+1;
+      ov.remove();
+      // Reset stato microfono per nuova registrazione
+      G.recText='';
+      G.isRec=false;
+      const mb=document.getElementById('MB');
+      if(mb){mb.classList.remove('rec');mb.innerHTML='🎤';}
+      const ms=document.getElementById('MS');
+      if(ms){ms.textContent='Premi per registrare DI NUOVO';ms.classList.remove('rec');}
+      const mwv=document.getElementById('MWV');
+      if(mwv)mwv.classList.remove('on');
+    };
+    document.getElementById('CONFIRM_BTN').onclick=function(){
+      sfxClick();
+      ov.remove();
+      // Resetta retry counter per il prossimo turno
+      G._micRetryUsed=0;
+      // Esegue il giudizio originale
+      const syn=window.speechSynthesis;
+      if(syn)syn.cancel();
+      load('IL MAESTRO BOCCALONE GIUDICA...','Silenzio in aula! 🧑‍🏫');
+      setTimeout(()=>{
+        try{
+          const sc=judgeLocally(G.recText.trim(),G.phon);
+          uload();
+          const name=G.queue[G.pIdx]||G.players[0]||'TU';
+          G.rscores[name]=sc;
+          G.scores[name]=(G.scores[name]||0)+sc;
+          showVerdict(name,sc);
+        }catch(e){
+          uload();
+          console.error('judge error',e);
+          alert('⚠️ Errore nel giudizio. Riprova!');
+        }
+      },1100);
+    };
+  }
+}
+// Reset counter al cambio round
+const _origShowPronounceV14=showPronounce;
+showPronounce=function(){
+  G._micRetryUsed=0;
+  return _origShowPronounceV14();
+};
+
+// ───── 3. ROADMAP OVERLAY ─────
+const ROADMAP=[
+  {ico:'✅',title:'GIRO CRAZY 🤪',desc:'Round speciale con frase random e audio-only',status:'done'},
+  {ico:'✅',title:'Multilingua autodetect',desc:'Italiano, Inglese, Spagnolo, Francese, Tedesco',status:'done'},
+  {ico:'✅',title:'Achievement & Trofei',desc:'20 trofei sbloccabili con bonus monete',status:'done'},
+  {ico:'✅',title:'Streak giorni di fila',desc:'+100 monete ogni 7 giorni consecutivi',status:'done'},
+  {ico:'✅',title:'Sfida giornaliera',desc:'1 round bonus ogni giorno con +30 monete',status:'done'},
+  {ico:'🔄',title:'Account reali con email',desc:'Login persistente che ti segue ovunque',status:'next',eta:'Sessione 2'},
+  {ico:'🔄',title:'Match online random nel mondo',desc:'Sfida giocatori veri in real-time',status:'next',eta:'Sessione 2'},
+  {ico:'🔄',title:'Classifica mondiale LIVE',desc:'Top 100 aggiornata in tempo reale',status:'next',eta:'Sessione 2'},
+  {ico:'📅',title:'Musica di sottofondo',desc:'Vere canzoni royalty-free al posto del drone',status:'planned',eta:'Sessione 3'},
+  {ico:'📅',title:'Premi top classifica',desc:'Skin esclusive per i primi 10 mondiali',status:'planned',eta:'Sessione 3'},
+  {ico:'📅',title:'Pack monete reali €',desc:'Starter €2,99 · Big €8,99 · Mega €15,99',status:'planned',eta:'Sessione 4'},
+  {ico:'📅',title:'Inviti via contatti telefonici',desc:'Sfida amici prendendoli dalla rubrica',status:'planned',eta:'Sessione 4'},
+  {ico:'📅',title:'App ufficiale Google Play',desc:'Installazione nativa da Play Store',status:'planned',eta:'Sessione 5'},
+  {ico:'📅',title:'App ufficiale Apple Store',desc:'Versione iOS sull\'App Store',status:'planned',eta:'Sessione 6'},
+  {ico:'💡',title:'Modalità coppia',desc:'2 telefoni connessi via Bluetooth in locale',status:'idea'},
+  {ico:'💡',title:'Eventi stagionali',desc:'Halloween, Natale, San Valentino con skin a tempo',status:'idea'},
+  {ico:'💡',title:'Sistema clan / amici',desc:'Aggiungi amici, sfide private, mini-classifiche',status:'idea'},
+];
+function openRoadmap(){
+  sfxClick();
+  document.getElementById('ROADMAP_OV').classList.add('on');
+  renderRoadmap();
+  if(typeof gtag==='function')gtag('event','roadmap_open');
+}
+function closeRoadmap(){document.getElementById('ROADMAP_OV').classList.remove('on');}
+function renderRoadmap(){
+  const list=document.getElementById('ROADMAP_LIST');
+  const statusColor={done:'#00ff88',next:'#ff2d78',planned:'#ffcc00',idea:'#9b30ff'};
+  const statusLabel={done:'✓ FATTO',next:'🔄 PROSSIMA',planned:'📅 IN PROGRAMMA',idea:'💡 IDEA'};
+  list.innerHTML=ROADMAP.map(r=>{
+    const c=statusColor[r.status]||'#fff';
+    return `<div style="background:rgba(15,0,48,.7);border:1.5px solid ${c}40;border-radius:14px;padding:14px;margin-bottom:9px;border-left:4px solid ${c}">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:1.8rem;line-height:1;flex-shrink:0">${r.ico}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:#fff;letter-spacing:1.5px">${r.title}</div>
+            <div style="font-size:.55rem;padding:2px 7px;border-radius:6px;background:${c}22;color:${c};letter-spacing:1.5px;font-family:'Bebas Neue',sans-serif">${statusLabel[r.status]}</div>
+          </div>
+          <div style="font-size:.75rem;color:var(--mt);line-height:1.4">${r.desc}</div>
+          ${r.eta?`<div style="font-size:.65rem;color:${c};margin-top:4px;letter-spacing:1px">📍 ${r.eta}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
 </script>
 </body>
 </html>
