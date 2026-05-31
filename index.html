@@ -2479,9 +2479,16 @@ function setR(n){
   document.getElementById('R'+n).classList.add('on');
 }
 function startGame(){
-  if(G.players.length<2)return;
+  if(G.players.length<2){showToast&&showToast('Servono almeno 2 giocatori','warn');return;}
+  // V14.3: salva players prima di clean, poi ripristina
+  const savedPlayers=G.players.slice();
+  const savedRounds=G.rounds||5;
+  try{if(typeof cleanGameState==='function')cleanGameState();}catch(e){}
+  G.players=savedPlayers;
+  G.rounds=savedRounds;
   G.round=1;G.chooser=0;G.subRound=0;G.firstChooser=0;
   G.players.forEach(p=>G.scores[p]=0);
+  G.usedPhrases={1:[],2:[],3:[],4:[]};
   showChoose();
 }
 
@@ -3165,6 +3172,8 @@ function confetti(){
 // ─── SINGLE-PLAYER MODE ───
 function startSolo(){
   sfxClick();
+  // V14.3: cleanup PRIMA di avviare nuova partita (evita state sporco)
+  try{if(typeof cleanGameState==='function')cleanGameState();}catch(e){}
   G.solo=true;G.players=['TU'];G.scores={'TU':0};G.rounds=5;G.round=1;G.subRound=0;
   G.chooser=0;G.firstChooser=0;G.usedPhrases={1:[],2:[],3:[],4:[]};
   G.queue=['TU'];G.pIdx=0;
@@ -5668,12 +5677,64 @@ function confirmExitMatch(){
   doExitMatch(penalty);
 }
 
+function cleanGameState(){
+  // Reset COMPLETO dello state di gioco (usato in exit e prima di start nuovo)
+  try{
+    // 1. Stop audio/voice in corso
+    if(window.speechSynthesis){try{window.speechSynthesis.cancel();}catch(e){}}
+    if(G.recognition){try{G.recognition.stop();}catch(e){}try{G.recognition.abort();}catch(e){}G.recognition=null;}
+    _spk=false;
+    // 2. Reset flag modalità
+    G.story=false;G.pvp=false;G.solo=false;G._onlineMatch=false;
+    G._isDailyChallenge=false;G._crazyRound=false;
+    G._chosenLang=null;G._pvpLang=null;G._micRetryUsed=0;
+    G.storyChap=undefined;G.storyLvl=undefined;
+    // 3. Reset stato partita
+    G.players=[];G.scores={};G.rscores={};
+    G.queue=[];G.pIdx=0;
+    G.round=1;G.subRound=0;
+    G.chooser=0;G.firstChooser=0;
+    G.usedPhrases={};
+    G.recText='';G.isRec=false;
+    // 4. Reset parola/lingua corrente
+    G.phrase=null;G.lang=null;G.tran='';G.phon='';
+    G.wOpts=[];G.lOpts=[];G.selW=null;G.selL=null;G.selLg=null;
+    // 5. Reset PVP state
+    _pvp=null;
+    // 6. Reset UI floating
+    try{hideExitFab();}catch(e){}
+    // 7. Reset bottoni microfono / wave
+    try{
+      const mb=document.getElementById('MB');
+      if(mb){mb.classList.remove('rec');mb.innerHTML='🎤';}
+      const ms=document.getElementById('MS');
+      if(ms){ms.textContent='Premi per registrare';ms.classList.remove('rec');}
+      ['WV','MWV'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('on');});
+      const spkb=document.getElementById('SPKB');
+      if(spkb){
+        spkb.classList.remove('spk');
+        const span=spkb.querySelector('span:not(:first-child)');
+        if(span&&span.dataset.orig){span.innerHTML=span.dataset.orig;delete span.dataset.orig;}
+      }
+    }catch(e){}
+    // 8. Rimuovi eventuali warning tts accumulati
+    try{document.querySelectorAll('.tts-warn').forEach(el=>el.remove());}catch(e){}
+    // 9. Rimuovi retry dialog se presente
+    try{const r=document.getElementById('RETRY_OV');if(r)r.remove();}catch(e){}
+    // 10. Restore S7 UI (potrebbe essere in modalità solo)
+    try{
+      const sb=document.getElementById('SOLO_BOX');if(sb){sb.style.display='none';sb.innerHTML='';}
+      const wv2=document.getElementById('WV2');if(wv2)wv2.style.display='block';
+      const hero=document.querySelector('#S7 .hero');
+      if(hero){hero.innerHTML='POLIGLOTTA<br>SUPREMO';hero.style.fontSize='2.5rem';}
+    }catch(e){}
+    // 11. Chiudi LOV se aperto
+    try{uload();}catch(e){}
+  }catch(err){console.error('cleanGameState error',err);}
+}
+
 function doExitMatch(penalty){
-  // Cleanup G state
-  G.story=false;G.pvp=false;G.solo=false;G._onlineMatch=false;
-  G.players=[];G.scores={};G.queue=[];G.pIdx=0;G.round=1;G.subRound=0;
-  G.usedPhrases={};
-  _pvp=null;
+  cleanGameState();
   // Penalità futura per match online
   if(penalty==='abandon_online'){
     // Per ora simbolico: -50 segnati in localStorage (sarà usato quando avremo Firebase)
@@ -6510,6 +6571,34 @@ if(typeof renderShop==='function'){
 setTimeout(()=>{
   try{applyI18n();}catch(e){}
 },900);
+
+// V14.3 — wrappa tutti i punti di ingresso "nuova partita" con cleanGameState()
+// così non resta MAI state sporco dalla partita precedente
+(function wrapStartFunctions(){
+  const fns=['pvpCreateConfirm','pvpAcceptStart','startStoryLevel','startDailyChallenge','rivincita'];
+  fns.forEach(fn=>{
+    if(typeof window[fn]==='function'){
+      const orig=window[fn];
+      window[fn]=function(...args){
+        try{
+          // Per rivincita, preserva i players esistenti
+          if(fn==='rivincita'){
+            const savedPlayers=G.players.slice();
+            const savedRounds=G.rounds;
+            const wasSolo=G.solo;
+            cleanGameState();
+            G.players=savedPlayers;
+            G.rounds=savedRounds;
+            G.solo=wasSolo;
+            return orig.apply(this,args);
+          }
+          cleanGameState();
+        }catch(e){console.warn('clean before '+fn+' err',e);}
+        return orig.apply(this,args);
+      };
+    }
+  });
+})();
 
 // ═══════════════════════════════════════════════════════
 // V14 — Fix layout top + Doppia registrazione + Roadmap
