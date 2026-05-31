@@ -4426,36 +4426,62 @@ function onbPickAvatar(id){
 function onbFinish(){
   try{
     const name=(document.getElementById('ONB_NAME').value||'').trim();
-    if(name.length<2){alert('🤔 Scegli un nickname di almeno 2 caratteri!');return;}
+    if(name.length<2){showToast('🤔 Scegli almeno 2 caratteri','warn');return;}
     const av=document.querySelector('#ONB_AVS .onb-av.on')?.dataset.av||'fox';
-    // Setup base sicuro
     saveProfile({nickname:name,avatar:av});
-    // Forza unlock dell'avatar scelto (anche se default lo è gia)
     try{
       const u=getUnlocked();
       if(!u.includes(av)){u.push(av);localStorage.setItem(UNLOCKED_KEY,JSON.stringify(u));}
     }catch(e){}
     localStorage.setItem(EQUIPPED_KEY,av);
     localStorage.setItem(ONB_KEY,'1');
-    // ASSEGNA monete PRIMA di chiudere overlay (evita race condition)
     const prev=getCoins();
     localStorage.setItem(COIN_KEY,String(prev+50));
-    // Chiudi overlay
     document.getElementById('ONB_OV').classList.remove('on');
-    // Aggiorna UI
     updateCoinDisplay();
     try{updateStreakBadge();updateDailyCard();}catch(e){}
-    // Effetti dopo aver chiuso
     setTimeout(()=>{
       try{sfxFanfare();confetti();}catch(e){}
       coinPop('+50');
-      alert('🎁 +50 monete di benvenuto, '+name+'!\nUsale nel Negozio o nella Modalità Storia.');
-    },350);
+      // TOAST invece di alert (non blocca mobile)
+      showToast('🎁 BENVENUTO '+name.toUpperCase()+'!<br>+50 monete bonus 🪙','success');
+    },400);
     if(typeof gtag==='function')gtag('event','onboarding_complete',{nickname:name,avatar:av});
   }catch(err){
     console.error('onbFinish error',err);
-    alert('⚠️ Errore durante la creazione del profilo. Riprova!');
+    showToast('⚠️ Errore. Riprova!','error');
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST SYSTEM (V14.2) — sostituisce alert nei mobile
+// ═══════════════════════════════════════════════════════
+function showToast(html,type,duration){
+  type=type||'info';
+  duration=duration||3000;
+  let toast=document.getElementById('WDYM_TOAST');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='WDYM_TOAST';
+    toast.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-150%);z-index:9000;padding:14px 22px;border-radius:14px;font-family:\'Bebas Neue\',sans-serif;letter-spacing:1.5px;font-size:.95rem;text-align:center;max-width:90vw;line-height:1.4;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .4s cubic-bezier(.34,1.56,.64,1)';
+    document.body.appendChild(toast);
+  }
+  const colors={
+    success:{bg:'linear-gradient(135deg,#00ff88,#00c8ff)',color:'#000',border:'rgba(255,255,255,.3)'},
+    warn:{bg:'linear-gradient(135deg,#ffcc00,#ff8800)',color:'#000',border:'rgba(255,255,255,.3)'},
+    error:{bg:'linear-gradient(135deg,#ff2d78,#9b30ff)',color:'#fff',border:'rgba(255,255,255,.3)'},
+    info:{bg:'rgba(15,0,48,.95)',color:'#fff',border:'rgba(155,48,255,.5)'}
+  };
+  const c=colors[type]||colors.info;
+  toast.style.background=c.bg;
+  toast.style.color=c.color;
+  toast.style.border='2px solid '+c.border;
+  toast.innerHTML=html;
+  toast.style.transform='translateX(-50%) translateY(0)';
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>{
+    toast.style.transform='translateX(-50%) translateY(-150%)';
+  },duration);
 }
 
 // ─── LANGUAGE PICKER (Solo + PVP) ───
@@ -6060,15 +6086,20 @@ openStory=function(){
 // V13 — BUG FIXES + NUOVE FEATURE
 // ═══════════════════════════════════════════════════════
 
-// ───── 1. BROWSER BACK BUTTON FIX ─────
-// Intercetta il tasto indietro del browser/telefono
-// Se c'è un overlay aperto, lo chiude. Altrimenti conferma uscita.
+// ───── 1. BROWSER BACK BUTTON con DOPPIA FUNZIONE (V14.2) ─────
+// 1° tocco: chiude overlay aperto / indietro normale
+// 2° tocco rapido (entro 1.5s): chiede "Ricominciare la partita da capo?"
 (function setupBackButton(){
-  // Pusha uno state fittizio così c'è una history da gestire
   try{history.pushState({wdym:true,init:true},'',location.href);}catch(e){}
+  let _lastBackTap=0;
+  let _backInHome=0; // counter back consecutivi in home
 
   window.addEventListener('popstate',function(e){
-    // Lista overlay aperti (in ordine di priorità)
+    const now=Date.now();
+    const elapsed=now-_lastBackTap;
+    _lastBackTap=now;
+
+    // Overlay aperti (priorità)
     const overlays=[
       {id:'HAMB_DRAWER',off:()=>closeHamburger()},
       {id:'SHARE_OV',off:()=>closeShare()},
@@ -6080,6 +6111,7 @@ openStory=function(){
       {id:'MAIL_OV',off:()=>closeMail()},
       {id:'BAG_OV',off:()=>closeBag()},
       {id:'GIFT_OV',off:()=>closeGiftCode()},
+      {id:'ROADMAP_OV',off:()=>closeRoadmap()},
       {id:'PVP_OV',off:()=>closePvp()},
       {id:'GAME_CHOICE',off:()=>closeGameChoice()},
       {id:'PVP_CHOICE',off:()=>closePvpChoice()},
@@ -6087,27 +6119,47 @@ openStory=function(){
       {id:'LANG_OV',off:()=>closeLangPicker()},
       {id:'PATCH_BANNER',off:()=>closePatchBanner()}
     ];
+    // Se c'è un overlay aperto → 1° tap lo chiude
     for(const o of overlays){
       const el=document.getElementById(o.id);
       if(el&&el.classList.contains('on')){
         try{o.off();}catch(e){}
-        // Re-pusha uno state per non uscire al prossimo back
         try{history.pushState({wdym:true},'',location.href);}catch(e){}
+        _backInHome=0;
         return;
       }
     }
-    // Se siamo in una schermata di gioco (S2-S6), conferma uscita
+    // In schermata di gioco
     const activeScreen=document.querySelector('.sc.on');
     if(activeScreen&&['S2','S3','S4','S5','S6'].includes(activeScreen.id)){
-      // Re-pusha per non uscire
       try{history.pushState({wdym:true},'',location.href);}catch(e){}
-      if(confirm('⚠️ Vuoi davvero abbandonare questa partita?')){
+      // DOPPIO TAP RAPIDO (< 1500ms) → ricomincia con conferma
+      if(elapsed<1500){
+        if(confirm('⚠️ Vuoi RICOMINCIARE la partita da capo?\n\nPerderai tutti i progressi attuali.')){
+          doExitMatch('restart_back');
+          showToast('🔄 Partita resettata','info',2000);
+        }
+        return;
+      }
+      // 1° TAP → indietro normale (back to home con conferma soft)
+      if(confirm('↩️ Tornare al menu?\n(Tocca indietro 2 volte per RICOMINCIARE)')){
         doExitMatch('back_button');
       }
       return;
     }
-    // Se siamo in home, riconferma
+    // Siamo in HOME (S0 / S1 / S7)
     try{history.pushState({wdym:true},'',location.href);}catch(e){}
+    if(elapsed<1500){
+      _backInHome++;
+      if(_backInHome>=2){
+        // 2° back in home → mostra toast "tieni premuto per uscire"
+        showToast('👋 Per uscire chiudi la scheda del browser','info',2500);
+        _backInHome=0;
+      }
+    } else {
+      _backInHome=1;
+      showToast('↩️ Sei in home. 2° indietro per uscire.','info',1800);
+    }
   });
 })();
 
@@ -6166,36 +6218,50 @@ openStory=function(){
   };
 })();
 
-// ───── 3. HINDI / VOICES UNAVAILABLE — avviso chiaro ─────
-// Pre-warn quando una lingua TTS non e' disponibile
+// ───── 3. HINDI / VOICES UNAVAILABLE — avviso chiaro (FIXED V14.2) ─────
+// PULIZIA warning vecchi + protezione completa
 (function patchSpeakWithVoiceCheck(){
   const _origShowListen=showListen;
   showListen=function(){
-    const r=_origShowListen();
+    let r;
+    try{r=_origShowListen();}catch(e){console.error('showListen err',e);}
     // Avvisa se la lingua non e' disponibile
     try{
-      const syn=window.speechSynthesis;
-      if(!syn)return r;
-      const voices=syn.getVoices();
-      const lc=G.lang?.t?.split('-')[0];
-      if(!lc)return r;
-      const hasVoice=voices.some(v=>v.lang.startsWith(lc));
-      const hardLangs=['hi','ar','zh','ja','ko'];
-      if(!hasVoice&&hardLangs.includes(lc)){
-        // Mostra hint sotto il bottone audio
-        const lb=document.getElementById('LB');
-        if(lb&&!lb.querySelector('.tts-warn')){
-          const warn=document.createElement('div');
-          warn.className='tts-warn';
-          warn.style.cssText='margin-top:8px;padding:8px 12px;background:rgba(255,204,0,.12);border:1px solid rgba(255,204,0,.35);border-radius:10px;font-size:.7rem;color:var(--gd);line-height:1.4;text-align:center';
-          warn.innerHTML='⚠️ La voce '+(G.lang.n||'')+' non e\' installata sul tuo telefono.<br>Leggi la <b>pronuncia fonetica gialla</b> ☝️';
-          lb.appendChild(warn);
-        }
+      // PULIZIA: rimuovi sempre warning vecchi prima
+      const lb=document.getElementById('LB');
+      if(lb){
+        lb.querySelectorAll('.tts-warn').forEach(el=>el.remove());
       }
-    }catch(e){}
+      const syn=window.speechSynthesis;
+      if(!syn||!lb)return r;
+      const voices=(syn.getVoices&&syn.getVoices())||[];
+      const langCode=(G&&G.lang&&G.lang.t)?G.lang.t:'';
+      if(!langCode)return r;
+      const lc=langCode.split('-')[0];
+      const hasVoice=voices.length>0&&voices.some(v=>v.lang&&v.lang.startsWith(lc));
+      const hardLangs=['hi','ar','zh','ja','ko','ru'];
+      if(!hasVoice&&hardLangs.includes(lc)){
+        const warn=document.createElement('div');
+        warn.className='tts-warn';
+        warn.style.cssText='margin-top:8px;padding:8px 12px;background:rgba(255,204,0,.12);border:1px solid rgba(255,204,0,.35);border-radius:10px;font-size:.7rem;color:var(--gd);line-height:1.4;text-align:center';
+        const langName=(G.lang&&G.lang.n)?G.lang.n:'questa lingua';
+        warn.innerHTML='⚠️ La voce '+langName+' non e\' installata sul telefono.<br>Leggi la <b>pronuncia fonetica gialla</b> ☝️';
+        lb.appendChild(warn);
+      }
+    }catch(e){console.warn('TTS warn check err',e);}
     return r;
   };
 })();
+// Pulisci anche quando si cambia schermata
+const _origGoCleanup=go;
+go=function(id){
+  try{
+    if(id!=='S3'){
+      document.querySelectorAll('.tts-warn').forEach(el=>el.remove());
+    }
+  }catch(e){}
+  return _origGoCleanup(id);
+};
 
 // ───── 4. CHOOSER ASCOLTA + GIOCA ─────
 // In modalità Gruppo, il chooser ora pronuncia anche lui (incluso nella queue)
