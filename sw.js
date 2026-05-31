@@ -1,10 +1,10 @@
-// What Do You Mean? — Service Worker V9
+// What Do You Mean? — Service Worker V14.1
 // Strategy:
 //  - HTML: network-first (sempre fresh, fallback cache)
 //  - Altri asset: cache-first (icone, font, ecc.)
 // Il nome cache contiene la versione → cambia ad ogni release.
 
-const CACHE_VERSION = 'wdym-v9-2026-01';
+const CACHE_VERSION = 'wdym-v14-1-2026-30';
 const CACHE = CACHE_VERSION;
 
 const STATIC_ASSETS = [

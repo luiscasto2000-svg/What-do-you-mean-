@@ -3022,12 +3022,37 @@ document.addEventListener('touchend',e=>{
 // V2 ADDITIONS — Single-Player + Share + Confetti + Sound + PWA
 // ═══════════════════════════════════════════════════════
 
-// ─── Service Worker V9 — auto-update e force reload ───
-const APP_VERSION='9.0.0';
+// ─── Service Worker V14.1 — AUTO-UPDATE AGGRESSIVO (zero azione utente) ───
+// Per chi visita per la 1° volta: nessuna cache, vede V14 subito
+// Per chi ha vecchia cache: SW si aggiorna in background + reload silenzioso
+const APP_VERSION='14.1.0';
+(function aggressiveAutoUpdate(){
+  // 1. Se versione salvata diversa → PULIZIA TOTALE caches + unregister SW vecchi
+  const savedVer=localStorage.getItem('wdym_app_version');
+  if(savedVer&&savedVer!==APP_VERSION){
+    console.log('[WDYM] Versione cambiata:',savedVer,'→',APP_VERSION,'pulizia in corso...');
+    // Cancella TUTTE le cache
+    if(window.caches){
+      caches.keys().then(keys=>Promise.all(keys.map(k=>caches.delete(k)))).catch(()=>{});
+    }
+    // Unregister TUTTI i Service Worker vecchi
+    if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations){
+      navigator.serviceWorker.getRegistrations().then(regs=>{
+        regs.forEach(r=>{
+          // Notifica al SW vecchio che è ora di morire
+          if(r.active)r.active.postMessage({type:'FORCE_KILL'});
+        });
+      }).catch(()=>{});
+    }
+  }
+  localStorage.setItem('wdym_app_version',APP_VERSION);
+})();
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('./sw.js').then(reg=>{
-      // Controlla aggiornamenti ogni volta che la pagina si apre
+      // Controlla aggiornamenti ogni 5 minuti mentre l'app è aperta
+      setInterval(()=>{try{reg.update();}catch(e){}},5*60*1000);
+      // Forza check immediato all'apertura
       reg.update();
       // Quando un nuovo SW è installato e in attesa, attivalo subito
       reg.addEventListener('updatefound',()=>{
@@ -3035,34 +3060,39 @@ if('serviceWorker' in navigator){
         if(!newSW)return;
         newSW.addEventListener('statechange',()=>{
           if(newSW.state==='installed'&&navigator.serviceWorker.controller){
-            // C'è un aggiornamento pronto → attiva subito
+            console.log('[WDYM] Nuovo SW pronto → skip waiting');
             newSW.postMessage({type:'SKIP_WAITING'});
           }
         });
       });
-    }).catch(()=>{});
+    }).catch(e=>console.warn('[WDYM] SW register failed',e));
     // Quando il SW prende controllo (cambio versione), ricarica la pagina UNA SOLA VOLTA
-    let _reloadDone=false;
+    let _reloadDone=sessionStorage.getItem('wdym_reloaded_once')==='1';
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(_reloadDone)return;
       _reloadDone=true;
-      console.log('SW aggiornato → reload');
-      window.location.reload();
+      sessionStorage.setItem('wdym_reloaded_once','1');
+      // Mostra banner brevissimo "Aggiornamento" per non confondere l'utente
+      try{
+        const b=document.createElement('div');
+        b.style.cssText='position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#00ff88,#00c8ff);color:#000;padding:10px;text-align:center;font-family:\'Bebas Neue\',sans-serif;letter-spacing:2px;z-index:9999;font-size:.9rem;box-shadow:0 4px 16px rgba(0,255,136,.5)';
+        b.textContent='🔄 NUOVA VERSIONE — AGGIORNAMENTO...';
+        document.body.appendChild(b);
+      }catch(e){}
+      console.log('[WDYM] SW aggiornato → reload in 500ms');
+      setTimeout(()=>window.location.reload(),500);
     });
     // Messaggio dal SW quando attiva nuova versione
     navigator.serviceWorker.addEventListener('message',e=>{
       if(e.data&&e.data.type==='SW_UPDATED'){
-        console.log('Nuova versione SW attiva:',e.data.version);
+        console.log('[WDYM] Nuova versione SW attiva:',e.data.version);
       }
     });
   });
-  // Forza update se la versione salvata è diversa
-  const savedVer=localStorage.getItem('wdym_app_version');
-  if(savedVer&&savedVer!==APP_VERSION){
-    // Pulisci tutte le cache vecchie
-    if(window.caches)caches.keys().then(keys=>keys.forEach(k=>caches.delete(k)));
-  }
-  localStorage.setItem('wdym_app_version',APP_VERSION);
+  // Reset flag reload alla prossima sessione
+  window.addEventListener('beforeunload',()=>{
+    // nulla — lasciamo che il flag sessionStorage si pulisca da solo al cambio sessione
+  });
 }
 
 // ─── Install Prompt (Android Chrome) ───
