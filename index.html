@@ -597,6 +597,33 @@ input::placeholder{color:var(--mt);opacity:.7}
 
 body{padding-bottom:104px} /* spazio per bottom nav più grande */
 
+/* ── SIDE PANEL DX (V14.5) — widget novità stile gaming ── */
+.side-panel{position:fixed;right:8px;top:74px;z-index:150;
+  display:flex;flex-direction:column;gap:8px;width:64px}
+.side-item{position:relative;background:linear-gradient(180deg,rgba(15,0,48,.85),rgba(7,0,26,.95));
+  border:1.5px solid rgba(155,48,255,.35);border-radius:14px;
+  padding:8px 4px 6px;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:2px;transition:all .15s;
+  box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.side-item:active{transform:scale(.92)}
+.side-item:hover{border-color:rgba(255,45,120,.55);box-shadow:0 4px 16px rgba(255,45,120,.25)}
+.side-item.locked{opacity:.85}
+.side-emoji{font-size:1.5rem;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.side-label{font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:1px;color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.6);line-height:1.2}
+.side-badge{position:absolute;top:-4px;right:-4px;background:#ff2d78;color:#fff;
+  width:14px;height:14px;border-radius:50%;font-size:.55rem;font-weight:bold;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+  border:1.5px solid rgba(7,0,26,.95);box-shadow:0 0 6px rgba(255,45,120,.8);
+  font-family:Arial,sans-serif}
+.side-coming{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  background:rgba(155,48,255,.85);color:#fff;font-family:'Bebas Neue',sans-serif;
+  font-size:.5rem;letter-spacing:1px;padding:1px 6px;border-radius:6px;
+  border:1px solid rgba(255,255,255,.2);white-space:nowrap}
+
+/* Nascondi il side panel quando un overlay e' aperto */
+body.overlay-open .side-panel{display:none}
+
 /* ── HAMBURGER MENU (V8) — tondo in alto a destra ── */
 .hamb-fab{position:fixed;top:14px;right:14px;z-index:200;
   width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);
@@ -1111,9 +1138,10 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <div class="ach-toast-icon" id="ACH_T_ICON">🏆</div>
   <div class="ach-toast-body">
     <div class="ach-toast-label">🎉 ACHIEVEMENT SBLOCCATO</div>
-    <div class="ach-toast-title" id="ACH_T_TITLE">Nome</div>
-    <div class="ach-toast-reward" id="ACH_T_REWARD">+50 🪙</div>
+    <div class="ach-toast-title" id="ACH_T_TITLE"></div>
+    <div class="ach-toast-reward" id="ACH_T_REWARD"></div>
   </div>
+  <button onclick="event.stopPropagation();dismissAchToast()" style="background:rgba(0,0,0,.25);border:none;color:#000;font-size:1rem;width:26px;height:26px;border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:bold;line-height:1">✕</button>
 </div>
 
 <!-- HAMBURGER DRAWER V9 (4 voci stile gaming: Settings/Mail/Bag/Gift) -->
@@ -1331,6 +1359,25 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <button class="choice-close" onclick="closePvpChoice()">CHIUDI</button>
 </div>
 
+<!-- SIDE PANEL DX (Novità in arrivo, stile gaming side widget) -->
+<div id="SIDE_PANEL" class="side-panel">
+  <div class="side-item" onclick="openShop();shopTab('packs')" title="Starter Pack">
+    <div class="side-emoji">🎁</div>
+    <div class="side-label">STARTER</div>
+    <span class="side-badge">!</span>
+  </div>
+  <div class="side-item locked" onclick="showToast('🎰 Ruota della Fortuna<br>In arrivo nel prossimo update','info',2500)" title="Ruota Fortuna">
+    <div class="side-emoji">🎰</div>
+    <div class="side-label">FORTUNA</div>
+    <span class="side-coming">SOON</span>
+  </div>
+  <div class="side-item locked" onclick="showToast('🎟️ VIP Cards<br>In arrivo nel prossimo update','info',2500)" title="VIP">
+    <div class="side-emoji">🎟️</div>
+    <div class="side-label">VIP</div>
+    <span class="side-coming">SOON</span>
+  </div>
+</div>
+
 <!-- BOTTOM NAVIGATION V12 — 5 tasti con GIOCA al centro (FAB rialzato) -->
 <nav class="bnav" id="BNAV">
   <button class="bnav-btn shop" onclick="safeCall('openShop')" aria-label="Negozio">
@@ -1434,22 +1481,6 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
   <!-- STREAK BADGE -->
   <div id="STREAK_BADGE_HOME" class="streak-badge cold">
     <span class="sf">🔥</span><span id="STREAK_TXT">0 GIORNI DI FILA</span>
-  </div>
-  <!-- OFFERTA LANCIO BANNER -->
-  <div id="LAUNCH_OFFER" class="daily-card" onclick="openShop();shopTab('packs')"
-    style="background:linear-gradient(135deg,rgba(255,45,120,.22),rgba(155,48,255,.15),rgba(0,200,255,.1));
-    border-color:rgba(255,45,120,.6);box-shadow:0 4px 28px rgba(255,45,120,.35)">
-    <div class="daily-row">
-      <div class="daily-icon">🎁</div>
-      <div class="daily-info">
-        <div class="daily-title" style="background:linear-gradient(135deg,#ff2d78,#ffcc00,#00c8ff);
-          -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
-          OFFERTA LANCIO!
-        </div>
-        <div class="daily-sub">Starter Pack: 250 monete + Avatar EPICO gratis!</div>
-      </div>
-      <div class="daily-reward" style="background:rgba(255,45,120,.2);color:#ff2d78;border-color:rgba(255,45,120,.5)">€ 2,99</div>
-    </div>
   </div>
   <!-- DAILY CHALLENGE CARD -->
   <div id="DAILY_CARD" class="daily-card" onclick="startDailyChallenge()">
@@ -4485,8 +4516,9 @@ function showToast(html,type,duration){
   if(!toast){
     toast=document.createElement('div');
     toast.id='WDYM_TOAST';
-    toast.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-150%);z-index:9000;padding:14px 22px;border-radius:14px;font-family:\'Bebas Neue\',sans-serif;letter-spacing:1.5px;font-size:.95rem;text-align:center;max-width:90vw;line-height:1.4;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .4s cubic-bezier(.34,1.56,.64,1)';
+    toast.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-150%);z-index:9000;padding:12px 38px 12px 18px;border-radius:14px;font-family:\'Bebas Neue\',sans-serif;letter-spacing:1.5px;font-size:.92rem;text-align:center;max-width:88vw;line-height:1.4;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.34,1.56,.64,1);cursor:pointer';
     document.body.appendChild(toast);
+    toast.onclick=hideToast;
   }
   const colors={
     success:{bg:'linear-gradient(135deg,#00ff88,#00c8ff)',color:'#000',border:'rgba(255,255,255,.3)'},
@@ -4498,12 +4530,22 @@ function showToast(html,type,duration){
   toast.style.background=c.bg;
   toast.style.color=c.color;
   toast.style.border='2px solid '+c.border;
-  toast.innerHTML=html;
+  // Inietta il contenuto + bottone X chiudere in alto a destra
+  toast.innerHTML=html+'<span style="position:absolute;top:6px;right:8px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.25);color:inherit;font-size:.9rem;font-weight:bold;display:flex;align-items:center;justify-content:center;line-height:1;cursor:pointer;font-family:Arial,sans-serif">×</span>';
   toast.style.transform='translateX(-50%) translateY(0)';
   clearTimeout(toast._t);
-  toast._t=setTimeout(()=>{
+  toast._t=setTimeout(hideToast,duration);
+}
+function hideToast(){
+  const toast=document.getElementById('WDYM_TOAST');
+  if(toast){
     toast.style.transform='translateX(-50%) translateY(-150%)';
-  },duration);
+    clearTimeout(toast._t);
+    // Reset contenuto dopo l'animazione di uscita (evita ghost click)
+    setTimeout(()=>{
+      if(toast)toast.innerHTML='';
+    },400);
+  }
 }
 
 // ─── LANGUAGE PICKER (Solo + PVP) ───
@@ -5974,27 +6016,59 @@ function checkAchievements(){
     showAchToast(newly,0);
   }
 }
+window._achToastQueue=[];
+window._achToastDismiss=null;
 function showAchToast(list,idx){
-  if(idx>=list.length)return;
+  // V14.5: protezione totale contro toast vuoti/fantasma
+  if(!list||!Array.isArray(list)||idx>=list.length)return;
   const a=list[idx];
+  if(!a||!a.n||!a.e){console.warn('Toast skip: dati achievement invalidi',a);return;}
   const t=document.getElementById('ACH_TOAST');
+  if(!t)return;
   document.getElementById('ACH_T_ICON').textContent=a.e;
   document.getElementById('ACH_T_TITLE').textContent=a.n;
-  document.getElementById('ACH_T_REWARD').textContent='+'+a.reward+' 🪙';
+  document.getElementById('ACH_T_REWARD').textContent='+'+(a.reward||0)+' 🪙';
   t.classList.add('on');
   vibrate(80);
-  // V14.4: durata ridotta + cliccabile per chiudere subito
   let dismissed=false;
   const dismiss=()=>{
     if(dismissed)return;dismissed=true;
     t.classList.remove('on');
     t.onclick=null;
-    setTimeout(()=>showAchToast(list,idx+1),250);
+    // Reset campi a vuoto dopo chiusura (evita fantasmi)
+    setTimeout(()=>{
+      document.getElementById('ACH_T_TITLE').textContent='';
+      document.getElementById('ACH_T_REWARD').textContent='';
+      showAchToast(list,idx+1);
+    },300);
   };
+  window._achToastDismiss=dismiss;
   t.onclick=dismiss;
   setTimeout(dismiss,1800);
   if(typeof gtag==='function')gtag('event','achievement_unlock',{id:a.id});
 }
+function dismissAchToast(){
+  // Chiusura forzata dell'achievement toast
+  const t=document.getElementById('ACH_TOAST');
+  if(!t)return;
+  t.classList.remove('on');
+  t.onclick=null;
+  if(window._achToastDismiss)try{window._achToastDismiss();}catch(e){}
+  setTimeout(()=>{
+    document.getElementById('ACH_T_TITLE').textContent='';
+    document.getElementById('ACH_T_REWARD').textContent='';
+  },300);
+}
+// All'avvio: nascondi sempre il toast achievement (evita "fantasma" dopo refresh)
+(function hideAchToastOnInit(){
+  setTimeout(()=>{
+    const t=document.getElementById('ACH_TOAST');
+    if(t){t.classList.remove('on');}
+    document.querySelectorAll('#WDYM_TOAST').forEach(el=>{
+      el.style.transform='translateX(-50%) translateY(-150%)';
+    });
+  },50);
+})();
 
 // Hook track 10/10 e PVP win
 const _origShowVerdictAch=showVerdict;
