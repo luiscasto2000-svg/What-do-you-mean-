@@ -949,19 +949,20 @@ body{padding-bottom:104px} /* spazio per bottom nav più grande */
 .streak-badge.cold{color:var(--mt);border-color:rgba(155,48,255,.25);background:rgba(155,48,255,.05)}
 
 /* ── V11 — ACHIEVEMENT TOAST ── */
-.ach-toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-150%);
+/* V14.4: toast achievement piu compatto, posizionato in basso (no clash con coin badge) */
+.ach-toast{position:fixed;bottom:120px;left:50%;transform:translateX(-50%) translateY(150%);
   z-index:700;
   background:linear-gradient(135deg,rgba(255,204,0,.95),rgba(255,136,0,.95));
-  border:2px solid rgba(255,255,255,.4);border-radius:18px;
-  padding:14px 20px;box-shadow:0 8px 32px rgba(255,204,0,.5),0 0 0 4px rgba(255,204,0,.15);
-  display:flex;align-items:center;gap:12px;max-width:90vw;width:340px;
-  transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+  border:1.5px solid rgba(255,255,255,.3);border-radius:14px;
+  padding:9px 14px;box-shadow:0 6px 24px rgba(255,204,0,.4);
+  display:flex;align-items:center;gap:9px;max-width:88vw;width:auto;min-width:240px;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);cursor:pointer}
 .ach-toast.on{transform:translateX(-50%) translateY(0)}
-.ach-toast-icon{font-size:2.4rem;line-height:1;flex-shrink:0;animation:bnc 1s ease-out}
+.ach-toast-icon{font-size:1.7rem;line-height:1;flex-shrink:0}
 .ach-toast-body{flex:1;min-width:0;color:#000}
-.ach-toast-label{font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:2px;opacity:.8;margin-bottom:1px}
-.ach-toast-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1.5px;line-height:1.1}
-.ach-toast-reward{font-size:.7rem;font-weight:bold;margin-top:2px}
+.ach-toast-label{font-family:'Bebas Neue',sans-serif;font-size:.58rem;letter-spacing:1.5px;opacity:.75;line-height:1}
+.ach-toast-title{font-family:'Bebas Neue',sans-serif;font-size:.92rem;letter-spacing:1px;line-height:1.1;margin-top:1px}
+.ach-toast-reward{font-size:.62rem;font-weight:bold;margin-top:1px;opacity:.85}
 
 /* ── V11 — ACHIEVEMENTS OVERLAY (lista nel profilo) ── */
 .ach-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:520px}
@@ -2697,10 +2698,22 @@ function pboxHTML(){
 
 function showListen(){
   stopSpeak();
+  // V14.4: AGGIORNO i campi PRIMA di mostrare S3 (evita flash della lingua vecchia)
+  try{
+    document.getElementById('LP').textContent=`ROUND ${G.round}/${G.rounds}`;
+    if(G.lang&&G.lang.n)document.getElementById('SLNG').textContent=G.lang.n.toUpperCase();
+    document.getElementById('LB').innerHTML=pboxHTML();
+    // Pulisci eventuali warning TTS residui prima di rimostrare S3
+    document.querySelectorAll('.tts-warn').forEach(el=>el.remove());
+  }catch(e){console.warn('showListen pre-go err',e);}
   go('S3');
-  document.getElementById('LP').textContent=`ROUND ${G.round}/${G.rounds}`;
-  document.getElementById('SLNG').textContent=G.lang.n.toUpperCase();
-  document.getElementById('LB').innerHTML=pboxHTML();
+  // Doppio aggiornamento dopo render per sicurezza
+  requestAnimationFrame(()=>{
+    try{
+      if(G.lang&&G.lang.n)document.getElementById('SLNG').textContent=G.lang.n.toUpperCase();
+      document.getElementById('LB').innerHTML=pboxHTML();
+    }catch(e){}
+  });
   setTimeout(()=>doSpeak(),700);
 }
 
@@ -5967,13 +5980,19 @@ function showAchToast(list,idx){
   const t=document.getElementById('ACH_TOAST');
   document.getElementById('ACH_T_ICON').textContent=a.e;
   document.getElementById('ACH_T_TITLE').textContent=a.n;
-  document.getElementById('ACH_T_REWARD').textContent='+'+a.reward+' 🪙 monete';
+  document.getElementById('ACH_T_REWARD').textContent='+'+a.reward+' 🪙';
   t.classList.add('on');
   vibrate(80);
-  setTimeout(()=>{
+  // V14.4: durata ridotta + cliccabile per chiudere subito
+  let dismissed=false;
+  const dismiss=()=>{
+    if(dismissed)return;dismissed=true;
     t.classList.remove('on');
-    setTimeout(()=>showAchToast(list,idx+1),350);
-  },2800);
+    t.onclick=null;
+    setTimeout(()=>showAchToast(list,idx+1),250);
+  };
+  t.onclick=dismiss;
+  setTimeout(dismiss,1800);
   if(typeof gtag==='function')gtag('event','achievement_unlock',{id:a.id});
 }
 
