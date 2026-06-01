@@ -4,7 +4,7 @@
 //  - Altri asset: cache-first (icone, font, ecc.)
 // Il nome cache contiene la versione → cambia ad ogni release.
 
-const CACHE_VERSION = 'wdym-v14-1-2026-30';
+const CACHE_VERSION = 'wdym-v14-6-2026-31';
 const CACHE = CACHE_VERSION;
 
 const STATIC_ASSETS = [

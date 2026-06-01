@@ -3076,7 +3076,7 @@ document.addEventListener('touchend',e=>{
 // ─── Service Worker V14.1 — AUTO-UPDATE AGGRESSIVO (zero azione utente) ───
 // Per chi visita per la 1° volta: nessuna cache, vede V14 subito
 // Per chi ha vecchia cache: SW si aggiorna in background + reload silenzioso
-const APP_VERSION='14.1.0';
+const APP_VERSION='14.6.0';
 (function aggressiveAutoUpdate(){
   // 1. Se versione salvata diversa → PULIZIA TOTALE caches + unregister SW vecchi
   const savedVer=localStorage.getItem('wdym_app_version');
@@ -6059,16 +6059,38 @@ function dismissAchToast(){
     document.getElementById('ACH_T_REWARD').textContent='';
   },300);
 }
-// All'avvio: nascondi sempre il toast achievement (evita "fantasma" dopo refresh)
-(function hideAchToastOnInit(){
-  setTimeout(()=>{
+// V14.6: FORZA cleanup totale toast all'avvio + ad ogni 200ms per prima sec
+(function nukeGhostToasts(){
+  function killAll(){
+    // Achievement toast
     const t=document.getElementById('ACH_TOAST');
-    if(t){t.classList.remove('on');}
-    document.querySelectorAll('#WDYM_TOAST').forEach(el=>{
-      el.style.transform='translateX(-50%) translateY(-150%)';
-    });
-  },50);
+    if(t){
+      t.classList.remove('on');
+      t.style.transform='translateX(-50%) translateY(150%)';
+      t.style.pointerEvents='none';
+      const title=document.getElementById('ACH_T_TITLE');if(title)title.textContent='';
+      const reward=document.getElementById('ACH_T_REWARD');if(reward)reward.textContent='';
+      setTimeout(()=>{t.style.pointerEvents='';},500);
+    }
+    // Welcome / generic toast
+    const w=document.getElementById('WDYM_TOAST');
+    if(w){
+      w.style.transform='translateX(-50%) translateY(-150%)';
+      w.innerHTML='';
+    }
+  }
+  // Esegui SUBITO + dopo 100ms + dopo 500ms + dopo 1500ms (paranoid)
+  killAll();
+  setTimeout(killAll,100);
+  setTimeout(killAll,500);
+  setTimeout(killAll,1500);
 })();
+// Listener globale: ESC chiude tutti i toast
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    try{dismissAchToast();hideToast();}catch(err){}
+  }
+});
 
 // Hook track 10/10 e PVP win
 const _origShowVerdictAch=showVerdict;
