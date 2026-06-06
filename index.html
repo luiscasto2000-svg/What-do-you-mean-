@@ -26,7 +26,7 @@
   gtag('config', 'G-7DZ3L2FB8L');
 </script>
 <title>🌍 What Do You Mean? — Il gioco della pronuncia</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Lilita+One&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <!-- html2canvas per generare immagine podio condivisibile -->
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -528,6 +528,209 @@ input::placeholder{color:var(--mt);opacity:.7}
   color:#fff;font-family:'Bebas Neue',sans-serif;letter-spacing:3px;font-size:.85rem;
   padding:6px 14px;border-radius:100px;margin-top:8px}
 
+/* ════════════════════════════════════════════════════════════════════
+   V15.1 — ITALIAN POP CARTOON OVERRIDE THEME
+   Neo-brutalism + chunky fonts + bordi/ombre nere offset
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Reset variabili principali su un tema piu vibrante */
+:root{
+  --pop-bg: #1a0033;
+  --pop-bg-soft: #2d1554;
+  --pop-cream: #FFF5E4;
+  --pop-coral: #FF4D5E;
+  --pop-gold: #FFCD3C;
+  --pop-mint: #3DCDA8;
+  --pop-pink: #FF3D9F;
+  --pop-blue: #3DAFFF;
+  --pop-purple: #B14EFF;
+  --pop-black: #0F0820;
+  --pop-shadow: #000;
+  --pop-border: 2.5px solid var(--pop-black);
+  --pop-shadow-offset: 4px 4px 0 var(--pop-shadow);
+  --pop-radius: 16px;
+}
+
+/* Body con texture sottile per sembrare "stampato" */
+body{
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255,205,60,.10) 0, transparent 35%),
+    radial-gradient(circle at 88% 80%, rgba(255,77,94,.10) 0, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(61,175,255,.06) 0, transparent 50%),
+    var(--pop-bg) !important;
+  font-family: 'Fredoka', 'DM Sans', system-ui, sans-serif !important;
+}
+body::before{
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 0%, rgba(255,205,60,.18) 0, transparent 55%),
+    radial-gradient(ellipse 50% 35% at 80% 100%, rgba(255,61,159,.15) 0, transparent 55%) !important;
+}
+
+/* Titoli "POP" — usa Lilita One chunky */
+.hero, .pvp-title, .shop-title, .wheel-title, .story-title, .fc-title,
+.choice-title, .patch-title, .onb-title, .ach-toast-title {
+  font-family: 'Lilita One', 'Bebas Neue', sans-serif !important;
+  letter-spacing: 0 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: 4px 4px 0 var(--pop-black), 0 0 0 transparent !important;
+  background: linear-gradient(135deg, var(--pop-gold), var(--pop-pink), var(--pop-coral)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* CARD — bordo + ombra offset stile sticker */
+.card, .prof-card, .pvp-card, .shop-card, .medal-box, .vbox, .pbox, .tban,
+.story-chapter, .quest-card, .pack-card, .skin-row, .wheel-stage,
+.hd-header, .choice-card, .ach-toast, .daily-card,
+.fc-overlay .prof-card, #SHOP_INFO, .coming-info, .onb-card, .patch-card {
+  border: var(--pop-border) !important;
+  box-shadow: var(--pop-shadow-offset) !important;
+  border-radius: var(--pop-radius) !important;
+  background: var(--pop-bg-soft) !important;
+  backdrop-filter: none !important;
+}
+
+/* BOTTONI — chunky con bordo + offset shadow, premuti si "schiacciano" */
+.btn, .wheel-btn, .sbtn, .shop-close, .fc-close, .story-close, .choice-close,
+.hd-item, .hd-toggle, button.bp, button.bs, button.bg, button.bbl,
+.btn-pvp, .btn-solo, .btn-share, .btn-online, .btn-profile, .btn-lb,
+.btn-story-home, .install-bar button {
+  font-family: 'Lilita One', 'Bebas Neue', sans-serif !important;
+  font-weight: 400 !important;
+  border: var(--pop-border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--pop-shadow-offset) !important;
+  text-shadow: 1px 1px 0 rgba(0,0,0,.3);
+  letter-spacing: .5px !important;
+  transition: transform .08s ease, box-shadow .08s ease !important;
+}
+.btn:active, .wheel-btn:active, .sbtn:active, button.bp:active, button.bs:active,
+.btn-pvp:active, .btn-solo:active, .btn-share:active, .btn-online:active,
+.btn-profile:active, .btn-lb:active, .btn-story-home:active, .choice-card:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 0 0 0 var(--pop-shadow) !important;
+}
+
+/* Colori "POP" sui bottoni primari */
+.bp, .btn-pvp { background: var(--pop-coral) !important; color: #fff !important; }
+.bg, .btn-story-home, .btn-online { background: var(--pop-mint) !important; color: var(--pop-black) !important; }
+.bbl { background: var(--pop-blue) !important; color: #fff !important; }
+.btn-solo { background: var(--pop-gold) !important; color: var(--pop-black) !important; }
+.btn-share { background: var(--pop-mint) !important; color: var(--pop-black) !important; }
+.btn-profile { background: var(--pop-purple) !important; color: #fff !important; }
+.btn-lb { background: var(--pop-pink) !important; color: #fff !important; }
+.bs { background: var(--pop-bg) !important; color: #fff !important; }
+.wheel-btn { background: var(--pop-pink) !important; color: #fff !important; }
+
+/* Coin badge sticker */
+.coin-badge {
+  background: var(--pop-gold) !important;
+  border: var(--pop-border) !important;
+  box-shadow: var(--pop-shadow-offset) !important;
+  color: var(--pop-black) !important;
+}
+
+/* RULES FAB + HAMBURGER FAB sticker style */
+.rules-fab, .hamb-fab, .exit-fab {
+  border: var(--pop-border) !important;
+  box-shadow: var(--pop-shadow-offset) !important;
+  background: var(--pop-pink) !important;
+  color: #fff !important;
+}
+.hamb-fab { background: var(--pop-purple) !important; }
+.exit-fab { background: var(--pop-coral) !important; color: #fff !important; }
+
+/* Side panel widget sticker */
+.side-item {
+  background: var(--pop-bg-soft) !important;
+  border: var(--pop-border) !important;
+  box-shadow: 3px 3px 0 var(--pop-black) !important;
+  border-radius: 12px !important;
+}
+.side-item:active { transform: translate(3px,3px) !important; box-shadow: 0 0 0 var(--pop-black) !important; }
+
+/* BOTTOM NAV chunky */
+.bnav {
+  border-top: var(--pop-border) !important;
+  background: var(--pop-bg-soft) !important;
+  box-shadow: 0 -4px 0 var(--pop-black) !important;
+}
+.bnav-btn {
+  border: 2px solid var(--pop-black) !important;
+  box-shadow: 2px 2px 0 var(--pop-black) !important;
+  border-radius: 12px !important;
+  background: var(--pop-bg) !important;
+}
+.bnav-btn:active { transform: translate(2px,2px); box-shadow: 0 0 0 var(--pop-black) !important; }
+.bnav-btn.story-fab {
+  background: var(--pop-gold) !important;
+  color: var(--pop-black) !important;
+  border: 3.5px solid var(--pop-black) !important;
+  box-shadow: 4px 4px 0 var(--pop-black) !important;
+}
+.bnav-btn.story-fab .bl { background: var(--pop-coral); color: #fff !important; border: 2px solid var(--pop-black); }
+
+/* Inputs sticker */
+input, textarea, .onb-input {
+  font-family: 'Fredoka', system-ui, sans-serif !important;
+  border: var(--pop-border) !important;
+  box-shadow: 3px 3px 0 var(--pop-black) !important;
+  background: var(--pop-cream) !important;
+  color: var(--pop-black) !important;
+  border-radius: 12px !important;
+}
+
+/* Story map nodes pop */
+.story-node-inner {
+  border: 2.5px solid var(--pop-black) !important;
+}
+.story-node.next .story-node-inner { background: var(--pop-coral) !important; }
+.story-node.completed .story-node-inner { background: var(--pop-mint) !important; }
+.story-node.boss .story-node-inner { background: var(--pop-gold) !important; }
+.story-node.locked .story-node-inner { background: var(--pop-bg) !important; }
+
+/* Shop items sticker */
+.shop-item {
+  border: var(--pop-border) !important;
+  box-shadow: 3px 3px 0 var(--pop-black) !important;
+  background: var(--pop-bg-soft) !important;
+  border-radius: 14px !important;
+}
+.shop-item:active { transform: translate(3px,3px); box-shadow: 0 0 0 var(--pop-black) !important; }
+
+/* Patch banner pop */
+.patch-card {
+  background: var(--pop-cream) !important;
+  color: var(--pop-black) !important;
+}
+.patch-list b, .patch-list li, .patch-list { color: var(--pop-black) !important; }
+
+/* Wheel disco POP */
+.wheel-disk {
+  border: 6px solid var(--pop-black) !important;
+  box-shadow: 6px 6px 0 var(--pop-black), inset 0 0 0 4px var(--pop-cream) !important;
+}
+.wheel-center {
+  border: 3px solid var(--pop-black) !important;
+  background: var(--pop-coral) !important;
+  color: #fff !important;
+}
+
+/* Toasts pop */
+#WDYM_TOAST {
+  border: var(--pop-border) !important;
+  box-shadow: var(--pop-shadow-offset) !important;
+  font-family: 'Lilita One', sans-serif !important;
+}
+
+/* CSS extras */
+.clbl, .story-sub, .pvp-sub, .shop-sub, .fc-sub, .choice-sub, .wheel-sub {
+  font-family: 'Fredoka', sans-serif !important;
+  letter-spacing: 1.5px !important;
+  font-weight: 600 !important;
+}
+
 /* ── BOTTOM NAVIGATION V7 — stile gaming app (5 tab, centrale rialzato FAB) ── */
 .bnav{position:fixed;bottom:0;left:0;right:0;z-index:300;
   background:linear-gradient(180deg,rgba(26,0,80,.55) 0%,rgba(7,0,26,.95) 35%,rgba(15,0,48,1) 100%);
@@ -596,6 +799,66 @@ input::placeholder{color:var(--mt);opacity:.7}
 }
 
 body{padding-bottom:104px} /* spazio per bottom nav più grande */
+
+/* ── RUOTA DELLA FORTUNA (V15) ── */
+.wheel-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+  z-index:620;display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:24px 18px;animation:fin .25s ease}
+.wheel-overlay.on{display:flex}
+.wheel-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#ffcc00,#ff2d78,#9b30ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:4px;text-align:center;line-height:1}
+.wheel-sub{font-size:.72rem;color:var(--mt);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;text-align:center}
+.wheel-stage{position:relative;width:300px;height:300px;max-width:80vw;max-height:80vw;margin-bottom:20px}
+.wheel-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:3;
+  font-size:2.2rem;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+.wheel-disk{width:100%;height:100%;border-radius:50%;
+  border:6px solid #ffcc00;box-shadow:0 0 32px rgba(255,204,0,.5),inset 0 0 24px rgba(0,0,0,.5);
+  transition:transform 4.5s cubic-bezier(.17,.67,.21,.99);transform:rotate(0deg)}
+.wheel-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:60px;height:60px;background:linear-gradient(135deg,#ffcc00,#ff8800);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;z-index:2;
+  border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.wheel-btn{background:linear-gradient(135deg,#ff2d78,#9b30ff);color:#fff;border:none;
+  padding:14px 28px;border-radius:14px;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;
+  box-shadow:0 4px 20px rgba(255,45,120,.4);max-width:300px;width:100%;margin-bottom:8px}
+.wheel-btn:active{transform:scale(.96)}
+.wheel-btn:disabled{opacity:.5;cursor:not-allowed}
+.wheel-cooldown{font-size:.75rem;color:var(--mt);text-align:center;margin-top:6px}
+.wheel-result{position:fixed;inset:0;background:rgba(7,0,26,.92);z-index:630;display:none;
+  flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.wheel-result.on{display:flex}
+.wheel-result-emoji{font-size:6rem;animation:medalSpin 1s ease-out;margin-bottom:8px}
+.wheel-result-title{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:3px;
+  background:linear-gradient(135deg,#ffcc00,#ff2d78);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:12px;text-align:center}
+.wheel-result-msg{font-size:1rem;color:var(--tx);text-align:center;margin-bottom:24px}
+
+/* ── OBIETTIVI GIORNALIERI (V15) ── */
+.quests-overlay{position:fixed;inset:0;background:rgba(7,0,26,.97);backdrop-filter:blur(10px);
+  z-index:618;display:none;flex-direction:column;align-items:center;
+  overflow-y:auto;padding:24px 18px 100px;animation:fin .25s ease}
+.quests-overlay.on{display:flex}
+.quest-card{background:rgba(15,0,48,.7);border:1.5px solid rgba(155,48,255,.25);
+  border-radius:14px;padding:14px;margin-bottom:10px;width:100%;max-width:480px;
+  display:flex;align-items:center;gap:14px;position:relative}
+.quest-card.done{border-color:rgba(0,255,136,.5);background:rgba(0,255,136,.06)}
+.quest-icon{font-size:2rem;line-height:1;flex-shrink:0}
+.quest-body{flex:1;min-width:0}
+.quest-title{font-family:'Bebas Neue',sans-serif;font-size:.92rem;letter-spacing:1.5px;color:#fff;line-height:1.2;margin-bottom:4px}
+.quest-desc{font-size:.72rem;color:var(--mt);line-height:1.3}
+.quest-prog{margin-top:6px;height:6px;background:rgba(0,0,0,.4);border-radius:3px;overflow:hidden}
+.quest-prog-fill{height:100%;background:linear-gradient(90deg,#ffcc00,#ff2d78);transition:width .4s}
+.quest-card.done .quest-prog-fill{background:linear-gradient(90deg,#00ff88,#00c8ff)}
+.quest-reward{flex-shrink:0;background:rgba(255,204,0,.15);color:#ffcc00;
+  border:1px solid rgba(255,204,0,.4);border-radius:100px;padding:5px 10px;
+  font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-size:.82rem;white-space:nowrap}
+.quest-card.done::after{content:'✓';position:absolute;top:8px;right:10px;
+  color:var(--gn);font-size:1.1rem;font-weight:bold}
+.quests-reset{font-size:.7rem;color:var(--mt);text-align:center;margin-top:14px}
 
 /* ── SIDE PANEL DX (V14.5) — widget novità stile gaming ── */
 .side-panel{position:fixed;right:8px;top:74px;z-index:150;
@@ -1353,23 +1616,62 @@ body.overlay-open .side-panel{display:none}
   <button class="choice-close" onclick="closePvpChoice()">CHIUDI</button>
 </div>
 
-<!-- SIDE PANEL DX (Novità in arrivo, stile gaming side widget) -->
+<!-- SIDE PANEL DX (novità + ruota fortuna + obiettivi) -->
 <div id="SIDE_PANEL" class="side-panel">
   <div class="side-item" onclick="openShop();shopTab('packs')" title="Starter Pack">
     <div class="side-emoji">🎁</div>
     <div class="side-label">STARTER</div>
     <span class="side-badge">!</span>
   </div>
-  <div class="side-item locked" onclick="showToast('🎰 Ruota della Fortuna<br>In arrivo nel prossimo update','info',2500)" title="Ruota Fortuna">
+  <div class="side-item" onclick="openWheel()" title="Ruota Fortuna">
     <div class="side-emoji">🎰</div>
     <div class="side-label">FORTUNA</div>
-    <span class="side-coming">SOON</span>
+    <span class="side-badge" id="WHEEL_DOT" style="display:none">!</span>
+  </div>
+  <div class="side-item" onclick="openQuests()" title="Obiettivi">
+    <div class="side-emoji">🎯</div>
+    <div class="side-label">QUEST</div>
+    <span class="side-badge" id="QUEST_DOT" style="display:none">!</span>
   </div>
   <div class="side-item locked" onclick="showToast('🎟️ VIP Cards<br>In arrivo nel prossimo update','info',2500)" title="VIP">
     <div class="side-emoji">🎟️</div>
     <div class="side-label">VIP</div>
     <span class="side-coming">SOON</span>
   </div>
+</div>
+
+<!-- RUOTA FORTUNA OVERLAY -->
+<div id="WHEEL_OV" class="wheel-overlay">
+  <div class="wheel-title">🎰 RUOTA DELLA FORTUNA</div>
+  <div class="wheel-sub">1 giro gratis ogni 24 ore</div>
+  <div class="wheel-stage">
+    <div class="wheel-pointer">▼</div>
+    <div id="WHEEL_DISK" class="wheel-disk"></div>
+    <div class="wheel-center">🎰</div>
+  </div>
+  <button id="WHEEL_BTN" class="wheel-btn" onclick="spinWheel()">🎰 GIRA!</button>
+  <div id="WHEEL_COOLDOWN" class="wheel-cooldown"></div>
+  <button class="story-close" onclick="closeWheel()" style="max-width:300px;margin-top:8px">CHIUDI</button>
+</div>
+
+<!-- WHEEL RESULT MODAL -->
+<div id="WHEEL_RESULT" class="wheel-result" onclick="closeWheelResult()">
+  <div class="wheel-result-emoji" id="WHEEL_RES_EMOJI">🎁</div>
+  <div class="wheel-result-title" id="WHEEL_RES_TITLE">HAI VINTO!</div>
+  <div class="wheel-result-msg" id="WHEEL_RES_MSG"></div>
+  <button class="wheel-btn" onclick="closeWheelResult()">CHIUDI</button>
+</div>
+
+<!-- OBIETTIVI GIORNALIERI OVERLAY -->
+<div id="QUESTS_OV" class="quests-overlay">
+  <div class="story-header">
+    <div class="story-title" style="background:linear-gradient(135deg,#ffcc00,#00ff88);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🎯 OBIETTIVI</div>
+    <div class="story-sub">missioni di oggi · si rigenera a mezzanotte</div>
+  </div>
+  <div id="QUESTS_LIST" style="width:100%;max-width:480px"></div>
+  <div class="quests-reset" id="QUESTS_RESET"></div>
+  <button class="story-close" onclick="closeQuests()" style="max-width:300px;margin-top:8px">CHIUDI</button>
 </div>
 
 <!-- BOTTOM NAVIGATION V12 — 5 tasti con GIOCA al centro (FAB rialzato) -->
@@ -3070,7 +3372,7 @@ document.addEventListener('touchend',e=>{
 // ─── Service Worker V14.1 — AUTO-UPDATE AGGRESSIVO (zero azione utente) ───
 // Per chi visita per la 1° volta: nessuna cache, vede V14 subito
 // Per chi ha vecchia cache: SW si aggiorna in background + reload silenzioso
-const APP_VERSION='14.7.0';
+const APP_VERSION='15.0.0';
 (function aggressiveAutoUpdate(){
   // 1. Se versione salvata diversa → PULIZIA TOTALE caches + unregister SW vecchi
   const savedVer=localStorage.getItem('wdym_app_version');
@@ -6058,6 +6360,258 @@ function dismissAchToast(){
     el.classList.remove('on');
   });
 }
+// ═══════════════════════════════════════════════════════
+// V15 — RUOTA DELLA FORTUNA + OBIETTIVI GIORNALIERI + SHARE
+// ═══════════════════════════════════════════════════════
+
+// ─── RUOTA DELLA FORTUNA ───
+const WHEEL_SECTORS=[
+  {coins:50,  label:'50 🪙',  color:'#ffcc00', emoji:'🪙'},
+  {coins:10,  label:'10 🪙',  color:'#9b30ff', emoji:'🪙'},
+  {coins:100, label:'100 🪙', color:'#00c8ff', emoji:'💰'},
+  {coins:25,  label:'25 🪙',  color:'#ff8800', emoji:'🪙'},
+  {coins:500, label:'JACKPOT!', color:'#ff2d78', emoji:'💎'},
+  {coins:15,  label:'15 🪙',  color:'#00ff88', emoji:'🪙'},
+  {coins:200, label:'200 🪙', color:'#ffcc00', emoji:'🎁'},
+  {coins:75,  label:'75 🪙',  color:'#9b30ff', emoji:'🪙'}
+];
+const WHEEL_KEY='wdym_wheel_last';
+const WHEEL_COOLDOWN_MS=24*60*60*1000; // 24h
+
+function buildWheelDisk(){
+  const disk=document.getElementById('WHEEL_DISK');
+  if(!disk||disk.dataset.built)return;
+  const n=WHEEL_SECTORS.length;
+  const slice=360/n;
+  // SVG conico dinamico
+  let gradStops='';
+  WHEEL_SECTORS.forEach((s,i)=>{
+    const a1=i*slice;
+    const a2=(i+1)*slice;
+    gradStops+=`${s.color} ${a1}deg ${a2}deg,`;
+  });
+  gradStops=gradStops.slice(0,-1);
+  disk.style.background=`conic-gradient(from 0deg, ${gradStops})`;
+  // Aggiungi etichette
+  WHEEL_SECTORS.forEach((s,i)=>{
+    const label=document.createElement('div');
+    const angle=i*slice+slice/2;
+    label.style.cssText=`position:absolute;top:50%;left:50%;transform:rotate(${angle}deg) translateY(-110px) rotate(${-angle}deg);font-family:'Bebas Neue',sans-serif;font-size:.78rem;letter-spacing:1px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:1px`;
+    label.innerHTML=`<span style="font-size:1.4rem">${s.emoji}</span><span>${s.label}</span>`;
+    disk.appendChild(label);
+  });
+  disk.dataset.built='1';
+}
+
+function canSpinWheel(){
+  const last=parseInt(localStorage.getItem(WHEEL_KEY)||'0');
+  return (Date.now()-last)>=WHEEL_COOLDOWN_MS;
+}
+function formatCooldown(){
+  const last=parseInt(localStorage.getItem(WHEEL_KEY)||'0');
+  const rem=WHEEL_COOLDOWN_MS-(Date.now()-last);
+  if(rem<=0)return '';
+  const h=Math.floor(rem/3600000);
+  const m=Math.floor((rem%3600000)/60000);
+  return `⏰ Prossimo giro tra ${h}h ${m}m`;
+}
+
+function openWheel(){
+  try{sfxClick();}catch(e){}
+  buildWheelDisk();
+  document.getElementById('WHEEL_OV').classList.add('on');
+  updateWheelBtn();
+  if(typeof gtag==='function')gtag('event','wheel_open');
+}
+function closeWheel(){document.getElementById('WHEEL_OV').classList.remove('on');}
+function updateWheelBtn(){
+  const btn=document.getElementById('WHEEL_BTN');
+  const cd=document.getElementById('WHEEL_COOLDOWN');
+  const dot=document.getElementById('WHEEL_DOT');
+  if(canSpinWheel()){
+    btn.disabled=false;btn.textContent='🎰 GIRA GRATIS!';
+    cd.textContent='';
+    if(dot)dot.style.display='flex';
+  } else {
+    btn.disabled=true;btn.textContent='⏰ TORNA DOMANI';
+    cd.textContent=formatCooldown();
+    if(dot)dot.style.display='none';
+  }
+}
+let _spinning=false;
+function spinWheel(){
+  if(_spinning)return;
+  if(!canSpinWheel()){showToast('⏰ Hai gia girato oggi!<br>Torna domani per un altro giro.','warn',2500);return;}
+  _spinning=true;
+  try{sfxClick();vibrate(60);}catch(e){}
+  // Scegli premio random PRIMA dell'animazione
+  const idx=Math.floor(Math.random()*WHEEL_SECTORS.length);
+  const prize=WHEEL_SECTORS[idx];
+  // Calcola angolo: 5 giri completi + landing
+  const slice=360/WHEEL_SECTORS.length;
+  const target=360*5+(360-(idx*slice+slice/2)); // lo spazio sotto il puntatore
+  const disk=document.getElementById('WHEEL_DISK');
+  disk.style.transition='transform 4.5s cubic-bezier(.17,.67,.21,.99)';
+  disk.style.transform=`rotate(${target}deg)`;
+  setTimeout(()=>{
+    _spinning=false;
+    localStorage.setItem(WHEEL_KEY,String(Date.now()));
+    try{addCoins(prize.coins,'wheel_'+idx);}catch(e){}
+    try{sfxFanfare();confetti();vibrate(100);}catch(e){}
+    showWheelResult(prize);
+    updateWheelBtn();
+    if(typeof gtag==='function')gtag('event','wheel_spin',{prize:prize.coins});
+  },4700);
+}
+function showWheelResult(prize){
+  document.getElementById('WHEEL_RES_EMOJI').textContent=prize.coins>=200?'💎':'🎁';
+  document.getElementById('WHEEL_RES_TITLE').textContent=prize.coins>=500?'JACKPOT!':'HAI VINTO!';
+  document.getElementById('WHEEL_RES_MSG').innerHTML=`Hai ottenuto <b style="color:#ffcc00">+${prize.coins} 🪙 monete</b>!<br><span style="font-size:.75rem;color:#7060a0">Torna domani per un altro giro gratuito</span>`;
+  document.getElementById('WHEEL_RESULT').classList.add('on');
+}
+function closeWheelResult(){
+  document.getElementById('WHEEL_RESULT').classList.remove('on');
+  closeWheel();
+}
+
+// ─── OBIETTIVI GIORNALIERI ───
+const QUEST_TEMPLATES=[
+  {id:'play3',  title:'Gioca 3 partite',          desc:'Completa 3 partite (qualsiasi modalità)', target:3,  reward:30, stat:'gamesPlayed'},
+  {id:'win2',   title:'Vinci 2 partite',           desc:'Termina 2 partite con almeno 60%',         target:2,  reward:40, stat:'gamesWon'},
+  {id:'perfect',title:'Prendi un 10/10',           desc:'Pronuncia perfetta almeno una volta',      target:1,  reward:50, stat:'perfectScores'},
+  {id:'pvp1',   title:'Sfida un amico',            desc:'Crea o accetta una sfida PvP',             target:1,  reward:35, stat:'pvpPlayed'},
+  {id:'story2', title:'2 livelli storia',          desc:'Completa 2 livelli storia',                target:2,  reward:30, stat:'storyDone'},
+  {id:'solo3',  title:'3 round solo',              desc:'Gioca 3 round in modalità solo',           target:3,  reward:25, stat:'soloPlayed'},
+  {id:'share1', title:'Condividi con un amico',    desc:'Usa il pulsante condividi una volta',      target:1,  reward:20, stat:'sharesCount'},
+  {id:'coins50',title:'Guadagna 50 monete',        desc:'Accumula 50+ monete oggi',                 target:50, reward:25, stat:'todayCoins'},
+];
+const QUEST_KEY='wdym_quests';
+function todayKeyStr(){
+  const d=new Date();
+  return d.getFullYear()+'-'+(d.getMonth()+1).toString().padStart(2,'0')+'-'+d.getDate().toString().padStart(2,'0');
+}
+function getQuestState(){
+  let s;
+  try{s=JSON.parse(localStorage.getItem(QUEST_KEY)||'null');}catch(e){s=null;}
+  if(!s||s.date!==todayKeyStr()){
+    // Genera 3 obiettivi random per oggi
+    const shuffled=QUEST_TEMPLATES.slice().sort(()=>Math.random()-0.5);
+    const todays=shuffled.slice(0,3).map(t=>({id:t.id,progress:0,claimed:false,startCoins:0}));
+    // Snapshot stats baseline per tracciare incrementi
+    const stats=(typeof getStats==='function')?getStats():{};
+    s={date:todayKeyStr(),quests:todays,baseline:{
+      gamesPlayed:stats.gamesPlayed||0,
+      gamesWon:stats.gamesWon||0,
+      pvpPlayed:stats.pvpPlayed||0,
+      soloPlayed:stats.soloPlayed||0,
+      storyDone:(()=>{const p=(typeof getStoryProgress==='function')?getStoryProgress():{};let c=0;for(const k in p)if(p[k]>0)c++;return c;})(),
+      perfectScores:0,
+      sharesCount:0,
+      todayCoins:(typeof getCoins==='function')?getCoins():0
+    }};
+    localStorage.setItem(QUEST_KEY,JSON.stringify(s));
+  }
+  return s;
+}
+function updateQuestProgress(){
+  const s=getQuestState();
+  const stats=(typeof getStats==='function')?getStats():{};
+  const baseline=s.baseline;
+  const currentStory=(()=>{const p=(typeof getStoryProgress==='function')?getStoryProgress():{};let c=0;for(const k in p)if(p[k]>0)c++;return c;})();
+  const currentCoins=(typeof getCoins==='function')?getCoins():0;
+  s.quests.forEach(q=>{
+    const t=QUEST_TEMPLATES.find(x=>x.id===q.id);
+    if(!t||q.claimed)return;
+    let prog=0;
+    switch(t.stat){
+      case 'gamesPlayed':prog=(stats.gamesPlayed||0)-baseline.gamesPlayed;break;
+      case 'gamesWon':prog=(stats.gamesWon||0)-baseline.gamesWon;break;
+      case 'pvpPlayed':prog=(stats.pvpPlayed||0)-baseline.pvpPlayed;break;
+      case 'soloPlayed':prog=(stats.soloPlayed||0)-baseline.soloPlayed;break;
+      case 'storyDone':prog=currentStory-baseline.storyDone;break;
+      case 'perfectScores':prog=parseInt(localStorage.getItem('wdym_perfect_today_'+todayKeyStr())||'0');break;
+      case 'sharesCount':prog=parseInt(localStorage.getItem('wdym_shares_today_'+todayKeyStr())||'0');break;
+      case 'todayCoins':prog=Math.max(0,currentCoins-baseline.todayCoins);break;
+    }
+    q.progress=Math.min(prog,t.target);
+  });
+  localStorage.setItem(QUEST_KEY,JSON.stringify(s));
+  // Aggiorna badge se ce ne sono di completati non riscossi
+  const hasReady=s.quests.some(q=>!q.claimed&&q.progress>=QUEST_TEMPLATES.find(t=>t.id===q.id).target);
+  const dot=document.getElementById('QUEST_DOT');
+  if(dot)dot.style.display=hasReady?'flex':'none';
+}
+function openQuests(){
+  try{sfxClick();}catch(e){}
+  updateQuestProgress();
+  renderQuests();
+  document.getElementById('QUESTS_OV').classList.add('on');
+  if(typeof gtag==='function')gtag('event','quests_open');
+}
+function closeQuests(){document.getElementById('QUESTS_OV').classList.remove('on');}
+function renderQuests(){
+  const s=getQuestState();
+  const list=document.getElementById('QUESTS_LIST');
+  list.innerHTML=s.quests.map(q=>{
+    const t=QUEST_TEMPLATES.find(x=>x.id===q.id);
+    if(!t)return '';
+    const isDone=q.progress>=t.target;
+    const pct=Math.min(100,(q.progress/t.target)*100);
+    const claimed=q.claimed;
+    return `<div class="quest-card ${isDone?'done':''}">
+      <div class="quest-icon">${claimed?'✅':isDone?'🎉':'🎯'}</div>
+      <div class="quest-body">
+        <div class="quest-title">${t.title}</div>
+        <div class="quest-desc">${t.desc} · ${q.progress}/${t.target}</div>
+        <div class="quest-prog"><div class="quest-prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="quest-reward" onclick="${isDone&&!claimed?`claimQuest('${q.id}')`:''}" style="${isDone&&!claimed?'cursor:pointer;animation:bnc 1.2s ease-in-out infinite':''}">${claimed?'✓':'+'+t.reward+' 🪙'}</div>
+    </div>`;
+  }).join('');
+  // Tempo rimanente al reset
+  const now=new Date();
+  const tomorrow=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  const rem=tomorrow-now;
+  const h=Math.floor(rem/3600000);
+  const m=Math.floor((rem%3600000)/60000);
+  document.getElementById('QUESTS_RESET').textContent=`⏰ Nuovi obiettivi tra ${h}h ${m}m`;
+}
+function claimQuest(id){
+  const s=getQuestState();
+  const q=s.quests.find(x=>x.id===id);
+  const t=QUEST_TEMPLATES.find(x=>x.id===id);
+  if(!q||!t||q.claimed||q.progress<t.target)return;
+  q.claimed=true;
+  localStorage.setItem(QUEST_KEY,JSON.stringify(s));
+  try{addCoins(t.reward,'quest_'+id);sfxFanfare();confetti();vibrate(80);}catch(e){}
+  showToast('🎯 OBIETTIVO COMPLETATO!<br>+'+t.reward+' monete 🪙','success',2200);
+  renderQuests();
+  updateQuestProgress();
+  if(typeof gtag==='function')gtag('event','quest_claim',{id:id,reward:t.reward});
+}
+// Hook: traccia 10/10 e shares
+const _origShowVerdictQuest=showVerdict;
+showVerdict=function(name,sc){
+  const r=_origShowVerdictQuest(name,sc);
+  if(sc>=10){
+    const k='wdym_perfect_today_'+todayKeyStr();
+    localStorage.setItem(k,String(parseInt(localStorage.getItem(k)||'0')+1));
+  }
+  try{updateQuestProgress();}catch(e){}
+  return r;
+};
+const _origShareAppQuest=(typeof shareApp==='function')?shareApp:null;
+if(_origShareAppQuest){
+  shareApp=function(ch){
+    const k='wdym_shares_today_'+todayKeyStr();
+    localStorage.setItem(k,String(parseInt(localStorage.getItem(k)||'0')+1));
+    try{updateQuestProgress();}catch(e){}
+    return _origShareAppQuest(ch);
+  };
+}
+// Init quest dot
+setTimeout(()=>{try{updateQuestProgress();}catch(e){}},1200);
+
 // V14.6: FORZA cleanup totale toast all'avvio + ad ogni 200ms per prima sec
 (function nukeGhostToasts(){
   function killAll(){
