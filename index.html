@@ -1633,11 +1633,43 @@ body.overlay-open .side-panel{display:none}
     <div class="side-label">QUEST</div>
     <span class="side-badge" id="QUEST_DOT" style="display:none">!</span>
   </div>
+  <div class="side-item" onclick="openTournament()" title="Torneo settimanale">
+    <div class="side-emoji">🏆</div>
+    <div class="side-label">TORNEO</div>
+    <span class="side-badge" id="TOURN_DOT" style="display:none">!</span>
+  </div>
+  <div class="side-item" onclick="playPhraseOfWeek()" title="Frase della settimana">
+    <div class="side-emoji">🌟</div>
+    <div class="side-label">FRASE</div>
+    <span class="side-badge">!</span>
+  </div>
   <div class="side-item locked" onclick="showToast('🎟️ VIP Cards<br>In arrivo nel prossimo update','info',2500)" title="VIP">
     <div class="side-emoji">🎟️</div>
     <div class="side-label">VIP</div>
     <span class="side-coming">SOON</span>
   </div>
+</div>
+
+<!-- TORNEO SETTIMANALE OVERLAY -->
+<div id="TOURN_OV" class="quests-overlay">
+  <div class="story-header" style="position:relative">
+    <div class="story-title" style="background:linear-gradient(135deg,#FFCD3C,#FF4D5E,#FF3D9F);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      font-family:'Lilita One',sans-serif">🏆 TORNEO SETTIMANALE</div>
+    <div class="story-sub" id="TOURN_TIME">⏰ caricamento...</div>
+    <div id="TOURN_RANK" style="display:inline-block;background:#FFCD3C;color:#000;
+      padding:6px 14px;border-radius:100px;border:2.5px solid #000;box-shadow:3px 3px 0 #000;
+      font-family:'Lilita One',sans-serif;font-size:.85rem;margin-top:10px">LA TUA POSIZIONE: #?</div>
+  </div>
+  <div style="background:rgba(0,0,0,.3);border:2.5px solid #000;border-radius:14px;
+    box-shadow:4px 4px 0 #000;padding:12px;width:100%;max-width:480px;margin-bottom:12px;
+    font-size:.78rem;color:#FFF5E4;line-height:1.5;text-align:center">
+    🥇 TOP 1 = <b style="color:#FFCD3C">1000 🪙 + skin Galaxy Guardian 🌌</b><br>
+    🥈 TOP 2 = <b style="color:#FFCD3C">500 🪙</b> · 🥉 TOP 3 = <b style="color:#FFCD3C">200 🪙</b><br>
+    <span style="opacity:.7">Gioca round per accumulare punti!</span>
+  </div>
+  <div id="TOURN_LIST" style="width:100%;max-width:480px"></div>
+  <button class="story-close" onclick="closeTournament()" style="max-width:300px;margin-top:8px">CHIUDI</button>
 </div>
 
 <!-- RUOTA FORTUNA OVERLAY -->
@@ -1700,6 +1732,13 @@ body.overlay-open .side-panel{display:none}
     <div class="onb-globe">🌍</div>
     <div class="onb-title">BENVENUTO!</div>
     <div class="onb-sub">crea il tuo profilo</div>
+    <div style="background:linear-gradient(135deg,#FFCD3C,#FF4D5E);color:#000;
+      border:2.5px solid #000;border-radius:100px;padding:6px 16px;
+      box-shadow:3px 3px 0 #000;margin-bottom:14px;
+      font-family:'Lilita One',sans-serif;font-size:.8rem;letter-spacing:1px;
+      display:inline-block">
+      🎁 PROMO LANCIO: +250 🪙 + AVATAR RARO GRATIS
+    </div>
     <div class="onb-label">👤 Il tuo nickname</div>
     <input type="text" id="ONB_NAME" class="onb-input" placeholder="Es: Mario" maxlength="16">
     <div class="onb-label">🎭 Scegli il tuo avatar</div>
@@ -3372,7 +3411,7 @@ document.addEventListener('touchend',e=>{
 // ─── Service Worker V14.1 — AUTO-UPDATE AGGRESSIVO (zero azione utente) ───
 // Per chi visita per la 1° volta: nessuna cache, vede V14 subito
 // Per chi ha vecchia cache: SW si aggiorna in background + reload silenzioso
-const APP_VERSION='15.0.0';
+const APP_VERSION='16.0.0';
 (function aggressiveAutoUpdate(){
   // 1. Se versione salvata diversa → PULIZIA TOTALE caches + unregister SW vecchi
   const savedVer=localStorage.getItem('wdym_app_version');
@@ -6611,6 +6650,260 @@ if(_origShareAppQuest){
 }
 // Init quest dot
 setTimeout(()=>{try{updateQuestProgress();}catch(e){}},1200);
+
+// ═══════════════════════════════════════════════════════
+// V16 — TORNEO SETTIMANALE + FRASE DELLA SETTIMANA + ONBOARDING 250
+// ═══════════════════════════════════════════════════════
+
+// ─── Utility: settimana ISO ───
+function weekId(d){
+  d=d||new Date();
+  const t=new Date(d);
+  t.setHours(0,0,0,0);
+  t.setDate(t.getDate()-((t.getDay()+6)%7)); // lunedi
+  return t.getFullYear()+'-W'+Math.floor((t.getTime()-new Date(t.getFullYear(),0,1).getTime())/(7*86400000));
+}
+function endOfWeek(){
+  const d=new Date();
+  d.setHours(23,59,59,999);
+  d.setDate(d.getDate()+(7-((d.getDay()+6)%7))-1); // domenica
+  return d;
+}
+function fmtCountdown(ms){
+  if(ms<=0)return 'TERMINATO';
+  const d=Math.floor(ms/86400000);
+  const h=Math.floor((ms%86400000)/3600000);
+  const m=Math.floor((ms%3600000)/60000);
+  if(d>0)return d+'g '+h+'h '+m+'m';
+  return h+'h '+m+'m';
+}
+
+// ─── TORNEO SETTIMANALE ───
+const TOURNAMENT_KEY='wdym_tournament';
+// 15 bot smart con avatar + bandiera + base score variabile per settimana
+const TOURNAMENT_BOTS=[
+  {n:'Luca_IT',     c:'IT',av:'🦊'},
+  {n:'Marco_PT',    c:'PT',av:'🐼'},
+  {n:'Sofia_ES',    c:'ES',av:'🦁'},
+  {n:'Jin_CN',      c:'CN',av:'🐲'},
+  {n:'Hiro_JP',     c:'JP',av:'🥷'},
+  {n:'Pierre_FR',   c:'FR',av:'🥖'},
+  {n:'Hans_DE',     c:'DE',av:'⚙️'},
+  {n:'Olga_RU',     c:'RU',av:'🦅'},
+  {n:'Carlos_MX',   c:'MX',av:'🌮'},
+  {n:'Yuki_JP',     c:'JP',av:'🐯'},
+  {n:'Ahmed_AE',    c:'AE',av:'🐪'},
+  {n:'Priya_IN',    c:'IN',av:'🐘'},
+  {n:'Min_KR',      c:'KR',av:'🐰'},
+  {n:'Eva_IT',      c:'IT',av:'🌟'},
+  {n:'Sara_TR',     c:'TR',av:'🪐'}
+];
+
+function getTournament(){
+  let t;
+  try{t=JSON.parse(localStorage.getItem(TOURNAMENT_KEY)||'null');}catch(e){t=null;}
+  const currentWeek=weekId();
+  if(!t||t.week!==currentWeek){
+    // Nuova settimana: genera bot smart con score random plausibili
+    const seed=parseInt(currentWeek.replace(/\D/g,''))||Date.now();
+    let rng=seed;
+    const next=()=>{rng=(rng*1103515245+12345)&0x7fffffff;return rng/0x7fffffff;};
+    const bots=TOURNAMENT_BOTS.map((b,i)=>{
+      // Score variabile: 80-180 (somma voti tipica settimana)
+      const base=Math.floor(80+next()*100);
+      return {...b,s:base,boost:Math.floor(next()*5)+1}; // boost = quanto cresce al giorno
+    });
+    t={week:currentWeek,bots:bots,userScore:0,startTs:Date.now(),claimed:false};
+    localStorage.setItem(TOURNAMENT_KEY,JSON.stringify(t));
+  }
+  return t;
+}
+function updateBotsDaily(t){
+  // Ogni 24h del torneo, i bot crescono (simulazione "stanno giocando")
+  const daysPassed=Math.floor((Date.now()-t.startTs)/86400000);
+  if(t.lastUpdateDay===daysPassed)return t;
+  t.lastUpdateDay=daysPassed;
+  // Ricalcola: ogni bot = base + boost*giorni + random
+  t.bots.forEach(b=>{
+    if(b._origS===undefined)b._origS=b.s;
+    b.s=Math.floor(b._origS+b.boost*daysPassed+Math.random()*8);
+  });
+  return t;
+}
+function addTournamentScore(amount){
+  const t=getTournament();
+  t.userScore=(t.userScore||0)+amount;
+  localStorage.setItem(TOURNAMENT_KEY,JSON.stringify(t));
+  // Aggiorna badge se utente entra in top 3
+  updateTournamentBadge();
+}
+function getMyTournamentRank(){
+  const t=updateBotsDaily(getTournament());
+  const me={n:(getProfile().nickname||'TU').toUpperCase(),c:'IT',av:'⭐',s:t.userScore,me:true};
+  const all=[...t.bots,me].sort((a,b)=>b.s-a.s);
+  const rank=all.findIndex(x=>x.me)+1;
+  return {rank,all,total:all.length,t};
+}
+function updateTournamentBadge(){
+  const dot=document.getElementById('TOURN_DOT');
+  if(!dot)return;
+  const {rank}=getMyTournamentRank();
+  if(rank<=3){dot.style.display='flex';dot.textContent=rank+'°';}
+  else{dot.style.display='none';}
+}
+// Hook showVerdict per addare punteggio torneo
+const _origShowVerdictTourn=showVerdict;
+showVerdict=function(name,sc){
+  const r=_origShowVerdictTourn(name,sc);
+  if(sc>0)try{addTournamentScore(sc);}catch(e){}
+  return r;
+};
+
+function openTournament(){
+  try{sfxClick();}catch(e){}
+  document.getElementById('TOURN_OV').classList.add('on');
+  renderTournament();
+  if(typeof gtag==='function')gtag('event','tournament_open');
+}
+function closeTournament(){document.getElementById('TOURN_OV').classList.remove('on');}
+function renderTournament(){
+  const {rank,all,t}=getMyTournamentRank();
+  const list=document.getElementById('TOURN_LIST');
+  const top10=all.slice(0,10);
+  list.innerHTML=top10.map((p,i)=>{
+    const isMe=p.me;
+    const isTop=i<3;
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    return `<div style="display:flex;align-items:center;gap:11px;padding:10px 13px;margin-bottom:6px;
+      background:${isMe?'rgba(255,205,60,.15)':'rgba(15,0,48,.7)'};
+      border:2px solid ${isMe?'#FFCD3C':'rgba(155,48,255,.2)'};
+      border-radius:12px;box-shadow:${isMe?'3px 3px 0 #000':'2px 2px 0 #000'};
+      font-family:'Lilita One',sans-serif">
+      <div style="min-width:36px;font-size:1.1rem;text-align:center">${medal}</div>
+      <div style="font-size:1.5rem">${p.av}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.92rem;color:#fff;text-shadow:1px 1px 0 #000">${p.n}${isMe?' (TU)':''}</div>
+        <div style="font-size:.65rem;color:#FFCD3C">${p.c} · ${isTop?'PREMIO!':'in gara'}</div>
+      </div>
+      <div style="font-size:1.1rem;color:#FFCD3C;text-shadow:1px 1px 0 #000">${p.s}</div>
+    </div>`;
+  }).join('');
+  // Tempo rimanente
+  const rem=endOfWeek().getTime()-Date.now();
+  document.getElementById('TOURN_TIME').textContent='⏰ Fine torneo: '+fmtCountdown(rem);
+  document.getElementById('TOURN_RANK').textContent='LA TUA POSIZIONE: #'+rank+' su '+all.length;
+}
+
+// ─── FRASE DELLA SETTIMANA ───
+const PHRASES_OF_WEEK=[
+  {it:'Otorinolaringoiatra molto bravo',lang:'zh-CN'},
+  {it:'Gnocchi al pomodoro',            lang:'ja-JP'},
+  {it:'Bruschetta senza pomodoro',      lang:'ar-SA'},
+  {it:'Sciopero dei pinguini',          lang:'hi-IN'},
+  {it:'Caffè davvero forte',            lang:'ko-KR'},
+  {it:'Lavastoviglie rotta',            lang:'ru-RU'},
+  {it:'Pizza con ananas',               lang:'zh-CN'},
+  {it:'Maglione di lana',               lang:'ja-JP'},
+  {it:'Strofinaccio molto sporco',      lang:'ar-SA'},
+  {it:'Cane con occhiali',              lang:'hi-IN'}
+];
+function getPhraseOfWeek(){
+  const w=weekId();
+  const seed=parseInt(w.replace(/\D/g,''))||0;
+  const idx=seed%PHRASES_OF_WEEK.length;
+  return PHRASES_OF_WEEK[idx];
+}
+function playPhraseOfWeek(){
+  try{sfxClick();}catch(e){}
+  const p=getPhraseOfWeek();
+  // Cerca traduzione nel DB esistente, altrimenti usa la frase come testo
+  let found=null;
+  if(typeof DB!=='undefined'){
+    for(let lv=1;lv<=4;lv++){
+      if(!DB[lv])continue;
+      const m=DB[lv].find(x=>x.it===p.it);
+      if(m){found=m;break;}
+    }
+  }
+  if(!found){
+    // Fallback: usa la frase come italiano + lingua scelta, ma senza traduzione
+    showToast('🌟 Frase della settimana<br>'+p.it,'success',3000);
+    return;
+  }
+  // Setup partita solo con questa frase
+  try{if(typeof cleanGameState==='function')cleanGameState();}catch(e){}
+  G.solo=true;G._isPhraseOfWeek=true;
+  G.players=['TU'];G.scores={'TU':0};
+  G.rounds=1;G.round=1;G.subRound=0;
+  G.chooser=-1;G.firstChooser=0;
+  G.usedPhrases={};G.queue=['TU'];G.pIdx=0;
+  G.phrase=found;
+  G.lang=LANGS.find(l=>l.t===p.lang)||LANGS[0];
+  if(!found.tr[G.lang.t]){
+    const keys=Object.keys(found.tr);
+    G.lang=LANGS.find(l=>l.t===keys[0])||LANGS[0];
+  }
+  G.tran=found.tr[G.lang.t].t;
+  G.phon=found.tr[G.lang.t].p;
+  showListen();
+  if(typeof gtag==='function')gtag('event','phrase_of_week_play');
+}
+// Hook soloFinal per bonus monete x2 sulla frase settimanale
+const _origSoloFinalPhrase=(typeof soloFinal==='function')?soloFinal:null;
+if(_origSoloFinalPhrase){
+  soloFinal=function(){
+    if(G._isPhraseOfWeek){
+      try{
+        const sc=G.scores['TU']||0;
+        if(sc>0)addCoins(sc*2,'phrase_of_week');
+        showToast('🌟 FRASE DELLA SETTIMANA!<br>+'+(sc*2)+' monete bonus 🪙','success',2800);
+      }catch(e){}
+      G._isPhraseOfWeek=false;
+    }
+    return _origSoloFinalPhrase();
+  };
+}
+
+// ─── ONBOARDING REGALO 250 monete (PROMO LANCIO) ───
+const _origOnbFinish=(typeof onbFinish==='function')?onbFinish:null;
+if(_origOnbFinish){
+  onbFinish=function(){
+    try{
+      const name=(document.getElementById('ONB_NAME').value||'').trim();
+      if(name.length<2){showToast('🤔 Scegli almeno 2 caratteri','warn');return;}
+      const av=document.querySelector('#ONB_AVS .onb-av.on')?.dataset.av||'fox';
+      saveProfile({nickname:name,avatar:av});
+      try{
+        const u=getUnlocked();
+        if(!u.includes(av)){u.push(av);localStorage.setItem(UNLOCKED_KEY,JSON.stringify(u));}
+        // BONUS: sblocca anche un avatar RARO random gratis
+        const raros=['pirate','robot','ninja','wizard'];
+        const giftRaro=raros[Math.floor(Math.random()*raros.length)];
+        if(!u.includes(giftRaro)){u.push(giftRaro);localStorage.setItem(UNLOCKED_KEY,JSON.stringify(u));}
+      }catch(e){}
+      localStorage.setItem(EQUIPPED_KEY,av);
+      localStorage.setItem(ONB_KEY,'1');
+      // +250 monete invece di +50 (PROMO LANCIO)
+      const prev=getCoins();
+      localStorage.setItem(COIN_KEY,String(prev+250));
+      document.getElementById('ONB_OV').classList.remove('on');
+      updateCoinDisplay();
+      try{updateStreakBadge();updateDailyCard();}catch(e){}
+      setTimeout(()=>{
+        try{sfxFanfare();confetti();}catch(e){}
+        coinPop('+250');
+        showToast('🎁 BENVENUTO '+name.toUpperCase()+'!<br>+250 monete + AVATAR RARO 🌟','success',3500);
+      },400);
+      if(typeof gtag==='function')gtag('event','onboarding_complete',{nickname:name,avatar:av,bonus:250});
+    }catch(err){
+      console.error('onbFinish v16 error',err);
+      showToast('⚠️ Errore. Riprova!','error');
+    }
+  };
+}
+
+// Init: aggiorna badge torneo all'avvio
+setTimeout(()=>{try{updateTournamentBadge();}catch(e){}},1400);
 
 // V14.6: FORZA cleanup totale toast all'avvio + ad ogni 200ms per prima sec
 (function nukeGhostToasts(){
